@@ -1,0 +1,21 @@
+# Object files
+*.o
+
+# Executables
+ircserv
+
+# Archives & debug
+*.a
+*.dSYM/
+vgcore.*
+
+# Editor/system files
+*~
+.DS_Store
+
+# VSCode configs (optional)
+.vscode/
+
+# Local notes/private (do NOT commit)
+subject_dont_push/
+

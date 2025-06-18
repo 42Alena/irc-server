@@ -1,0 +1,75 @@
+LINKS:
+https://www.varonis.com/blog/netcat-commands 
+https://en.wikipedia.org/wiki/Netcat 
+
+_____NetCat (nc)?
+netcat is a terminal tool to:
+    Connect to TCP/UDP sockets
+    Send raw text or data
+    Test your server without needing a full IRC client
+
+______Use netcat to Test ft_irc Server
+1. Start your IRC server:
+	./ircserv 6667 mypassword
+
+2. Use netcat to connect
+	nc localhost 6667
+3.  Run server + test?
+	-open 2.terminal
+
+Netcat, often abbreviated as nc, is a versatile command-line utility for reading and writing data across network connections using TCP or UDP protocols. It's commonly used for tasks like network debugging, port scanning, file transfers, and even setting up basic chat servers. Think of it as a "Swiss Army knife" for TCP/IP due to its flexibility and various applications. 
+ 
+Client and Server Mode:
+It can act as both a client (connecting to a server) and a server (listening for connections). 
+Port Scanning:
+Netcat can scan for open ports on a target machine, which is useful for security testing and network diagnostics. 
+File Transfer:
+It can be used to transfer files between systems, often with minimal overhead compared to other methods. 
+ Basic Chat Server:
+Netcat can be used to set up simple text-based chat sessions between users. 
+Data Streaming:
+It can stream data, which can be useful for various tasks like monitoring network traffic or sending data to other tools. 
+Back-end Tool:
+Netcat is designed to be a reliable back-end tool, easily integrated with other scripts and programs. 
+
+Examples of Common Uses:
+Checking if a port is open.
+Code
+
+    nc -vz [host] [port]
+
+This command checks if a specific port is open on the given host. -z is used for scanning, and -v for verbose output. Transferring a file. 
+Code
+
+    # Server (listening on port 12345)
+    nc -l 12345 > received_file.txt
+    # Client (connecting and sending the file)
+    nc [server_ip] 12345 < file_to_send.txt
+
+This demonstrates how to send a file from one machine to another using Netcat. Creating a simple chat server. 
+Code
+
+    # Server (listening on port 1234)
+    nc -l -p 1234
+    # Client (connecting to the server)
+    nc [server_ip] 1234
+
+This allows two users to communicate with each other through a simple text-based chat. 
+Alternatives:
+While Netcat is powerful, other tools like socat offer even more advanced features and flexibility for network manipulation. Ncat, a project by Nmap, is another alternative that builds upon Netcat's functionality. 
+
+Netcat - Wikipedia
+Netcat ist ein typisches Unix-Programm, das die grundlegende Unix-Philosophie implementiert. Insbesondere arbeitet Netcat mit der ...
+Wikipedia
+Was ist Netcat? - IONOS
+24 Jun 2022 — Netcat ist ein Befehlszeilentool, das im Netzwerk für das Schreiben und Lesen von Daten zuständig ist. Für den Datenaus...
+IONOS
+Netcat Command in Linux: A Complete Guide with Examples
+11 Mar 2025 — What is Netcat Command in Linux? Netcat (nc) is a command-line utility that can read and write data across a network co...
+CyberPanel
+
+AI responses may include mistakes. Learn more
+Netcat
+Wikipedia
+https://en.wikipedia.org › wiki › Netcat
+netcat (often abbreviated to nc) is a computer networking utility for reading from and writing to network connections using TCP or UDP.

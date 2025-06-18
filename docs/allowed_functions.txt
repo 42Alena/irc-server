@@ -1,0 +1,86 @@
+
+ 1. Socket Creation & Setup
+| Function       | Purpose                              | Header           |
+| -------------- | ------------------------------------ | ---------------- |
+| `socket()`     | Create a new socket                  | `<sys/socket.h>` |
+| `setsockopt()` | Set socket options (e.g., reuseaddr) | `<sys/socket.h>` |
+| `bind()`       | Attach socket to IP/port             | `<sys/socket.h>` |
+| `listen()`     | Start listening for connections      | `<sys/socket.h>` |
+| `accept()`     | Accept new client connection         | `<sys/socket.h>` |
+| `connect()`    | Connect to a remote socket           | `<sys/socket.h>` |
+| `close()`      | Close a file/socket descriptor       | `<unistd.h>`     |
+ How to use:
+
+int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+bind(sockfd, (sockaddr*)&addr, sizeof(addr));
+listen(sockfd, SOMAXCONN);
+int client_fd = accept(sockfd, NULL, NULL);
+_________________________-
+ 2. Address Resolution & IP Handling
+| Function           | Purpose                            | Header           |
+| ------------------ | ---------------------------------- | ---------------- |
+| `gethostbyname()`  | Resolve hostname to IP             | `<netdb.h>`      |
+| `getaddrinfo()`    | High-level IP/port resolution      | `<netdb.h>`      |
+| `freeaddrinfo()`   | Free `getaddrinfo()` memory        | `<netdb.h>`      |
+| `getprotobyname()` | Get protocol (e.g., TCP) info      | `<netdb.h>`      |
+| `getsockname()`    | Get local socket address           | `<sys/socket.h>` |
+| `inet_addr()`      | Convert IP string to binary (IPv4) | `<arpa/inet.h>`  |
+| `inet_ntoa()`      | Convert binary IP to string        | `<arpa/inet.h>`  |
+
+ How to use:
+
+struct sockaddr_in addr;
+addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+Or:
+
+struct addrinfo hints, *res;
+getaddrinfo("localhost", "6667", &hints, &res);
+freeaddrinfo(res);
+
+___________ 3. Data Transfer
+| Function             | Purpose               | Header           |
+| -------------------- | --------------------- | ---------------- |
+| `recv()`             | Read data from socket | `<sys/socket.h>` |
+| `send()`             | Send data to socket   | `<sys/socket.h>` |
+| `read()` / `write()` | Alternative to above  | `<unistd.h>`     |
+
+How to use:
+
+char buffer[1024];
+ssize_t bytes = recv(fd, buffer, sizeof(buffer), 0);
+send(fd, "Hello\n", 6, 0);
+
+
+________ 4. Endianness Conversion
+| Function  | Purpose                        | Header          |
+| --------- | ------------------------------ | --------------- |
+| `htons()` | Host to network short (16-bit) | `<arpa/inet.h>` |
+| `htonl()` | Host to network long (32-bit)  | `<arpa/inet.h>` |
+| `ntohs()` | Network to host short          | `<arpa/inet.h>` |
+| `ntohl()` | Network to host long           | `<arpa/inet.h>` |
+
+ 5. Signals & FD Flags
+ Example to set non-blocking:
+
+fcntl(fd, F_SETFL, O_NONBLOCK);
+
+
+________ 6. File Descriptors & Polling
+| Function  | Purpose                | Header         |
+| --------- | ---------------------- | -------------- |
+| `poll()`  | Monitor multiple FDs   | `<poll.h>`     |
+| `lseek()` | Move read/write offset | `<unistd.h>`   |
+| `fstat()` | Get file info from FD  | `<sys/stat.h>` |
+
+ Summary Table
+| Group          | Functions                                                                                  | Headers                        |
+| -------------- | ------------------------------------------------------------------------------------------ | ------------------------------ |
+| Sockets        | `socket`, `bind`, `listen`, `accept`, `connect`, `close`, `setsockopt`, `getsockname`      | `<sys/socket.h>`, `<unistd.h>` |
+| IP/Host        | `gethostbyname`, `getaddrinfo`, `freeaddrinfo`, `inet_addr`, `inet_ntoa`, `getprotobyname` | `<netdb.h>`, `<arpa/inet.h>`   |
+| Data Transfer  | `recv`, `send`, `read`, `write`                                                            | `<sys/socket.h>`, `<unistd.h>` |
+| Byte Order     | `htons`, `ntohs`, `htonl`, `ntohl`                                                         | `<arpa/inet.h>`                |
+| Signals        | `signal`, `sigaction`                                                                      | `<signal.h>`                   |
+| FD Flags       | `fcntl`                                                                                    | `<fcntl.h>`                    |
+| Polling & Stat | `poll`, `lseek`, `fstat`                                                                   | `<poll.h>`, `<sys/stat.h>`     |

@@ -1,0 +1,11 @@
+ Step-by-step Implementation Roadmap
+✅ Step	Description
+✅ main() & Server class OCF	
+▶️ Server::run()	Setup listening socket, poll loop
+👤 Client class	Track nickname, username, socket, registration status
+📡 Command Parser	Handle IRC commands (PASS, NICK, USER, JOIN, etc.)
+💬 Channel logic	Implement JOIN, PRIVMSG, TOPIC, KICK...
+⚠️ Error handling	Invalid commands, wrong password, duplicate nicknames
+🔒 Password protection	Require client to send correct PASS before continuing
+🧪 Test with netcat, irssi, or weechat	Connect with real IRC clients
+📃 Subject compliance check	Make sure all mandatory commands and behaviors are implemented

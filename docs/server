@@ -1,0 +1,11 @@
+SOURCES:
+https://beej.us/guide/bgnet/html/split-wide/system-calls-or-bust.html#socket 
+
+https://man7.org/linux/man-pages/man2/socket.2.html
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int socket(int domain, int type, int protocol); 
+
+
