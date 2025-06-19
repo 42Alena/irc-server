@@ -34,7 +34,7 @@ re:  fclean all
 #_________BUILD+RUN programm with ./ircserv <port> <password>
 # run: fclean  $(NAME)
 # 	clear
-# 	@echo "❌ Missing args! Use: make runpp"
+# 	@echo " Missing args! Use: make runpp"
 # 	-./$(NAME) 
 
 #_________BUILD+RUN programm with ./ircserv <port> <password>
