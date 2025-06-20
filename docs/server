@@ -9,3 +9,50 @@ https://man7.org/linux/man-pages/man2/socket.2.html
 int socket(int domain, int type, int protocol); 
 
 
+______POLL________________
+https://man7.org/linux/man-pages/man2/poll.2.html 
+
+SYNOPSIS        
+       #include <poll.h>
+       int poll(struct pollfd *fds, nfds_t nfds, int timeout);
+
+DESCRIPTION  
+
+       poll()  waits for one of a   set of file descriptors to become ready to perform I/O. 
+
+       The set of file descriptors to be monitored is specified in the
+       fds argument, which is an array of structures of the following
+       form:
+
+           struct pollfd {
+               int   fd;         /* file descriptor */
+               short events;     /* requested events */
+               short revents;    /* returned events */
+           };
+
+        fd = file descriptor  open file.  
+        '-'  = corresponding events field is ignored + revents field = 0.  
+        //(This provides an easy way of  ignoring a file descriptor for a single poll() call:
+       //  simply set   the fd field to its bitwise complement.)
+
+       "events"- input  = bit mask specifying 
+       the  events the application is interested in for the     fd. 
+        This field may be specified as zero,
+         in which case the only  events that can be returned
+          in revents are POLLHUP, POLLERR, and       POLLNVAL (see below).
+
+       "revents" - output, filled by the kernel  with  actually occurred events.  
+       The bits returned in   revents can include any of those specified in events, 
+       or one of   the values POLLERR, POLLHUP, or POLLNVAL. 
+        (These three bits are    meaningless in the events field,
+         and will be set in the revents
+       field whenever the corresponding condition is true.)
+
+_____  short revents;    /* returned events */ ________
+
+POLLIN      |There is data to read.     | => Accept or read from client
+POLLHUP	    |Client disconnected    	|=> Close socket and clean up
+POLLERR	    |Error on socket    	    | => Close and maybe log error
+POLLNVAL	|Invalid socket (closed/..) | => Remove from _poll_fds
+
+____________
