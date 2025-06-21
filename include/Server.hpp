@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/20 22:35:16 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/21 09:39:38 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,9 @@
 #include <sys/types.h> //  ssize_t
 #include <unistd.h>	   //  read(), close()
 
+#include <sys/socket.h> //accept()
+#include <netinet/in.h> // struct sockaddr_in 
+
 #include "Client.hpp"
 
 class Server
@@ -45,8 +48,8 @@ class Server
 private:
 	int _port;
 	std::string _password;
-	int _server_fd; // sserver socket()
-	std::vector<struct pollfd> _poll_fds;
+	int _serverFd; // sserver socket()
+	std::vector<struct pollfd> _pollFds;
 
 	std::map<int, Client> _clients;
 

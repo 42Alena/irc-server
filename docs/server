@@ -53,6 +53,52 @@ _____  short revents;    /* returned events */ ________
 POLLIN      |There is data to read.     | => Accept or read from client
 POLLHUP	    |Client disconnected    	|=> Close socket and clean up
 POLLERR	    |Error on socket    	    | => Close and maybe log error
-POLLNVAL	|Invalid socket (closed/..) | => Remove from _poll_fds
+POLLNVAL	|Invalid socket (closed/..) | => Remove from _pollFds
 
-____________
+____________ACCEPT()_____________
+
+       int accept(int sockfd, struct sockaddr *_Nullable restrict addr,
+                  socklen_t *_Nullable restrict addrlen);
+https://man7.org/linux/man-pages/man2/accept.2.html
+
+The accept() system call is used with connection-based socket  types (SOCK_STREAM, SOCK_SEQPACKET). 
+It extracts the first   connection request on the queue of pending connections 
+for the  listening socket, sockfd, creates a new connected socket, and
+returns a new file descriptor referring to that socket.  The newly
+created socket is not in the listening state.  The original socket
+sockfd is unaffected by this call.
+
+
+https://www.ibm.com/docs/pt-br/zos/2.4.0?topic=functions-accept-accept-new-connection-socket 
+       Example
+The following are two examples of the accept() call. In the first, the caller wishes to have the requester's address returned. In the second, the caller does not wish to have the requester's address returned.
+
+int clientsocket;
+int s;
+struct sockaddr clientaddress;
+int address_len;
+int accept(int s, struct sockaddr *addr, int *address_len);
+/* socket(), bind(), and listen() 
+have been called */
+/* EXAMPLE 1: I want the address now */
+address_len = sizeof(clientaddress);
+clientsocket = accept(s, &clientaddress, &address_len);
+
+
+
+___STRUCT SOCKADDRESS___________
+https://man7.org/linux/man-pages/man3/sockaddr.3type.html 
+
+  Internet domain sockets
+       #include <netinet/in.h>
+
+       struct sockaddr_in {
+           sa_family_t     sin_family;     /* AF_INET */
+           in_port_t       sin_port;       /* Port number */
+           struct in_addr  sin_addr;       /* IPv4 address */
+       };
+
+       socklen_t
+              Describes the length of a socket address.  This is an
+              integer type of at least 32 bits.
+
