@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42.fr>          +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/21 10:00:40 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/23 18:42:42 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,111 +65,119 @@ poll - wait for some event on a file descriptor https://man7.org/linux/man-pages
 
 	accept -  a connection on a socket https://man7.org/linux/man-pages/man2/accept.2.html
 
-
+socket()	"Failed to create server socket"
+bind()	"Failed to bind server socket to address"
+listen()	"Failed to listen for incoming connections"
+accept()	"Failed to accept new client connection"
+fcntl()	"Failed to set socket to non-blocking mode"
 */
 int Server::run()
 {
-	_serverFd = socket(AF_INET, SOCK_STREAM, 0); // socket(Ipv4,TCP, default) Ret: fd||-1 +errno
-	if (_serverFd == -1)
-		throw std::runtime_error(std::string("Failed Socket creation: ") + strerror(errno));
+	// (socket) Create server socket with TCP (SOCK_STREAM) over IPv4 (AF_INET)
+	_serverFd = socket(AF_INET, SOCK_STREAM, 0);
+	checkResult(_serverFd, "SERVER: Failed to create server socket with TCP");
 
+	// (setsockopt) Allow immediate reuse of port (SO_REUSEADDR) to avoid 'Address already in use' on restart
 	int enableReuseAddress = 1;
-	//(socket fd,socket layer(not tcp), reuse port, &option, size (option)). ret 0|| -1 +errno
-	int setSocketOptionResult = setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR,
-										   &enableReuseAddress, sizeof(enableReuseAddress));
-	if (setSocketOptionResult == -1)	
-		throw std::runtime_error("Failed: set Socket Option");
+	int serverSockOptResult = setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR, &enableReuseAddress, sizeof(enableReuseAddress));
+	checkResult(serverSockOptResult, "SERVER: Failed to set server socket option SO_REUSEADDR");
 
+	// (fcntl) Set server socket to non-blocking mode (O_NONBLOCK) so poll() doesn't block indefinitely
 	int serverFileControlResult = fcntl(_serverFd, F_SETFL, O_NONBLOCK);
-	if (serverFileControlResult == -1)	
-		throw std::runtime_error(std::string("Failed set file control: ") + strerror(errno));
-	
+	checkResult(serverFileControlResult, "SERVER: Failed to set server socket to non-blocking mode");
+
+	// (sockaddr_in) Define server address for IPv4 (AF_INET), bind to all interfaces (INADDR_ANY) and target port
 	struct sockaddr_in serverAddress;
-	serverAddress.sin_family = AF_INET;			// IPv4
-	serverAddress.sin_port = htons(_port);		// convert port to network byte order
-	serverAddress.sin_addr.s_addr = INADDR_ANY; // bind to all interfaces (0.0.0.0)
+	serverAddress.sin_family = AF_INET;
+	serverAddress.sin_port = htons(_port);
+	serverAddress.sin_addr.s_addr = INADDR_ANY;
 
-	int bindResult = bind(_serverFd, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
-	if (bindResult == -1)
-		throw std::runtime_error(std::string("Failed to bind: ") + strerror(errno));
-	
+	// (bind) Bind server socket to IP/Port for incoming TCP connections
+	int serverBindResult = bind(_serverFd, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
+	checkResult(serverBindResult, "SERVER: Failed to bind server socket to port " + std::to_string(_port));
 
-	int listenResult = listen(_serverFd, SOMAXCONN); //( ,(backlog=maximum number of pending connections= SOMAXCONN=128))
-	if (listenResult == -1)	
-		throw std::runtime_error(std::string("Failed to listen: ") + strerror(errno));
-	
+	// (listen) Start listening for incoming TCP connections with max queue (SOMAXCONN)
+	int serverListenResult = listen(_serverFd, SOMAXCONN);
+	checkResult(serverListenResult, "SERVER: Failed to listen on server port " + std::to_string(_port));
 
-	// poll(struct pollfd *fds,number fds, timeout=secToWait=0=NonBlocking=returnImmediatly). ret>=0 || -1 errno
-	//.data() comes from  <vector>. Ret:  a pointer to the first element (T*)||  NULL if empty.
-	// number fds: _pollFds.size()
-	int pollResult = poll(_pollFds.data(), _pollFds.size(), 0);
-	if (pollResult == -1)	
-		throw std::runtime_error(std::string("Failed to wait for event with  poll(): ") + strerror(errno));
-	
+	// (pollfd) Register server socket with poll() to monitor for new TCP connections (POLLIN)
+	std::cout << "SERVER: Registering server socket with poll() to monitor for new TCP connections..." << std::endl;
+	struct pollfd serverPollFd;
+	serverPollFd.fd = _serverFd;
+	serverPollFd.events = POLLIN;
+	serverPollFd.revents = 0;
+	_pollFds.push_back(serverPollFd);
 
-	struct pollfd server_pollfd;
-	server_pollfd.fd = _serverFd;
-	server_pollfd.events = POLLIN; // POLLIN - There is data to read
-	server_pollfd.revents = 0;	   // 0 =poll(0fill with result)
-
-	_pollFds.push_back(server_pollfd);
-
-	//  Check which fds have events
-	nfds_t fdIndex = 0;
-	while (fdIndex < _pollFds.size())
+	// (loop) Start main server loop to handle events
+	while (true)
 	{
+		// (poll) Wait for events on all monitored file descriptors
+		int serverPollResult = poll(_pollFds.data(), _pollFds.size(), 0);
+		checkResult(serverPollResult, "SERVER: Failed to poll() while waiting for events");
 
-		if (_pollFds[fdIndex].revents & POLLIN)
+		nfds_t fdIndex = 0;
+		while (fdIndex < _pollFds.size())
 		{
-			char buf[10];
-			ssize_t readBytes = read(_pollFds[fdIndex].fd, buf, sizeof(buf));
-			if (readBytes == -1)
-				throwRuntimeErr("read"); // Exit if read fails
-			fdIndex++;
-			printf("   Read %zd bytes: %.*s\n", readBytes, (int)readBytes, buf); // Show what was read
-
-			// client
-			if (_pollFds[fdIndex].fd == _serverFd)
+			// Check for readable events
+			if (_pollFds[fdIndex].fd == _serverFd && (_pollFds[fdIndex].revents & POLLIN))
 			{
-				int clientFd;
+				// (accept) Accept new incoming TCP connection
 				struct sockaddr_in clientAddress;
 				socklen_t clientAddressrLen = sizeof(clientAddress);
-				clientFd = accept(_serverFd,
-								  reinterpret_cast<struct sockaddr *>(&clientAddress), // Convert sockaddr_in* to sockaddr*
-								  &clientAddressrLen);
+				int clientFd = accept(_serverFd, reinterpret_cast<struct sockaddr *>(&clientAddress), &clientAddressrLen);
+				checkResult(clientFd, "SERVER: Failed to accept new TCP connection");
 
-				if (clientFd == -1)				
-					throwRuntimeErr("creating client fd");
-				
-				int clientFileControlResult = fcntl(_serverFd, F_SETFL, O_NONBLOCK);
-				if (clientFileControlResult == -1)				
-					throw std::runtime_error(std::string("Failed set client file control: ") + strerror(errno));
-				
+				// (fcntl) Set client socket to non-blocking mode
+				int clientFileControlResult = fcntl(clientFd, F_SETFL, O_NONBLOCK);
+				checkResult(clientFileControlResult, "SERVER: Failed to set client socket to non-blocking mode");
+
+				// (pollfd) Add new client to poll() monitoring
+				struct pollfd clientPollFd;
+				clientPollFd.fd = clientFd;
+				clientPollFd.events = POLLIN;
+				clientPollFd.revents = 0;
+
+				// (map) Add new client to _clients tracking
+				if (_clients.find(clientFd) != _clients.end())
+				{
+					logErrAndThrow("SERVER: Logic error - client fd already exists in _clients map");
+				}
+				else
+				{
+					_clients[clientFd] = Client(clientFd, "", "");
+					std::cout << "SERVER: New client connected on fd " << clientFd << std::endl;
+				}
+
+				_pollFds.push_back(clientPollFd);
+			}
+			else if (_pollFds[fdIndex].revents & POLLIN)
+			{
+				// (read) Incoming data from client over TCP connection
+				char buf[10];
+				ssize_t readBytes = read(_pollFds[fdIndex].fd, buf, sizeof(buf));
+				checkResult(readBytes, "SERVER: Failed to read from client TCP connection");
+				std::cout << "SERVER: Received " << readBytes << " bytes from client fd " << _pollFds[fdIndex].fd << std::endl;
+				fdIndex++;
+			}
+			else if (_pollFds[fdIndex].revents & (POLLHUP | POLLERR))
+			{
+				// (close) Handle client disconnection or socket error
+				int fd = _pollFds[fdIndex].fd;
+				int fdCloseResult = close(fd);
+				checkResult(fdCloseResult, "SERVER: Failed to close client TCP connection on fd " + std::to_string(fd));
+				std::cout << "SERVER: Closed client TCP connection on fd " << fd << std::endl;
+
+				_clients.erase(fd);
+				_pollFds.erase(_pollFds.begin() + fdIndex);
+			}
+			else
+			{
+				fdIndex++;
 			}
 		}
-	else if (_pollFds[fdIndex].revents & (POLLHUP | POLLERR)) // error socket || client disconnected
-	{
-
-		printf("    Closing fd %d\n", _pollFds[fdIndex].fd);
-		if (close(_pollFds[fdIndex].fd) == -1)
-		{
-			_pollFds.erase(_pollFds.begin() + fdIndex);
-			throwRuntimeErr("close");
-		}
 	}
-	else
-	{
-		fdIndex++;
-	}
-}
 
-/*
-Infinite loop with poll()
-If _serverFd is ready → accept() a new connection
-Add the new client to _clients and _pollFds
-If a client socket is ready → read or disconnect */
-
-return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
 
 //________________getter_________________________________
@@ -195,7 +203,20 @@ std::ostream &operator<<(std::ostream &os, const Server &o)
 }
 
 //______ HELPER FUNCTIONS____________________
-void Server::throwRuntimeErr(const std::string &errMsg)
+
+void Server::checkResult(int result, const std::string &errMsg)
 {
-	throw std::runtime_error("Error in " + errMsg + " => " + std::string(strerror(errno)));
+	if (result == -1)
+		logErrAndThrow(errMsg);
+}
+
+void Server::logErrAndThrow(const std::string &msg)
+{
+	std::cerr << ESRV << msg << RST << std::endl;
+	throw std::runtime_error("SERVER: failed to " + msg + std::string(strerror(errno)));
+}
+
+void Server::logInfo(const std::string &msg)
+{
+	std::cout << BLU << SRV << "SERVER:  " << msg << RST << std::endl;
 }

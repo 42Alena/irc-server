@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/23 14:36:09 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/06/23 19:11:54 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,15 @@
 // from  man poll()
 #include <fcntl.h>	   //  open()
 #include <poll.h>	   //  poll() and struct pollfd
-#include <stdio.h>	   //  printf(), fprintf()
+#include <stdio.h>	   //  std::cout <<(), fstd::cout <<()
 #include <stdlib.h>	   //  malloc(), exit()
 #include <sys/types.h> //  ssize_t
 #include <unistd.h>	   //  read(), close()
 
 #include <sys/socket.h> //accept()
-#include <netinet/in.h> // struct sockaddr_in 
+#include <netinet/in.h> // struct sockaddr_in
 
+#include "colors.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
 
@@ -81,6 +82,10 @@ private:
 	void handleTopic(Client* client, const std::vector<std::string>& params);
 	void handleMode(Client* client, const std::vector<std::string>& params);
 	
+	void checkResult(int result, const std::string &errMsg);
+
+	void logInfo(const std::string &msg);
+	void logErrAndThrow(const std::string &msg);
 
 public:
 	Server();
