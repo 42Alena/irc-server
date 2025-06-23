@@ -6,7 +6,7 @@
 /*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/23 14:43:18 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/06/23 17:11:52 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ class Channel
 		std::vector<Client*> _members;
 		std::vector<Client*> _operators;
 		std::map<char, bool> _modes;
-		int _limit;
+		std::string _key;
+		int _userLimit;
 
 	public:
 		Channel();// Default constructor
