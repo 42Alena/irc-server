@@ -6,7 +6,7 @@
 /*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/23 14:57:38 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/06/23 17:24:48 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,4 +50,21 @@ bool Channel::isOperator(Client* client) const {
 	//return true if _client is in _operators vector
 }
 
+//Function to check if a client is a member of the channel
+bool Channel::hasMembers(Client* client) const{
+	for(std::vector<Client*>::const_iterator it = _members.begin(); it != _members.end(); ++it){
+		if (*it == client){
+			return true; // If the client is found in the members vector, return true
+		}
+		return false; // If the client is not found, return false
+	}
+}
 
+//Function to check if a client is an operator of the channel
+bool Channel::isOperator(Client* client) const {
+	for(std::vector<Client*>::const_iterator it = _operators.begin(); it != _operators.end(); ++it){
+		if (*it == client)
+			return true; // If the client is found in the operators vector, return true
+		return false; // If the client is not found, return false
+	}
+}
