@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/21 09:39:38 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/23 14:36:09 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@
 #include <netinet/in.h> // struct sockaddr_in 
 
 #include "Client.hpp"
+#include "Channel.hpp"
 
 class Server
 {
@@ -51,9 +52,35 @@ private:
 	int _serverFd; // sserver socket()
 	std::vector<struct pollfd> _pollFds;
 
-	std::map<int, Client> _clients;
+	std::map<int, Client*> _clients;
+	//adding the channels map to manage channels from server
+	std::map<std::string, Channel*> _channels;
 
-	static void Server::throwRuntimeErr(const std::string& errMsg) ;
+	static void Server::throwRuntimeErr(const std::string& errMsg);
+
+	//Declaring some methods that the Server class will use internally
+	void acceptNewClient(); //To accept new clients
+	void removeClient(int fd); //to remove a client from the server
+	void handleClientInput(int fd); //to handle input from a client
+	void sendToClient(int fd, const std::string& message); //to send a message to a specific client
+	void broadcastToChannel(const std::string& channel, const std::string& msg, int except_fd = -1);// to send a message to all the channel members
+
+	//Handle commands from the clients: these are the methods that will handle the commands sent by the clients
+	// These methods will be called from handleCommand() method
+	// They will parse the parameters and execute the command
+	// they will also send the response to the client
+	// and broadcast the response to the channel members if needed
+	void handleCommand(Client* client, const std::string& line);
+	void handlePass(Client* client, const std::vector<std::string>& params);
+	void handleNick(Client* client, const std::vector<std::string>& params);
+	void handleUser(Client* client, const std::vector<std::string>& params);
+	void handleJoin(Client* client, const std::vector<std::string>& params);
+	void handlePrivateMessage(Client* client, const std::vector<std::string>& params);
+	void handleKick(Client* client, const std::vector<std::string>& params);
+	void handleInvite(Client* client, const std::vector<std::string>& params);
+	void handleTopic(Client* client, const std::vector<std::string>& params);
+	void handleMode(Client* client, const std::vector<std::string>& params);
+	
 
 public:
 	Server();
