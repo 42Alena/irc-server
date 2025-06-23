@@ -6,7 +6,7 @@
 /*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/23 14:43:18 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/06/23 17:24:09 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,13 @@
 class Channel 
 {
 	private:
-		std::string _name;
-		std::string _topic;
-		std::vector<Client*> _members;
-		std::vector<Client*> _operators;
-		std::map<char, bool> _modes;
-		int _limit;
+		std::string _name; // Name of the channel, must start with '#'
+		std::string _topic; // Topic of the channel
+		std::vector<Client*> _members; // Vector to store members of the channel
+		std::vector<Client*> _operators; // Vector to store operators of the channel
+		std::map<char, bool> _modes; // Map to store channel modes (e.g., 'i' for invite-only, 't' for topic settable by operators only)
+		std::string _key; // Key for the channel, if set
+		int _userLimit; // Limit on the number of users in the channel
 
 	public:
 		Channel();// Default constructor
