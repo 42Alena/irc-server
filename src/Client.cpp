@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/19 12:03:39 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/23 16:56:42 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,22 @@ Client &Client::operator=(const Client &o)
 Client::~Client() {}
 
 //________________GETTERs_________________________________
+//to get the file descriptor of the client
 int Client::getFd() const
 {
 	return _fd;
 }
 
-const std::string &Client::getNickname() const
+//to get the nickname of the client
+std::string Client::getNickname() const
 {
-	return _nickname;
+	return _nickName;
+}
+
+//to get the username of the client
+std::string Client::getUser() const
+{
+	return _user;
 }
 
 const std::string &Client::getReceivedData() const
@@ -54,11 +62,19 @@ const std::string &Client::getReceivedData() const
 }
 //________________SETTERs_________________________________
 
+//to set the nickname to the client
 void Client::setNickname(const std::string &nickname)
 {
-	_nickname = nickname;
+	_nickName = nickname;
 }
 
+//to set the user to the client
+void Client::setUser(const std::string &user)
+{
+	_user = user;
+}
+
+//to append the received data from the client to the existing data
 void Client::appendToReceivedData(const std::string &chunk)
 {
 	_receivedData += chunk;
@@ -67,6 +83,40 @@ void Client::appendToReceivedData(const std::string &chunk)
 void Client::clearReceivedData()
 {
 	_receivedData.clear();
+}
+
+//join a channel
+void Client::joinChannel(const std::string& channel){
+	_channels.push_back(channel);
+}
+
+//leave a channel
+void Client::leaveChannel(const std::string& channel){
+	//ToDo...
+	//...
+	//remove the channel from the vector of channels
+	//...
+	//ToDo...
+}
+
+
+//Add an operator to the channel
+void Client::addOperator(const std::string& channel){
+	_channelOps[channel] = true;
+}
+
+//Remove an operator from the channel
+void Client::removeOperator(const std::string& channel){
+	_channelOps[channel] = false;
+}
+
+//check if a client is an operator in a channel
+bool Client::isOperator(const std::string& channel) const{
+	// Check if the channel exists in the map
+	if (_channelOps.find(channel) != _channelOps.end()){
+		return _channelOps.at(channel);
+	}
+	return false;
 }
 
 //________________OTHER FUNCTIONS_________________________________
