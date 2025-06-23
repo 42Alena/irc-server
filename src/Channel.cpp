@@ -6,7 +6,7 @@
 /*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/23 13:15:28 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/06/23 14:57:38 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,11 @@ void Channel::setTopic(const std::string& topic) {_topic = topic;}
 void Channel::setMode(char mode, bool enable) {_modes[mode] = enable;}
 
 //Function to set a key for the channel
+//need to define a getter for the key since is private attribute
 void Channel::setKey(const std::string& key) {_key = key;}
 
 //Function to set a limit for the channel
+//need to define a getter for the userlimit since is private attribute
 void Channel::setLimit(int limit) {_userLimit = limit;}
 
 //Function to check if a client is a member of the channel
