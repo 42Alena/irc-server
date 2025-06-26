@@ -27,4 +27,4 @@ jobs:
         run: ls -l ircserv
 
       - name: Test server run
-        run: make runpp
+        run: export TERM=xterm && make runpp
