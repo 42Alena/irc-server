@@ -3,24 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/23 16:56:42 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:07:46 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Client.hpp"
 
-Client::Client() : _fd(-1), _nickname(""), _receivedData("") {}
+Client::Client() : _fd(-1), _nickName(""), _receivedData("") {}
 
 Client::Client(int fd) : _fd(fd) {}
 
 Client::Client(int fd, std::string nickname, std::string receivedData) : _fd(fd),
-																		 _nickname(nickname),
+																		 _nickName(nickname),
 																		 _receivedData(receivedData) {}
 Client::Client(const Client &o) : _fd(o._fd),
-								  _nickname(o._nickname),
+								  _nickName(o._nickName),
 								  _receivedData(o._receivedData)
 {
 }
@@ -30,7 +30,7 @@ Client &Client::operator=(const Client &o)
 	if (this != &o)
 	{
 		_fd = o._fd;
-		_nickname = o._nickname;
+		_nickName = o._nickName;
 		_receivedData = o._receivedData;
 	}
 	return *this;
@@ -92,6 +92,8 @@ void Client::joinChannel(const std::string& channel){
 
 //leave a channel
 void Client::leaveChannel(const std::string& channel){
+	
+	(void) channel;
 	//ToDo...
 	//...
 	//remove the channel from the vector of channels

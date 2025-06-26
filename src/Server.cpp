@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/23 18:42:42 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:04:38 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ int Server::run()
 				}
 				else
 				{
-					_clients[clientFd] = Client(clientFd, "", "");
+					_clients[clientFd] = new Client(clientFd, "", "");
 					std::cout << "SERVER: New client connected on fd " << clientFd << std::endl;
 				}
 

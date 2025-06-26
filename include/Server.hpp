@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/23 19:11:54 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:03:38 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ private:
 	//adding the channels map to manage channels from server
 	std::map<std::string, Channel*> _channels;
 
-	static void Server::throwRuntimeErr(const std::string& errMsg);
+	static void throwRuntimeErr(const std::string& errMsg);
 
 	//Declaring some methods that the Server class will use internally
 	void acceptNewClient(); //To accept new clients

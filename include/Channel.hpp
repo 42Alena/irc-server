@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/23 17:24:09 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:10:22 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,11 @@
 
 #include <string>
 #include <vector>
+#include "colors.hpp" /// Alena: replaced hardcoded color defines with colors.hpp
+#include <map>  // Alena: added for map
 
-#define BLUE "\e[1;94m"
-#define RED "\e[1;91m"
-#define GREEN "\e[1;92m"
-#define RESET "\033[0m"
-
+// TODO (Alena): added forward declaration Client class before use it
+class Client;
 class Channel 
 {
 	private:
@@ -33,9 +32,15 @@ class Channel
 		int _userLimit; // Limit on the number of users in the channel
 
 	public:
-		Channel();// Default constructor
-		Channel(const std::string& name); // Constructor with channel name
-		~Channel();// Destructor
+		//TODO (Alena): Function definition for 'Channel' not found.
+		//Channel();// Default constructor
+		
+		// TODO (Alena): commented out, _limit is not declared in Channel.cpp, causes error C/C++(292)
+		//Channel(const std::string& name); // Constructor with channel name
+		
+		//TODO (Alena): Function definition for '~Channel' not found.
+		//~Channel();// Destructor
+		
 		void addUser(Client* client);
 		void removeUser(Client* client);
 		void setTopic(const std::string& topic);

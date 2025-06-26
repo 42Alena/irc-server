@@ -1,6 +1,6 @@
 NAME     =  ircserv
 CXX       =  c++
-CXXFLAGS   =  -Wall -Wextra -Werror -std=c++98
+CXXFLAGS   =  -Wall -Wextra -Werror -std=c++98 -I./include
 # Default linker flags (empty by default)
 LDFLAGS =
 
@@ -63,4 +63,4 @@ fdebug: re
 	./$(NAME)
 
 
-.PHONY: all clean fclean re run fdebug vdebug
+.PHONY: all clean fclean re runpp fdebug vdebug
