@@ -42,12 +42,12 @@ re:  fclean all
 runpp: fclean $(NAME)
 	clear
 	@echo "Starting server in background..."
-	./$(NAME) 6667 myPassword & echo $$! > .server_pid
-	sleep 10
+	./$(NAME) 6667 myPassword & echo $$ > .server_pid
+	sleep 5
 	@echo "Connecting with netcat..."
 	- nc -v localhost 6667; echo "nc exit code: $$?"
 	@echo "Running server for 20sec  ..."
-	sleep 10
+	sleep 5
 	@echo "Killing server..."
 	- kill `cat .server_pid` 2>/dev/null || true
 	@rm -f .server_pid
