@@ -17,6 +17,9 @@ jobs:
       - name: Checkout code # First, get the code from your repository
         uses: actions/checkout@v4
 
+      - name: Env info
+        run: c++ --version
+
       - name: Compile project # Run your Makefile's default 'all' target
         run: make all
 
