@@ -23,3 +23,6 @@ jobs:
 
     - name: Check executable exists   # Optional: list details of the compiled file to verify it's there
       run: ls -l ircserv
+
+- name: Test server run
+  run: make runpp

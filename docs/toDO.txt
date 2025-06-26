@@ -45,3 +45,7 @@ src/Channel.cpp:89:15: error: redefinition of 'isOperator'
 src/Channel.cpp:67:15: note: previous definition is here
    67 | bool Channel::isOperator(Client* client) const {
       |               
+
+
+added  git actions. 
+made compiling
