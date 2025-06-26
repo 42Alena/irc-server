@@ -6,12 +6,13 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/23 19:11:54 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/26 15:29:17 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include <iostream>
+#include <sstream> //intToStr
 
 #include <string>
 #include <vector>
@@ -54,12 +55,38 @@ private:
 	std::vector<struct pollfd> _pollFds;
 
 	std::map<int, Client*> _clients;
-	//adding the channels map to manage channels from server
+	
+	//TODO: Luis: adding the channels map to manage channels from server
 	std::map<std::string, Channel*> _channels;
 
-	static void Server::throwRuntimeErr(const std::string& errMsg);
+	
+	void checkResult(int result, const std::string &errMsg);
+	
+	void logInfo(const std::string &msg);
+	void logErrAndThrow(const std::string &msg);
 
-	//Declaring some methods that the Server class will use internally
+public:
+	Server();
+	Server(int &port, std::string &password);
+	Server(const Server &o);
+	Server &operator=(const Server &o);
+	~Server();
+
+	int run();
+
+	//_________GETTER______________
+	int getPort() const;
+	std::string getPassword() const;
+
+	//_____HELPER FKT_________
+	std::string  intToString(int n);
+};
+
+std::ostream &operator<<(std::ostream &os, const Server &o);
+
+
+/*  TDOD: Luis: needed this for Channels
+//Declaring some methods that the Server class will use internally
 	void acceptNewClient(); //To accept new clients
 	void removeClient(int fd); //to remove a client from the server
 	void handleClientInput(int fd); //to handle input from a client
@@ -81,23 +108,6 @@ private:
 	void handleInvite(Client* client, const std::vector<std::string>& params);
 	void handleTopic(Client* client, const std::vector<std::string>& params);
 	void handleMode(Client* client, const std::vector<std::string>& params);
+
+*/
 	
-	void checkResult(int result, const std::string &errMsg);
-
-	void logInfo(const std::string &msg);
-	void logErrAndThrow(const std::string &msg);
-
-public:
-	Server();
-	Server(int &port, std::string &password);
-	Server(const Server &o);
-	Server &operator=(const Server &o);
-	~Server();
-
-	int run();
-
-	//_________GETTER______________
-	int getPort() const;
-	std::string getPassword() const;
-};
-std::ostream &operator<<(std::ostream &os, const Server &o);

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/23 18:42:42 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/26 15:31:19 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,11 +94,11 @@ int Server::run()
 
 	// (bind) Bind server socket to IP/Port for incoming TCP connections
 	int serverBindResult = bind(_serverFd, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
-	checkResult(serverBindResult, "SERVER: Failed to bind server socket to port " + std::to_string(_port));
+	checkResult(serverBindResult, "SERVER: Failed to bind server socket to port " + intToString(_port));
 
 	// (listen) Start listening for incoming TCP connections with max queue (SOMAXCONN)
 	int serverListenResult = listen(_serverFd, SOMAXCONN);
-	checkResult(serverListenResult, "SERVER: Failed to listen on server port " + std::to_string(_port));
+	checkResult(serverListenResult, "SERVER: Failed to listen on server port " + intToString(_port));
 
 	// (pollfd) Register server socket with poll() to monitor for new TCP connections (POLLIN)
 	std::cout << "SERVER: Registering server socket with poll() to monitor for new TCP connections..." << std::endl;
@@ -144,7 +144,7 @@ int Server::run()
 				}
 				else
 				{
-					_clients[clientFd] = Client(clientFd, "", "");
+					_clients[clientFd] = new Client(clientFd, "", "");
 					std::cout << "SERVER: New client connected on fd " << clientFd << std::endl;
 				}
 
@@ -164,7 +164,7 @@ int Server::run()
 				// (close) Handle client disconnection or socket error
 				int fd = _pollFds[fdIndex].fd;
 				int fdCloseResult = close(fd);
-				checkResult(fdCloseResult, "SERVER: Failed to close client TCP connection on fd " + std::to_string(fd));
+				checkResult(fdCloseResult, "SERVER: Failed to close client TCP connection on fd " + intToString(fd));
 				std::cout << "SERVER: Closed client TCP connection on fd " << fd << std::endl;
 
 				_clients.erase(fd);
@@ -219,4 +219,11 @@ void Server::logErrAndThrow(const std::string &msg)
 void Server::logInfo(const std::string &msg)
 {
 	std::cout << BLU << SRV << "SERVER:  " << msg << RST << std::endl;
+}
+
+std::string Server::intToString(int n)
+{
+	std::ostringstream os;
+	os << n;
+	return os.str();
 }

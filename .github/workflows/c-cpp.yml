@@ -1,0 +1,30 @@
+# Name of the GitHub Actions workflow shown in GitHub interface
+name: C/C++ CI
+
+# When the workflow should run
+on:
+  push: # Run when someone pushes to main branch
+    branches: ["main"]
+  pull_request: # Run when a pull request targets main branch
+    branches: ["main"]
+
+# Define the jobs to run
+jobs:
+  build: # Job name - can be anything, 'build' is common
+    runs-on: ubuntu-latest # Run the job on latest Ubuntu virtual machine
+
+    steps: # Sequence of steps for the job
+      - name: Checkout code # First, get the code from your repository
+        uses: actions/checkout@v4
+
+      - name: Env info
+        run: c++ --version
+
+      - name: Compile project # Run your Makefile's default 'all' target
+        run: make all
+
+      - name: Check executable exists # Optional: list details of the compiled file to verify it's there
+        run: ls -l ircserv
+
+      - name: Test server run
+        run: export TERM=xterm && make runpp

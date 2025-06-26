@@ -1,0 +1,52 @@
+
+26.06
+Channels.hpp:
+[ ] Alena: replaced hardcoded color defines with colors.hpp
+[ ] Alena: Commented out incomplete function to allow project to compile
+
+		//TODO (Alena): Function definition for 'Channel' not found.
+		//Channel();// Default constructor
+		
+		// TODO (Alena): commented out, _limit is not declared in Channel.cpp, causes error C/C++(292)
+		//Channel(const std::string& name); // Constructor with channel name
+		
+		//TODO (Alena): Function definition for '~Channel' not found.
+		//~Channel();// Destructor
+
+[] made tmp void for compiling:
+
+	//TODO(Alena) : made tmp void for compiling ( unused parameter 'client')
+	(void)client;
+
+
+
+Channel.cpp
+[ ]//Alena: commented out, "_limit" is not a nonstatic data member or base class of class "Channel"C/C++(292)
+	//constructor with channel name
+	//Channel::Channel(const std::string& name) : _name(name), _limit(0) {}
+
+[ ] // Alena: added forward declaration Client class before use it
+class Client;
+
+[] 	//TODO(Alena) : made tmp return true for compiling ( unused parameter 'client')
+    return true;
+
+
+[] /*
+TODO(Alena): commented out, because same function line 97 -115
+   79 | bool Channel::hasMembers(Client* client) const{
+      |               ^
+src/Channel.cpp:56:15: note: previous definition is here
+   56 | bool Channel::hasMembers(Client* client) const{
+      |               ^
+src/Channel.cpp:89:15: error: redefinition of 'isOperator'
+   89 | bool Channel::isOperator(Client* client) const {
+      |               ^
+src/Channel.cpp:67:15: note: previous definition is here
+   67 | bool Channel::isOperator(Client* client) const {
+      |               
+
+
+added  git actions. 
+made compiling version
+changed to_string to own function

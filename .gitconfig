@@ -1,0 +1,19 @@
+# Pull section: keeps history clean when pulling
+[pull]
+    rebase = true          # Use rebase instead of merge when pulling to avoid messy merge commits
+
+# Push section: makes pushing easier and more complete
+[push]
+    autoSetupRemote = true # Automatically link new branches to remote when pushing the first time
+    followTags = true      # Push any annotated tags along with commits
+
+# Fetch section: keeps your repo clean and updated
+[fetch]
+    prune = true           # Remove remote-tracking branches that were deleted from the remote
+    pruneTags = true       # Remove remote tags that were deleted from the remote
+    all = true             # Fetch from all remotes, not just origin
+
+# Rebase section: makes rebasing safer and more convenient
+[rebase]
+    updateRefs = true      # Update branch references automatically after successful rebase
+    autoStash = true       # Automatically stash your uncommitted changes before rebase and reapply them after
