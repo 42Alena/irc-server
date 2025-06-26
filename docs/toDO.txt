@@ -48,4 +48,5 @@ src/Channel.cpp:67:15: note: previous definition is here
 
 
 added  git actions. 
-made compiling
+made compiling version
+changed to_string to own function
