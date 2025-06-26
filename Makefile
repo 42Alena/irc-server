@@ -1,6 +1,7 @@
 NAME     =  ircserv
 CXX       =  c++
-CXXFLAGS   =  -Wall -Wextra -Werror -std=c++98 -I./include
+CXXFLAGS   =  -Wall -Wextra -Werror -std=c++98 
+#-I./include
 # Default linker flags (empty by default)
 LDFLAGS =
 

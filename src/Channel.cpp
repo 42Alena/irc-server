@@ -6,12 +6,12 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/26 14:46:55 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/26 15:06:31 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Channel.hpp"
-#include "Client.hpp"
+#include "../include/Client.hpp"
+#include "../include/Channel.hpp"
 
 // TODO (Alena):: commented out, "_limit" is not a nonstatic data member or base class of class "Channel"C/C++(292)
 // constructor with channel name
@@ -118,7 +118,7 @@ bool Channel::isOperator(Client *client) const
 			return true; // If the client is found in the operators vector, return true
 		return false;	 // If the client is not found, return false
 	}
-	
+
 	// TODO(Alena) : made tmp return true for compiling ( error: non-void function does not return a value in all control paths')
 	return true;
 }
