@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/26 15:31:19 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/27 16:07:37 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,6 +149,30 @@ int Server::run()
 				}
 
 				_pollFds.push_back(clientPollFd);
+				
+				//___________WIP(26.06): READ Client input_____________________			
+				
+				char readBuffer[512];
+				ssize_t readBytes;
+
+				//read all available data from client socket
+				while((readBytes = read(clientFd, readBuffer, sizeof(readBuffer))) > 0)
+				{
+					std::string receivedChunk(readBuffer, readBytes);
+					_clients[clientFd]->appendToReceivedData(receivedChunk);
+					
+					//check for commands
+					while(_clients[clientFd]->hasCompleteCommandRN())
+					{
+						std::string cmdClient = _clients[clientFd]->extractNextCmd();
+					}
+				
+				//WIP: started with writing handleCommand function
+				}
+				
+
+
+				
 			}
 			else if (_pollFds[fdIndex].revents & POLLIN)
 			{
@@ -180,7 +204,7 @@ int Server::run()
 	return EXIT_SUCCESS;
 }
 
-//________________getter_________________________________
+//________________GETTER_________________________________
 
 int Server::getPort() const
 {
@@ -202,24 +226,59 @@ std::ostream &operator<<(std::ostream &os, const Server &o)
 	return os;
 }
 
-//______ HELPER FUNCTIONS____________________
+//______ PRIVATE: HELPER FUNCTIONS_____________________________//
+
+void Server::handleCommand(Client* client, const std::string& line){
+	 
+	//DEBUG:__________________
+	std::cout << SRV << " Received command from client fd " << client->getFd() << ": " << line << RESET<< std::endl;
+	//__________DEBUG END__________________
+
+	// extract command (first space seaparted word)
+	std::istringstream iss(line);
+	std::string command;
+	iss >> command;
+
+	if (command.empty())		//ignore empty lines
+		return; 
+	
+	std::transform(command.begin(), command.end(), command.begin(), ::toupper); //convert cmd to uppercase
+	
+	//extract other words
+	std::string arg;
+	std::vector<std::string> arguments;
+	
+	while(iss >> arg)
+		arguments.push_back(arg);
+		
+	//call special function for command
+	if
+		
+}
+
 
 void Server::checkResult(int result, const std::string &errMsg)
 {
 	if (result == -1)
-		logErrAndThrow(errMsg);
+	logErrAndThrow(errMsg);
 }
 
 void Server::logErrAndThrow(const std::string &msg)
 {
 	std::cerr << ESRV << msg << RST << std::endl;
-	throw std::runtime_error("SERVER: failed to " + msg + std::string(strerror(errno)));
+	throw std::runtime_error("SERVER(errno):  "  + std::string(strerror(errno)));
 }
 
 void Server::logInfo(const std::string &msg)
 {
 	std::cout << BLU << SRV << "SERVER:  " << msg << RST << std::endl;
 }
+
+
+
+
+
+//______ PUBLIC: HELPER FUNCTIONS_____________________________//
 
 std::string Server::intToString(int n)
 {

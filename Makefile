@@ -46,7 +46,11 @@ runpp: fclean $(NAME)
 	sleep 5
 	@echo "Connecting with netcat..."
 	- nc -v localhost 6667; echo "nc exit code: $$?"
-	@echo "Running server for 20sec  ..."
+	
+	@echo "Sending test IRC commands..."
+	(echo "NICK testUser"; echo "USER testUser 0 * :Test User"; echo "JOIN #test"; sleep 2) | nc localhost 6667
+
+	@echo "Running server for 5sec  ..."
 	sleep 5
 	@echo "Killing server..."
 	- kill `cat .server_pid` 2>/dev/null || true

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/26 13:07:46 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/27 13:28:05 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,9 @@ std::string Client::getNickname() const
 }
 
 //to get the username of the client
-std::string Client::getUser() const
+std::string Client::getUserName() const
 {
-	return _user;
+	return _userName;
 }
 
 const std::string &Client::getReceivedData() const
@@ -85,41 +85,7 @@ void Client::clearReceivedData()
 	_receivedData.clear();
 }
 
-//join a channel
-void Client::joinChannel(const std::string& channel){
-	_channels.push_back(channel);
-}
 
-//leave a channel
-void Client::leaveChannel(const std::string& channel){
-	
-	(void) channel;
-	//ToDo...
-	//...
-	//remove the channel from the vector of channels
-	//...
-	//ToDo...
-}
-
-
-//Add an operator to the channel
-void Client::addOperator(const std::string& channel){
-	_channelOps[channel] = true;
-}
-
-//Remove an operator from the channel
-void Client::removeOperator(const std::string& channel){
-	_channelOps[channel] = false;
-}
-
-//check if a client is an operator in a channel
-bool Client::isOperator(const std::string& channel) const{
-	// Check if the channel exists in the map
-	if (_channelOps.find(channel) != _channelOps.end()){
-		return _channelOps.at(channel);
-	}
-	return false;
-}
 
 //________________OTHER FUNCTIONS_________________________________
 /* Section 2.3 Messages
@@ -170,4 +136,42 @@ const std::ostream &operator<<(std::ostream &os, const Client &o)
 	os << ");" << std::endl;
 
 	return os;
+}
+
+
+//_________________CHANNEL__________________________
+//join a channel
+void Client::joinChannel(const std::string& channel){
+	_channels.push_back(channel);
+}
+
+//leave a channel
+void Client::leaveChannel(const std::string& channel){
+	
+	(void) channel;
+	//ToDo...
+	//...
+	//remove the channel from the vector of channels
+	//...
+	//ToDo...
+}
+
+
+//Add an operator to the channel
+void Client::addOperator(const std::string& channel){
+	_channelOps[channel] = true;
+}
+
+//Remove an operator from the channel
+void Client::removeOperator(const std::string& channel){
+	_channelOps[channel] = false;
+}
+
+//check if a client is an operator in a channel
+bool Client::isOperator(const std::string& channel) const{
+	// Check if the channel exists in the map
+	if (_channelOps.find(channel) != _channelOps.end()){
+		return _channelOps.at(channel);
+	}
+	return false;
 }

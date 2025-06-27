@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/26 15:05:20 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/27 15:09:40 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ class Client
 {
 private:
 	int _fd;								 // read,write,clients in poll,close(fd). -1=nosocket
-	std::string _nickName;					 // NICK, private msg
-	std::string _user;						 // USER, private msg
+	std::string _nickName;					 // cmd: NICK, changeable name shown in chat,  private msg
+	std::string _userName;					 // cmd: USER, private msg
 	bool _registered;						 // true if USER+NICK+PASS false otherwise
 	std::vector<std::string> _channels;		 // to track the channels the client has joined
 	std::map<std::string, bool> _channelOps; // to track the channels where the client is an operator
@@ -36,6 +36,7 @@ private:
 											 // for LATER...
 											 //  std::string _username;  //USER, private msg
 											 // bool _registered;  //USER+NICK+PASS
+											 
 
 public:
 	Client();
@@ -46,27 +47,15 @@ public:
 	~Client();
 
 	//__________GETTERs______________________
-	// to get the file descriptor of the client
-	int getFd() const;
-	// to get the nickname of the client
-	std::string getNickname() const;
-	// to get the username of the client
-	std::string getUser() const;
-
-	// to check if the client is registered
-	bool isRegistered() const;
-	// to check if the client is an operator
-	bool isOperator(const std::string &channel) const;
-	// to join a channel
-	void joinChannel(const std::string &channel);
-	// to leave a channel
-	void leaveChannel(const std::string &channel);
-	// to add an operator to the channel
-	void addOperator(const std::string &channel);
-	// to remove an operator from the channel
-	void removeOperator(const std::string &channel);
-
+	
+	int getFd() const;        // to get the file descriptor of the client
+	
+	std::string getNickname() const;// to get the nickname of the client
+	
+	std::string getUserName() const; // returns the username set by USER command
 	const std::string &getReceivedData() const;
+
+	
 
 	//_________SETTERs_________________
 	// to set the nickname from the NICK command
@@ -80,6 +69,22 @@ public:
 	//________________OTHER FUNCTIONS_________________________________
 	bool hasCompleteCommandRN();
 	std::string extractNextCmd();
+	
+
+	//____________CHANNEL________________________
+	// to check if the client is registered
+	bool isRegistered() const;
+	// to check if the client is an operator
+	bool isOperator(const std::string &channel) const;
+	// to join a channel
+	void joinChannel(const std::string &channel);
+	// to leave a channel
+	void leaveChannel(const std::string &channel);
+	// to add an operator to the channel
+	void addOperator(const std::string &channel);
+	// to remove an operator from the channel
+	void removeOperator(const std::string &channel);
+
 };
 const std::ostream &operator<<(std::ostream &os, const Client &o);
 
