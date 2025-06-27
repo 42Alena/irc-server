@@ -1,3 +1,40 @@
+27.06
+Branch: irc-run-logic
+
+- Input buffering per client
+	read() reads available data
+	appendToReceivedData() adds it to _receivedData
+	While hasCompleteCommandRN() returns true
+		extractNextCmd() gets full line (up to \r\n)
+		handleCommand() is called with that line
+
+- Wrote: handleCommand()
+	Extract command (first word)
+	Convert command to uppercase (IRC commands are not case sensitive)
+	Split other words as arguments
+	Call right function based on command (PASS, NICK, USER, JOIN)
+
+- Server:
+	Uncommented function definitions for:
+		handlePass()
+		handleNick()
+		handleUser()
+		handleJoin()
+		handlePrivateMessage()
+
+- Full line (\r\n) detection works
+	Multiple commands handled if sent together
+
+- Command placeholders:
+	For now, PASS/NICK/USER/JOIN just reply with "received" message
+	PrivateMessage not implemented yet
+
+- Added simple sendToClient() for sending responses
+
+- runpp updated:
+	Uses -q 1 for nc so it auto-exits after sending test commands
+	Server starts, accepts client, sends basic responses, exits cleanly
+
 
 26.06
 Channels.hpp:

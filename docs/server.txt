@@ -102,3 +102,41 @@ https://man7.org/linux/man-pages/man3/sockaddr.3type.html
               Describes the length of a socket address.  This is an
               integer type of at least 32 bits.
 
+
+
++----------------+-----------------------------------+-------------------------------+
+| Command        | Description                       | Where to Handle               |
++----------------+-----------------------------------+-------------------------------+
+| PASS           | Set connection password           | Server::handlePass()          |
+| NICK           | Set nickname                      | Server::handleNick()          |
+| USER           | Set username                      | Server::handleUser()          |
++----------------+-----------------------------------+-------------------------------+
+| JOIN           | Join a channel                    | Server::handleJoin()          |
+| PART           | Leave a channel                   | Server (optional)             |
+| KICK           | Kick user from channel            | Server::handleKick()          |
+| TOPIC          | Change or view channel topic      | Server::handleTopic()         |
+| INVITE         | Invite user to channel            | Server::handleInvite()        |
+| MODE           | Set channel/user modes            | Server::handleMode()          |
++----------------+-----------------------------------+-------------------------------+
+| PRIVMSG        | Send private message to user/channel | Server::handlePrivateMessage() |
+| NOTICE         | Send message without auto-reply   | Server (optional)             |
++----------------+-----------------------------------+-------------------------------+
+| QUIT           | Client disconnects                | Server (cleanup logic)        |
+| PING           | Server ping check                 | Server (send PONG reply)      |
++----------------+-----------------------------------+-------------------------------+
+| WHO            | List users in channel             | Server (optional)             |
+| NAMES          | List nicknames in channel         | Server (optional)             |
++----------------+-----------------------------------+-------------------------------+
+
++-----------+----------------------------+----------------------------------------------+
+| Class     | Description                | Function Declaration                         |
++-----------+----------------------------+----------------------------------------------+
+| Server    | Handle password for server | void handlePass(Client* client, const std::vector<std::string>& args); |
+| Server    | Set/change client nickname | void handleNick(Client* client, const std::vector<std::string>& args); |
+| Server    | Set username/real name     | void handleUser(Client* client, const std::vector<std::string>& args); |
+| Server    | Join channel               | void handleJoin(Client* client, const std::vector<std::string>& args); |
+| Server    | Send private or channel msg| void handlePrivateMessage(Client* client, const std::vector<std::string>& args); |
+| Server    | Client disconnect          | void handleQuit(Client* client, const std::vector<std::string>& args); |
+| Server    | Reply to ping              | void handlePing(Client* client, const std::vector<std::string>& args); |
++-----------+----------------------------+----------------------------------------------+
+
