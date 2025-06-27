@@ -3,111 +3,110 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42.fr>          +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/27 16:25:33 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/27 17:34:38 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-#include <iostream>
-#include <sstream> //intToStr
 
+//======================== SYSTEM HEADERS ====================================//
+#include <iostream>
+#include <sstream>      // std::stringstream for intToString
 #include <string>
 #include <vector>
+#include <map>          // std::map
+#include <algorithm>    // std::transform
+#include <cstdlib>      // EXIT_SUCCESS, EXIT_FAILURE
 
-#include <cerrno>  //Errors
-#include <cstring> //Errors
+#include <cerrno>       // errno
+#include <cstring>      // strerror
+#include <cstdio>       // printf, perror (if needed)
+#include <unistd.h>     // read(), close()
 
-#include <sys/socket.h> //socket,bind,listen
-#include <sys/types.h>	//socket
-#include <sys/socket.h>
+#include <sys/types.h>  // socket types
+#include <sys/socket.h> // socket(), bind(), listen(), accept()
+#include <netinet/in.h> // struct sockaddr_in, htons()
+#include <arpa/inet.h>  // inet_ntoa etc.
+#include <poll.h>       // poll(), struct pollfd
+#include <fcntl.h>      // fcntl()
 
-#include <fcntl.h>		//fcntl
-#include <netinet/in.h> //struct sockaddr_in(IPv4)
-#include <arpa/inet.h>	//htons(convert hot<=>bytes)
-#include <poll.h>		//poll
-#include <map>			//std::map https://en.cppreference.com/w/cpp/container/map.html
-#include <cstdlib>		//EXIT_SUCCESS, EXIT_FAILURE
-#include <algorithm>	//transform()
-
-// from  man poll()
-#include <fcntl.h>	   //  open()
-#include <poll.h>	   //  poll() and struct pollfd
-#include <stdio.h>	   //  std::cout <<(), fstd::cout <<()
-#include <stdlib.h>	   //  malloc(), exit()
-#include <sys/types.h> //  ssize_t
-#include <unistd.h>	   //  read(), close()
-
-#include <sys/socket.h> //accept()
-#include <netinet/in.h> // struct sockaddr_in
-
+//======================== PROJECT HEADERS ===================================//
 #include "colors.hpp"
-#include "Client.hpp"
-#include "Channel.hpp"
+#include "../include/Client.hpp"
+#include "../include/Channel.hpp"
 
+
+//======================== CLASS DEFINITION ==================================//
 class Server
 {
 private:
-	//_______________________ Server Configuration _______________________//
-	int _port;			   									// Server port
-	std::string _password; 									// Password required for connection
+    //======================== PRIVATE: ATTRIBUTES =============================//
+    
+    // Server Configuration
+    int _port;
+    std::string _password;
 
-	//_______________________ Socket & Poll Management _______________________//
-	int _serverFd;											 // Server listening socket (socket())
-	std::vector<struct pollfd> _pollFds; 						// Poll file descriptors list
+    // Socket & Poll Management
+    int _serverFd;
+    std::vector<struct pollfd> _pollFds;
 
-	//_______________________ Client & Channel Tracking _______________________//
-	std::map<int, Client *> _clients;							// Map: client fd -> Client*
-	std::map<std::string, Channel *> _channels; 				// Map: channel name -> Channel*
+    // Client & Channel Tracking
+    std::map<int, Client *> _clients;
+    std::map<std::string, Channel *> _channels;
 
-	//_______________________ Connection & Client Management _______________________//
-	void acceptNewClient();								   // Accept new incoming client
-	void removeClient(int fd);							   // Remove client by fd
-	void handleClientInput(int fd);						   // Handle received data from client
-	void sendToClient(int fd, const std::string &message); // Send message to client
+    //======================== PRIVATE: HELPER FUNCTIONS =======================//
 
-	//_______________________ Command Dispatch & Parsing ___________________________//
-	void handleCommand(Client *client, const std::string &line); // Dispatch raw line to specific handler
+    // Connection & Client Management
+    void acceptNewClient();
+    void removeClient(int fd);
+    void handleClientInput(int fd);
+    void sendToClient(int fd, const std::string &message);
 
-	//_______________________ Mandatory IRC Command Handlers _______________________//
-	void handlePass(Client *client, const std::vector<std::string> &params);		   // PASS command
-	void handleNick(Client *client, const std::vector<std::string> &params);		   // NICK command
-	void handleUser(Client *client, const std::vector<std::string> &params);		   // USER command
-	void handleJoin(Client *client, const std::vector<std::string> &params);		   // JOIN command
-	void handlePrivateMessage(Client *client, const std::vector<std::string> &params); // PRIVMSG command
+    // Command Dispatch & Parsing
+    void handleCommand(Client *client, const std::string &line);
 
-	//_______________check result, error________________
-	void checkResult(int result, const std::string &errMsg);
-	void logInfo(const std::string &msg);
-	void logErrAndThrow(const std::string &msg);
+    // Mandatory IRC Command Handlers
+    void handlePass(Client *client, const std::vector<std::string> &params);
+    void handleNick(Client *client, const std::vector<std::string> &params);
+    void handleUser(Client *client, const std::vector<std::string> &params);
+    void handleJoin(Client *client, const std::vector<std::string> &params);
+    void handlePrivateMessage(Client *client, const std::vector<std::string> &params);
 
-	/*  Later: Needed for full channel logic or bonus commands
+    // Internal Utilities
+    void checkResult(int result, const std::string &errMsg);
+    void logInfo(const std::string &msg);
+    void logErrAndThrow(const std::string &msg);
 
-	void broadcastToChannel(const std::string& channel, const std::string& msg, int except_fd = -1); // To send a message to all channel members
-	void handleKick(Client* client, const std::vector<std::string>& params);
-	void handleInvite(Client* client, const std::vector<std::string>& params);
-	void handleTopic(Client* client, const std::vector<std::string>& params);
-	void handleMode(Client* client, const std::vector<std::string>& params);
-*/
+    /* Optional for full channel logic or bonus commands
+
+    void broadcastToChannel(const std::string &channel, const std::string &msg, int except_fd = -1);
+    void handleKick(Client *client, const std::vector<std::string> &params);
+    void handleInvite(Client *client, const std::vector<std::string> &params);
+    void handleTopic(Client *client, const std::vector<std::string> &params);
+    void handleMode(Client *client, const std::vector<std::string> &params);
+    */
 
 public:
-	Server();
-	Server(int &port, std::string &password);
-	Server(const Server &o);
-	Server &operator=(const Server &o);
-	~Server();
+    //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==============//
+    Server();
+    Server(int &port, std::string &password);
+    Server(const Server &o);
+    Server &operator=(const Server &o);
+    ~Server();
 
-	int run();
+    //======================== PUBLIC: MAIN SERVER METHODS =====================//
+    int run();
 
-	//_________GETTER______________
-	int getPort() const;
-	std::string getPassword() const;
+    //======================== PUBLIC: GETTERS =================================//
+    int getPort() const;
+    std::string getPassword() const;
 
-	//_____HELPER FKT_________
-	std::string intToString(int n);
+    //======================== PUBLIC: HELPER FUNCTIONS ========================//
+    std::string intToString(int n);
 };
 
+//======================== NON-MEMBER OPERATORS ==============================//
 std::ostream &operator<<(std::ostream &os, const Server &o);
-

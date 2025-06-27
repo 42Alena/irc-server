@@ -39,22 +39,47 @@ re:  fclean all
 # 	-./$(NAME) 
 
 #_________BUILD+RUN programm with ./ircserv <port> <password>
-runpp: fclean $(NAME)
+runpp:
 	clear
-	@echo "Starting server in background..."
-	./$(NAME) 6667 myPassword & echo $$ > .server_pid
-	sleep 5
-	@echo "Connecting with netcat..."
-	- nc -v localhost 6667; echo "nc exit code: $$?"
-	
-	@echo "Sending test IRC commands..."
-	(echo "NICK testUser"; echo "USER testUser 0 * :Test User"; echo "JOIN #test"; sleep 2) | nc localhost 6667
+	@echo "Killing existing server by PID if known..."
+	- kill `cat .server_pid` 2>/dev/null || true
+	@rm -f .server_pid
 
-	@echo "Running server for 5sec  ..."
-	sleep 5
+	@echo "Checking if port 6667 is still in use..."
+	@if lsof -i :6667 >/dev/null 2>&1; then \
+		echo "Port 6667 is busy, killing process by port..."; \
+		kill -9 `lsof -t -i :6667` || true; \
+		sleep 2; \
+	fi
+
+	@echo "Waiting for port 6667 to become available..."
+	@while lsof -i :6667 >/dev/null 2>&1; do \
+		echo "Port still busy, waiting..."; \
+		sleep 1; \
+	done
+
+	@make fclean
+	@make $(NAME)
+
+	# clear
+	@echo "Starting server in background..."
+	@sh -c './$(NAME) 6667 myPassword & echo $$! > .server_pid'
+	sleep 1
+
+	@echo "Connecting with netcat and sending test IRC commands..."
+	# '-q 1' makes nc exit 1 second after sending input
+	(echo "PASS myPassword"; sleep 0.5; echo "NICK testUser"; sleep 0.5; echo "USER testUser 0 * :Test User"; sleep 0.5; echo "JOIN #test"; sleep 0.5) | nc -v -q 1 localhost 6667
+
+	@echo "Running server for a few seconds..."
+	sleep 2
+
 	@echo "Killing server..."
 	- kill `cat .server_pid` 2>/dev/null || true
 	@rm -f .server_pid
+
+	@echo "runpp finished."
+
+
 
 #______DEBUG_VALGRIND_(LINUX only)______
 vdebug: CXXFLAGS += -g -v
