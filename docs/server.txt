@@ -3,6 +3,54 @@ https://beej.us/guide/bgnet/html/split-wide/system-calls-or-bust.html#socket
 
 https://man7.org/linux/man-pages/man2/socket.2.html
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-/*
+-Communication between client and server has to be done via TCP/IP (v4 or v6).
+-socket - create an endpoint for communication              https://man7.org/linux/man-pages/man2/socket.2.html
+-getsockopt, setsockopt - get and set options on sockets        https://man7.org/linux/man-pages/man2/setsockopt.2.html
+-fcntl - manipulate file descriptor                             https://man7.org/linux/man-pages/man2/fcntl.2.html
+-bind - bind a name to a socket                                                         https://man7.org/linux/man-pages/man2/bind.2.html
+-send  - send a message on a socket https://man7.org/linux/man-pages/man2/send.2.html
+-
+-struct sockaddr_in {                                                                           // https://man7.org/linux/man-pages/man3/sockaddr.3type.html
+-       sa_family_t     sin_family;     // AF_INET/
+-       in_port_t       sin_port;       // Port number
+-       struct in_addr  sin_addr;       //IPv4 address  ;}
+-https://man7.org/linux/man-pages/man3/inet_aton.3.html
+-
+-INADDR_ANY (0.0.0.0)              means any address for socket binding;
+-IPv4                                                                                                           https://man7.org/linux/man-pages/man7/ip.7.html
+-
+-struct in_addr {       uint32_t       s_addr;     }; // address in network byte order
+-htons()  converts the unsigned short integer hostshort  from host byte order to network byte order.  https://man7.org/linux/man-pages/man3/htons.3.html
+-
+-listen - listen for connections on a socket https://man7.org/linux/man-pages/man2/listen.2.html
+-poll - wait for some event on a file descriptor https://man7.org/linux/man-pages/man2/poll.2.html
+-                struct pollfd {
+-                          int   fd;         // file descriptor/
+-                          short events;     //requested events
+-                          short revents;    // returned events
+-                  };
+-
+-       accept -  a connection on a socket https://man7.org/linux/man-pages/man2/accept.2.html
+-Mistakes:
+-socket()       "Failed to create server socket"
+-bind() "Failed to bind server socket to address"
+-listen()       "Failed to listen for incoming connections"
+-accept()       "Failed to accept new client connection"
+-fcntl()        "Failed to set socket to non-blocking mode"
+-*/
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
 #include <sys/types.h>
 #include <sys/socket.h>
 
@@ -139,4 +187,8 @@ https://man7.org/linux/man-pages/man3/sockaddr.3type.html
 | Server    | Client disconnect          | void handleQuit(Client* client, const std::vector<std::string>& args); |
 | Server    | Reply to ping              | void handlePing(Client* client, const std::vector<std::string>& args); |
 +-----------+----------------------------+----------------------------------------------+
+
+//__________________SEND()
+
+https://man7.org/linux/man-pages/man2/send.2.html 
 

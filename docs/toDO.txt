@@ -1,3 +1,18 @@
+29.06
+branch server-client handling
+
+[x] sendToClient()
+ 
+ [x]removeClient(fd) properly. It only does:
+    Close fd
+    Erase from _clients
+    Erase from _pollFds
+	
+[] Move accept() logic from run() to acceptNewClient()
+
+[] Move read() logic from run() to handleClientInput()
+[] Update run() to call these	
+
 27.06
 Branch: irc-run-logic
 
