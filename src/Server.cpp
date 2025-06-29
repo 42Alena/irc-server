@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/29 14:20:11 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/29 15:22:05 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,82 +90,17 @@ int Server::run()
 		nfds_t pollFdIndex = 0;
 		while (pollFdIndex < _pollFds.size())
 		{
-			//==================== NEW CONNECTION HANDLING ====================//
-
+			//==================== NEW CLIENT CONNECTION HANDLING ====================//
 			if (_pollFds[pollFdIndex].fd == _serverFd && (_pollFds[pollFdIndex].revents & POLLIN))
 			{
-				while (true) // accept() all pending  TCP connections
-				{
-					struct sockaddr_in clientAddress;
-					socklen_t clientAddressrLen = sizeof(clientAddress);
-					int clientFd = accept(_serverFd, reinterpret_cast<struct sockaddr *>(&clientAddress), &clientAddressrLen);
-
-					if (clientFd == -1)
-					{
-						if (errno != EAGAIN && errno != EWOULDBLOCK) // Real error, not just no more connections
-						{
-							logErrAndThrow("Failed to accept new TCP connection");
-						}
-						break; // No more pending connections
-					}
-
-					// (fcntl) Set client socket to non-blocking mode
-					int clientFileControlResult = fcntl(clientFd, F_SETFL, O_NONBLOCK); // Set client to non-blocking
-					checkResult(clientFileControlResult, "Failed to set client socket to non-blocking mode");
-
-					// (map) Add new client to _clients tracking
-					if (_clients.find(clientFd) != _clients.end()) // Sanity check for logic error
-					{
-						logErrAndThrow("Logic error - client fd already exists in _clients map");
-					}
-					else
-					{
-						_clients[clientFd] = new Client(clientFd, "", ""); // Create new client object
-						std::cout << "New client connected on fd " << clientFd << std::endl;
-					}
-
-					// (pollfd) Add new client to poll() monitoring
-					struct pollfd clientPollFd;
-					clientPollFd.fd = clientFd;
-					clientPollFd.events = POLLIN; // Monitor client for incoming data
-					clientPollFd.revents = 0;
-					_pollFds.push_back(clientPollFd);
-				}
-
+				acceptNewClient();
 				pollFdIndex++;
 			}
-			//==================== (close) CLIENT DATA HANDLING ====================//
 
+			//==================== (close) CLIENT DATA HANDLING ====================//
 			else if (_pollFds[pollFdIndex].revents & POLLIN)
 			{
-				//(read) Incoming data from client over TCP connection
-				int fd = _pollFds[pollFdIndex].fd;
-				char buf[512];
-				ssize_t readBytes = read(fd, buf, sizeof(buf)); // Read incoming data
-
-				if (readBytes == 0)
-				{
-					logInfo("Client on fd " + intToString(fd)  + " disconnected");
-					removeClient(fd, pollFdIndex);
-				}
-				else if (readBytes > 0)
-				{
-					std::string receivedChunk(buf, readBytes);
-					_clients[fd]->appendToReceivedData(receivedChunk); // Buffer data for command parsing
-
-					while (_clients[fd]->hasCompleteCommandRN()) // Process all complete commands
-					{
-						std::string cmdClient = _clients[fd]->extractNextCmd();
-						handleCommand(_clients[fd], cmdClient);
-					}
-
-					pollFdIndex++;
-				}
-				else
-				{
-					checkResult(readBytes, "Failed to read from client TCP connection");
-					pollFdIndex++;
-				}
+				handleClientInput(pollFdIndex);
 			}
 			//==================== CLIENT DISCONNECT OR ERROR ====================//
 
@@ -252,27 +187,89 @@ void Server::handleCommand(Client *client, const std::string &line)
 
 void Server::acceptNewClient()
 {
-	logInfo("acceptNewClient() called - Not implemented yet.");
+	while (true) // accept() all pending  TCP connections
+	{
+		struct sockaddr_in clientAddress;
+		socklen_t clientAddressrLen = sizeof(clientAddress);
+		int clientFd = accept(_serverFd, reinterpret_cast<struct sockaddr *>(&clientAddress), &clientAddressrLen);
+
+		if (clientFd == -1)
+		{
+			if (errno != EAGAIN && errno != EWOULDBLOCK) // Real error, not just no more connections
+			{
+				logErrAndThrow("Failed to accept new TCP connection");
+			}
+			break; // No more pending connections
+		}
+
+		// (fcntl) Set client socket to non-blocking mode
+		int clientFileControlResult = fcntl(clientFd, F_SETFL, O_NONBLOCK); // Set client to non-blocking
+		checkResult(clientFileControlResult, "Failed to set client socket to non-blocking mode");
+
+		// (map) Add new client to _clients tracking
+		if (_clients.find(clientFd) != _clients.end()) // Sanity check for logic error
+		{
+			logErrAndThrow("Logic error - client fd already exists in _clients map");
+		}
+		else
+		{
+			_clients[clientFd] = new Client(clientFd, "", ""); // Create new client object
+			std::cout << "New client connected on fd " << clientFd << std::endl;
+		}
+
+		// (pollfd) Add new client to poll() monitoring
+		struct pollfd clientPollFd;
+		clientPollFd.fd = clientFd;
+		clientPollFd.events = POLLIN; // Monitor client for incoming data
+		clientPollFd.revents = 0;
+		_pollFds.push_back(clientPollFd);
+	}
 }
 
 void Server::removeClient(int fd, size_t pollFdIndex)
 {
-	close(fd);									// Close socket
-	_clients.erase(fd);							// Remove client from map
-	_pollFds.erase(_pollFds.begin() + pollFdIndex);  // Remove fd from poll list
+	close(fd);										// Close socket
+	_clients.erase(fd);								// Remove client from map
+	_pollFds.erase(_pollFds.begin() + pollFdIndex); // Remove fd from poll list
 }
 
-void Server::handleClientInput(int fd)
+void Server::handleClientInput(size_t pollFdIndex)
 {
-	(void)fd;
-	logInfo("handleClientInput() called - Not implemented yet.");
+	//(read) Incoming data from client over TCP connection
+	int fd = _pollFds[pollFdIndex].fd;
+	char buf[512];
+	ssize_t readBytes = read(fd, buf, sizeof(buf)); // Read incoming data
+
+	if (readBytes == 0)
+	{
+		logInfo("Client on fd " + intToString(fd) + " disconnected");
+		removeClient(fd, pollFdIndex);
+	}
+	else if (readBytes > 0)
+	{
+		std::string receivedChunk(buf, readBytes);
+		_clients[fd]->appendToReceivedData(receivedChunk); // Buffer data for command parsing
+
+		while (_clients[fd]->hasCompleteCommandRN()) // Process all complete commands
+		{
+			std::string cmdClient = _clients[fd]->extractNextCmd();
+			handleCommand(_clients[fd], cmdClient);
+		}
+
+		pollFdIndex++;
+	}
+	else
+	{
+		checkResult(readBytes, "Failed to read from client TCP connection");
+		pollFdIndex++;
+	}
 }
 
 /*
 	   send - send a message on a socket
 	   ssize_t send(int sockfd, const void buf[.size], size_t size, int flags);
 	   https://man7.org/linux/man-pages/man2/send.2.html
-	    data()- return a const char * (pointer to the beginning of the message)
+		data()- return a const char * (pointer to the beginning of the message)
 	   */
 void Server::sendToClient(int fd, const std::string &message)
 {

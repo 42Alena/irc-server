@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/29 14:14:59 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/29 15:21:56 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ private:
     // Connection & Client Management
     void acceptNewClient();
     void removeClient(int fd, size_t pollFdIndex);
-    void handleClientInput(int fd);
+    void handleClientInput(size_t pollFdIndex);
     void sendToClient(int fd, const std::string &message);
 
     // Command Dispatch & Parsing
