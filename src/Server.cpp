@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/30 16:18:37 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:45:37 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,6 +286,8 @@ void Server::handlePass(Client *client, const std::vector<std::string> &params)
 
 	sendToClient(client->getFd(), "PASS received\r\n");
 }
+
+
 /* 
 https://www.rfc-editor.org/rfc/rfc1459.html
 "4.1.2 Nick message
@@ -331,6 +333,7 @@ RFC 1459              Internet Relay Chat Protocol              May 1993
    "*/
 void Server::handleNick(Client *client, const std::vector<std::string> &params)
 {
+	
 	(void)client;
 	(void)params;
 	sendToClient(client->getFd(), "NICK received\r\n");

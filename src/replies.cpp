@@ -6,45 +6,130 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:13:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/30 15:55:34 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:45:06 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/replies.hpp"
 
-//https://www.rfc-editor.org/rfc/rfc1459.html#section-2.4
 
-std::string replyErrNoNickGiven(const std::string &server)
+std::string replyRpl001Welcome(const std::string &server, const std::string &nick, const std::string &user, const std::string &host)
 {
-	return ":" + server + " " ERR_NONICKNAMEGIVEN " :No nickname given\r\n";
+    return ":" + server + " " + RPL_WELCOME + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n";
 }
 
-std::string replyErrErroneusNick(const std::string &server, const std::string &nick)
+std::string replyRpl002YourHost(const std::string &server)
 {
-	return ":" + server + " " ERR_ERRONEUSNICKNAME " " + nick + " :Erroneous nickname\r\n";
+    return ":" + server + " " + RPL_YOURHOST + " :Your host is " + server + ", running version 1.0\r\n";
 }
 
-std::string replyErrNickInUse(const std::string &server, const std::string &nick)
+std::string replyRpl003Created(const std::string &server, const std::string &date)
 {
-	return ":" + server + " " ERR_NICKNAMEINUSE " " + nick + " :Nickname is already in use\r\n";
+    return ":" + server + " " + RPL_CREATED + " :This server was created " + date + "\r\n";
 }
 
-std::string replyErrNickCollision(const std::string &server, const std::string &nick)
+std::string replyRpl004MyInfo(const std::string &server)
 {
-	return ":" + server + " " ERR_NICKCOLLISION " " + nick + " :Nickname collision KILL\r\n";
+    return ":" + server + " " + RPL_MYINFO + " " + server + " 1.0 o oitkl\r\n";
 }
 
-std::string replyErrUserNotInChannel(const std::string &server, const std::string &nick, const std::string &channel)
+std::string replyRpl332Topic(const std::string &server, const std::string &channel, const std::string &topic)
 {
-	return ":" + server + " " ERR_USERNOTINCHANNEL " " + nick + " " + channel + " :They aren't on that channel\r\n";
+    return ":" + server + " " + RPL_TOPIC + " " + channel + " :" + topic + "\r\n";
 }
 
-std::string replyErrNotOnChannel(const std::string &server, const std::string &channel)
+std::string replyRpl353NamReply(const std::string &server, const std::string &channel, const std::string &names)
 {
-	return ":" + server + " " ERR_NOTONCHANNEL " " + channel + " :You're not on that channel\r\n";
+    return ":" + server + " " + RPL_NAMREPLY + " = " + channel + " :" + names + "\r\n";
 }
 
-std::string replyErrUserOnChannel(const std::string &server, const std::string &user, const std::string &channel)
+std::string replyRpl366EndOfNames(const std::string &server, const std::string &channel)
 {
-	return ":" + server + " " ERR_USERONCHANNEL " " + user + " " + channel + " :is already on channel\r\n";
+    return ":" + server + " " + RPL_ENDOFNAMES + " " + channel + " :End of /NAMES list\r\n";
 }
+
+std::string replyErr401NoSuchNick(const std::string &server, const std::string &nick)
+{
+    return ":" + server + " " + ERR_NOSUCHNICK + " " + nick + " :No such nick/channel\r\n";
+}
+
+std::string replyErr403NoSuchChannel(const std::string &server, const std::string &channel)
+{
+    return ":" + server + " " + ERR_NOSUCHCHANNEL + " " + channel + " :No such channel\r\n";
+}
+
+std::string replyErr404CannotSendToChan(const std::string &server, const std::string &channel)
+{
+    return ":" + server + " " + ERR_CANNOTSENDTOCHAN + " " + channel + " :Cannot send to channel\r\n";
+}
+
+std::string replyErr431NoNickGiven(const std::string &server)
+{
+    return ":" + server + " " + ERR_NONICKNAMEGIVEN + " :No nickname given\r\n";
+}
+
+std::string replyErr432ErroneousNick(const std::string &server, const std::string &nick)
+{
+    return ":" + server + " " + ERR_ERRONEUSNICKNAME + " " + nick + " :Erroneous nickname\r\n";
+}
+
+std::string replyErr433NickInUse(const std::string &server, const std::string &nick)
+{
+    return ":" + server + " " + ERR_NICKNAMEINUSE + " " + nick + " :Nickname is already in use\r\n";
+}
+
+std::string replyErr441UserNotInChannel(const std::string &server, const std::string &nick, const std::string &channel)
+{
+    return ":" + server + " " + ERR_USERNOTINCHANNEL + " " + nick + " " + channel + " :They aren't on that channel\r\n";
+}
+
+std::string replyErr442NotOnChannel(const std::string &server, const std::string &channel)
+{
+    return ":" + server + " " + ERR_NOTONCHANNEL + " " + channel + " :You're not on that channel\r\n";
+}
+
+std::string replyErr443UserOnChannel(const std::string &server, const std::string &user, const std::string &channel)
+{
+    return ":" + server + " " + ERR_USERONCHANNEL + " " + user + " " + channel + " :is already on channel\r\n";
+}
+
+std::string replyErr451NotRegistered(const std::string &server)
+{
+    return ":" + server + " " + ERR_NOTREGISTERED + " :You have not registered\r\n";
+}
+
+std::string replyErr461NeedMoreParams(const std::string &server, const std::string &command)
+{
+    return ":" + server + " " + ERR_NEEDMOREPARAMS + " " + command + " :Not enough parameters\r\n";
+}
+
+std::string replyErr462AlreadyRegistered(const std::string &server)
+{
+    return ":" + server + " " + ERR_ALREADYREGISTRED + " :Unauthorized command (already registered)\r\n";
+}
+
+std::string replyErr464PasswordMismatch(const std::string &server)
+{
+    return ":" + server + " " + ERR_PASSWDMISMATCH + " :Password incorrect\r\n";
+}
+
+std::string replyErr471ChannelIsFull(const std::string &server, const std::string &channel)
+{
+    return ":" + server + " " + ERR_CHANNELISFULL + " " + channel + " :Cannot join channel (+l)\r\n";
+}
+
+std::string replyErr473InviteOnlyChan(const std::string &server, const std::string &channel)
+{
+    return ":" + server + " " + ERR_INVITEONLYCHAN + " " + channel + " :Cannot join channel (+i)\r\n";
+}
+
+std::string replyErr475BadChannelKey(const std::string &server, const std::string &channel)
+{
+    return ":" + server + " " + ERR_BADCHANNELKEY + " " + channel + " :Cannot join channel (+k)\r\n";
+}
+
+std::string replyErr482ChanOpPrivsNeeded(const std::string &server, const std::string &channel)
+{
+    return ":" + server + " " + ERR_CHANOPRIVSNEEDED + " " + channel + " :You're not channel operator\r\n";
+}
+
