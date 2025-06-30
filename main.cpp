@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:32:27 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/26 15:44:41 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:07:56 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,5 +46,17 @@ int main(int argc, char **argv)
 	}
 
 	std::cout << server << std::endl;
-	return EXIT_SUCCESS;
+	//return EXIT_SUCCESS;
+	
+	// Luis: I created this test to check if I can set limit to a channel and get it back, Feel free to remove it
+	// Create a channel
+    Channel channel;
+
+    // Set the user limit for the channel
+    channel.setLimit(10);
+
+    // Get and print the user limit
+    std::cout << "Channel user limit: " << channel.getLimit() << std::endl;
+
+    return 0;
 };
