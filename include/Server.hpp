@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/29 15:21:56 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/30 20:32:10 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,17 @@
 
 //======================== SYSTEM HEADERS ====================================//
 #include <iostream>
-#include <sstream>      // std::stringstream for intToString
+#include <sstream> // std::stringstream for intToString
 #include <string>
 #include <vector>
-#include <map>          // std::map
-#include <algorithm>    // std::transform
-#include <cstdlib>      // EXIT_SUCCESS, EXIT_FAILURE
+#include <map>       // std::map
+#include <algorithm> // std::transform
+#include <cstdlib>   // EXIT_SUCCESS, EXIT_FAILURE
 
-#include <cerrno>       // errno
-#include <cstring>      // strerror
-#include <cstdio>       // printf, perror (if needed)
-#include <unistd.h>     // read(), close()
+#include <cerrno>   // errno
+#include <cstring>  // strerror
+#include <cstdio>   // printf, perror (if needed)
+#include <unistd.h> // read(), close()
 
 #include <sys/types.h>  // socket types
 #include <sys/socket.h> // socket(), bind(), listen(), accept()
@@ -38,13 +38,12 @@
 #include "../include/Client.hpp"
 #include "../include/Channel.hpp"
 
-
 //======================== CLASS DEFINITION ==================================//
 class Server
 {
 private:
     //======================== PRIVATE: ATTRIBUTES =============================//
-    
+
     // Server Configuration
     int _port;
     std::string _password;
@@ -59,23 +58,32 @@ private:
 
     //======================== PRIVATE: HELPER FUNCTIONS =======================//
 
-    // Connection & Client Management
+    // ─────────────────── Connection & Client Management ───────────────────
+    bool isNicknameInUse(const std::string &nickname);
+    Client *getClientByNickname(const std::string &nickname);
+    bool isValidNickname(const std::string &nickname);
+    bool isValidPassword(const std::string &password);
+
     void acceptNewClient();
     void removeClient(int fd, size_t pollFdIndex);
     void handleClientInput(size_t pollFdIndex);
     void sendToClient(int fd, const std::string &message);
 
-    // Command Dispatch & Parsing
+    // ─────────────────── Channel Management ───────────────────────
+    Channel *getChannelByName(const std::string &channelName);
+    bool isChannelName(const std::string &channelName);
+
+    // ─────────────────── Command Dispatch & Parsing ───────────────────
     void handleCommand(Client *client, const std::string &line);
 
-    // Mandatory IRC Command Handlers
+    // ─────────────────── Mandatory IRC Command Handlers
     void handlePass(Client *client, const std::vector<std::string> &params);
     void handleNick(Client *client, const std::vector<std::string> &params);
     void handleUser(Client *client, const std::vector<std::string> &params);
     void handleJoin(Client *client, const std::vector<std::string> &params);
     void handlePrivateMessage(Client *client, const std::vector<std::string> &params);
 
-    // Internal Utilities
+    // ─────────────────── Internal Utilities ───────────────────
     void checkResult(int result, const std::string &errMsg);
     void logInfo(const std::string &msg);
     void logErrAndThrow(const std::string &msg);

@@ -1,3 +1,21 @@
+30.06
+Branch feat/nick-pass-auth
+ - added replies.hpp/cpp
+
+ run()
+	-changed logic when client disconnected and error => removeClient()
+	
+Added in server.cpp/hpp
+	-helper function for validation niick/password/channel
+	-getClientByNickname
+	-getChannelByName()
+	- isChannelName()
+
+WIP:
+ NICK
+
+
+
 29.06
 branch server-client handling
 
@@ -12,6 +30,12 @@ branch server-client handling
 
 [] Move read() logic from run() to handleClientInput()
 [] Update run() to call these	
+
+28.06
+Branch: feat/nick-pass-auth
+feat/ → feature work
+fix/ → bugfix
+test/ → testing logic
 
 27.06
 Branch: irc-run-logic

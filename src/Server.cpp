@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/29 15:22:05 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/06/30 20:47:48 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,20 +102,15 @@ int Server::run()
 			{
 				handleClientInput(pollFdIndex);
 			}
+			
 			//==================== CLIENT DISCONNECT OR ERROR ====================//
-
 			else if (_pollFds[pollFdIndex].revents & (POLLHUP | POLLERR))
 			{
 				int fd = _pollFds[pollFdIndex].fd;
-				int fdCloseResult = close(fd); // Close socket
-				checkResult(fdCloseResult, "Failed to close client TCP connection on fd " + intToString(fd));
-				std::cout << "Closed client TCP connection on fd " << fd << std::endl;
-
-				_clients.erase(fd);
-				_pollFds.erase(_pollFds.begin() + pollFdIndex);
+				removeClient(fd, pollFdIndex);
 			}
+			
 			//==================== NO EVENTS, SKIP ====================//
-
 			else
 			{
 				pollFdIndex++;
@@ -170,7 +165,7 @@ void Server::handleCommand(Client *client, const std::string &line)
 	while (iss >> arg)
 		arguments.push_back(arg);
 
-	// Basic test dispatch
+	// WIP: Basic test dispatch
 	if (command == "PASS")
 		handlePass(client, arguments);
 	else if (command == "NICK")
@@ -180,10 +175,35 @@ void Server::handleCommand(Client *client, const std::string &line)
 	else if (command == "JOIN")
 		handleJoin(client, arguments);
 	else
-		sendToClient(client->getFd(), "Unknown command: " + command + "\r\n");
+		sendToClient(client->getFd(), "Unknown command: " + command + "\r\n"); //TODO
 }
 
 //======================== PRIVATE: Connection & Client Management ==================//
+
+bool Server::isValidNickname(const std::string &nickname){
+	(void)nickname;
+	return true;
+}
+bool Server::isValidPassword(const std::string &password){
+	(void)password;
+	return true;
+}
+bool Server::isNicknameInUse(const std::string &nickname){
+	(void)nickname;
+	return true;
+}
+
+Client* Server::getClientByNickname(const std::string &nickname){
+	
+	std::map<int, Client*>::iterator it;
+	for (it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		if (it->second->getNickname() == nickname)
+			return it->second;
+	}
+	return NULL;
+}
+
 
 void Server::acceptNewClient()
 {
@@ -225,13 +245,24 @@ void Server::acceptNewClient()
 		_pollFds.push_back(clientPollFd);
 	}
 }
-
+/* 
+* Close socket
+* Remove client from map
+* Remove fd from poll list
+ */
 void Server::removeClient(int fd, size_t pollFdIndex)
 {
-	close(fd);										// Close socket
-	_clients.erase(fd);								// Remove client from map
-	_pollFds.erase(_pollFds.begin() + pollFdIndex); // Remove fd from poll list
+	int fdCloseResult = close(fd);
+	checkResult(fdCloseResult, "Failed to close client TCP connection on fd " + intToString(fd));
+
+	logInfo("Closed client TCP connection on fd " + intToString(fd));
+
+	_clients.erase(fd);
+	_pollFds.erase(_pollFds.begin() + pollFdIndex);
 }
+
+
+
 
 void Server::handleClientInput(size_t pollFdIndex)
 {
@@ -277,6 +308,22 @@ void Server::sendToClient(int fd, const std::string &message)
 	checkResult(sendMsgResult, "Failed to send a message on socket");
 }
 
+//======================== PRIVATE: Channel management ==============================//
+
+Channel *Server::getChannelByName(const std::string &channelName){
+	std::map<std::string, Channel*>::iterator it = _channels.find(channelName);
+	if (it != _channels.end())
+		return it->second;
+	return NULL;
+}
+
+
+bool Server::isChannelName(const std::string &channelName){
+	if (_channels.find(channelName) != _channels.end())
+	return true;
+return false;
+}
+
 //======================== PRIVATE: Mandatory IRC Command Handlers ==================//
 
 void Server::handlePass(Client *client, const std::vector<std::string> &params)
@@ -287,11 +334,32 @@ void Server::handlePass(Client *client, const std::vector<std::string> &params)
 	sendToClient(client->getFd(), "PASS received\r\n");
 }
 
+
+/* 
+	https://www.rfc-editor.org/rfc/rfc1459.html
+	
+ * NICK command (RFC 1459 §4.1.2)
+ * -------------------------------
+ * Allows a user to set or change their nickname.
+ * Format: NICK <nickname>
+ * 
+ * If nickname is invalid or taken, server replies with:
+ *  - 431 ERR_NONICKNAMEGIVEN
+ *  - 432 ERR_ERRONEUSNICKNAME
+ *  - 433 ERR_NICKNAMEINUSE
+ * 
+ * Nickname collisions (server-side) trigger KILL commands.
+ * If client sends <hopcount>, it is ignored.
+ * Example: NICK Wiz
+ */
 void Server::handleNick(Client *client, const std::vector<std::string> &params)
 {
+	
 	(void)client;
 	(void)params;
 	sendToClient(client->getFd(), "NICK received\r\n");
+	
+	sendToClient(client->getFd(), "SERVER: NICK received\r\n");
 }
 
 void Server::handleUser(Client *client, const std::vector<std::string> &params)
