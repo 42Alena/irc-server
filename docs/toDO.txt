@@ -2,6 +2,19 @@
 Branch feat/nick-pass-auth
  - added replies.hpp/cpp
 
+ run()
+	-changed logic when client disconnected and error => removeClient()
+	
+Added in server.cpp/hpp
+	-helper function for validation niick/password/channel
+	-getClientByNickname
+	-getChannelByName()
+	- isChannelName()
+
+WIP:
+ NICK
+
+
 
 29.06
 branch server-client handling
