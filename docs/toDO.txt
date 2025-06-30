@@ -13,6 +13,12 @@ branch server-client handling
 [] Move read() logic from run() to handleClientInput()
 [] Update run() to call these	
 
+28.06
+Branch: feat/nick-pass-auth
+feat/ → feature work
+fix/ → bugfix
+test/ → testing logic
+
 27.06
 Branch: irc-run-logic
 

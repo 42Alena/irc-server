@@ -1,0 +1,23 @@
+28.06
+STEps to test:
+
+1.terminal:
+
+ make re
+ ./ircserv 6667 password123
+
+2.terminal (netcat)
+ nc localhost 6667
+
+ //test what you need
+ PASS testpass (for now :\r\n = CTR+v, CTR +m, Enter) 
+ or
+ echo -e "PASS test\r\n" | nc localhost 6667
+ 
+
+To stop: 
+2.terminal (netcat) 
+	 Ctrl+D  in netcat 2.terminal (EOF, closes connection)
+
+1.terminal
+	CTRL+C
