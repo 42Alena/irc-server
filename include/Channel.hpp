@@ -6,7 +6,7 @@
 /*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/01 15:46:21 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/07/01 17:31:46 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ public:
 	void setLimit(int _userLimit); //done
 	bool hasMembers(Client *client) const; //done
 	bool isOperator(Client *client) const; //done
+	void broadCastMessage(const std::string &message, Client *sender) const; //done
 	
 
 	// Getters

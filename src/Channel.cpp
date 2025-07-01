@@ -6,7 +6,7 @@
 /*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/01 16:03:11 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/07/01 17:34:06 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,3 +200,13 @@ bool Channel::isOperator(Client *client) const
 	return false;	 // If the client is not found, return false
 }
 
+// Function to broadcast a message to all members of the channel
+void Channel::broadCastMessage(const std::string &message, Client *sender) const {
+	for (std::vector<Client *>::const_iterator it = _members.begin(); it != _members.end(); ++it)
+	{
+		if (*it != sender) // Don't send the message to the sender
+		{
+			(*it)->appendToReceivedData(message); // Append the message to the client's received data
+		}
+	}
+}
