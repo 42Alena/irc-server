@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 15:15:20 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/02 17:30:34 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,23 @@
 class Client
 {
 private:
-    //======================== PRIVATE: ATTRIBUTES =============================//
 
+    //======================== SOCKET & IDENTIFICATION =========================//
     int _fd;                                    // Client socket file descriptor (-1 = no socket)
     std::string _nickName;                     // Nickname set by NICK command
     std::string _userName;                     // Username set by USER command
-    bool _registered;                          // True if USER+NICK+PASS provided
 
+    //======================== REGISTRATION TRACKING ===========================//
+    bool _hasProvidedPass;                     // True if PASS command provided
+    bool _hasProvidedNick;                     // True if NICK command provided
+    bool _hasProvidedUser;                     // True if USER command provided
+    bool _registered;                          // True if full registration completed (PASS + NICK + USER)
 
-    std::vector<Channel*> _channels;           //Channels the client has joined
-    std::map<Channel*, bool> _channelOps;   // Channels where client is operator
+    //======================== CHANNEL TRACKING ================================//
+    std::vector<Channel*> _channels;           // Channels the client has joined
+    std::map<Channel*, bool> _channelOps;      // Channels where client is operator
 
+    //======================== DATA BUFFERS ====================================//
     std::string _sendData;                     // Buffer for outgoing data (accumulates until \r\n)
     std::string _receivedData;                 // Buffer for incoming data (accumulates until \r\n)
 
@@ -45,7 +51,7 @@ public:
     //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==============//
     Client();
     Client(int fd);
-    Client(int fd, std::string nickname, std::string receivedData);
+    Client(int fd, const std::string &nickname, const std::string &receivedData);
     Client(const Client &o);
     Client &operator=(const Client &o);
     ~Client();
@@ -57,10 +63,21 @@ public:
     const std::string &getReceivedData() const;// Get accumulated received data
     const std::vector<Channel*> &getChannels() const; // Get list of channels, where this client is a member
 
+     bool getHasProvidedPass() const;
+     bool getHasProvidedNick() const;
+     bool getHasProvidedUser() const;
+ 
+    
+    
+
     //======================== PUBLIC: SETTERS =================================//
     void setNickname(const std::string &nickname); // Set nickname (NICK cmd)
     void setUser(const std::string &user);         // Set username (USER cmd)
+    void setHasProvidedPass(bool val);
+    void setHasProvidedNick(bool val);
+    void setHasProvidedUser(bool val);
 
+    
     //======================== PUBLIC: DATA BUFFER FUNCTIONS ===================//
     void appendToReceivedData(const std::string &chunk); // Add data to received buffer
     void clearReceivedData();                            // Clear received buffer

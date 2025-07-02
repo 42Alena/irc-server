@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 15:10:07 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/02 17:06:36 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,8 +207,7 @@ bool Server::isValidNickname(const std::string &nickname)
 	if (!isalpha(nickname[0]))
 		return false;
 
-	int length = static_cast<int>(nickname.size());
-	for (int i = 1; i < length; i++)
+	for (std::string::size_type i = 1; i < nickname.size(); i++)
 	{
 		char c = nickname[i];
 		if (isalpha(c) ||
@@ -225,7 +224,18 @@ bool Server::isValidNickname(const std::string &nickname)
 
 bool Server::isValidPassword(const std::string &password)
 {
-	(void)password;
+	if (password.empty())
+		return false;
+	if (password.size() > 32)
+		return false;
+
+	for (std::string::size_type i = 0; i < password.size(); i++)
+	{
+		char c = password[i];
+		if (!isprint(c))
+			return false;
+	}
+
 	return true;
 }
 
@@ -385,17 +395,39 @@ Password message
 
    Numeric Replies:
 
-		   ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+	   ERR_NEEDMOREPARAMS                        ERR_ALREADYREGISTRED
+		replyErr461NeedMoreParams()				replyErr462AlreadyRegistered()
 
+		ERR_PASSWDMISMATCH
+		replyErr464PasswordMismatch
    Example:
 
 		   PASS secretpasswordhere
-
+"
+std::string replyErr461NeedMoreParams(const std::string &server, const std::string &command)
+{
+	return ":" + server + " " + ERR_NEEDMOREPARAMS + " " + command + " :Not enough parameters\r\n";
+}
+	std::string replyErr462AlreadyRegistered(const std::string &server)
+{
+	return ":" + server + " " + ERR_ALREADYREGISTRED + " :Unauthorized command (already registered)\r\n";
+}
+Typical raw IRC message from client:
+PASS mysecretpassword
 */
 void Server::handlePass(Client *client, const std::vector<std::string> &params)
 {
-	(void)client;
-	(void)params;
+	if (params.empty())
+	{
+		sendToClient(client->getFd(), replyErr461NeedMoreParams(_serverName, "PASS"));
+		return;
+	}
+
+	if (!isValidPassword(params[0]))
+	{
+		sendToClient(client->getFd(), replyErr464PasswordMismatch(_serverName));
+		return;
+	}
 
 	sendToClient(client->getFd(), "PASS received\r\n");
 }
@@ -450,7 +482,6 @@ void Server::handleNick(Client *client, const std::vector<std::string> &params)
 
 	client->setNickname(newNickname);
 
-	
 	// broadcast after change nick to  client self and to all channles where this client is member
 	//:<old_nick> NICK <new_nick>\r\n
 	if (!oldNickname.empty())
