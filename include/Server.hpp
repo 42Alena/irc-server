@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 10:46:10 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/02 21:01:07 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #include <map>       // std::map
 #include <algorithm> // std::transform
 #include <cstdlib>   // EXIT_SUCCESS, EXIT_FAILURE
-#include <cctype>   // isalpha, isalnum, isprint
+#include <cctype>    // isalpha, isalnum, isprint
 
 #include <cerrno>   // errno
 #include <cstring>  // strerror
@@ -59,13 +59,17 @@ private:
     std::map<int, Client *> _clients;
     std::map<std::string, Channel *> _channels;
 
+    //======================== PRIVATE: CONSTRUCTORS  (only 1 server) ==============//
+    Server();
+    Server(const Server &o);
+    Server &operator=(const Server &o);
+
     //======================== PRIVATE: HELPER FUNCTIONS =======================//
 
     // ─────────────────── Connection & Client Management ───────────────────
     bool isNicknameInUse(const std::string &nickname);
     Client *getClientByNickname(const std::string &nickname);
     bool isValidNickname(const std::string &nickname);
-    bool isValidPassword(const std::string &password);
 
     void acceptNewClient();
     void removeClient(int fd, size_t pollFdIndex);
@@ -91,6 +95,9 @@ private:
     void logInfo(const std::string &msg);
     void logErrAndThrow(const std::string &msg);
 
+
+     
+
     /* Optional for full channel logic or bonus commands
 
     void broadcastToChannel(const std::string &channel, const std::string &msg, int except_fd = -1);
@@ -102,22 +109,21 @@ private:
 
 public:
     //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==============//
-    Server();
-    Server(int &port, std::string &password);
-    Server(const Server &o);
-    Server &operator=(const Server &o);
+    Server(int port, const std::string &password);
     ~Server();
-    
+
     //======================== PUBLIC: MAIN SERVER METHODS =====================//
     int run();
-    
+
     //======================== PUBLIC: GETTERS =================================//
     int getPort() const;
-    std::string getPassword() const;
+    const std::string &getServerName() const;
+
 
     //======================== PUBLIC: HELPER FUNCTIONS ========================//
     std::string intToString(int n);
+
+    // ─────────────────── PUBLIC: bool ───────────────────
+    static bool isValidPassword(const std::string &password); // static to check server password too
 };
 
-//======================== NON-MEMBER OPERATORS ==============================//
-std::ostream &operator<<(std::ostream &os, const Server &o);

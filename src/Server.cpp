@@ -6,39 +6,27 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 17:06:36 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/02 21:29:25 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Server.hpp"
 
-//======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ===================//
-
-Server::Server() : _serverName("ircserv"),
-				   _port(0),
-				   _password(""),
-				   _serverFd(-1) {}
-
-Server::Server(int &port, std::string &password) : _serverName("ircserv"),
-												   _port(port),
-												   _password(password),
-												   _serverFd(-1) {}
-
-Server::Server(const Server &o) : _serverName(o._serverName),
-								  _port(o._port),
-								  _password(o._password),
-								  _serverFd(o._serverFd) {}
-
+//======================== PRIVATE: CONSTRUCTORS  (1 server only) ===================//
+Server::Server() {}
+Server::Server(const Server &o) { (void)o; }
 Server &Server::operator=(const Server &o)
 {
-	if (this != &o)
-	{
-		_port = o._port;
-		_password = o._password;
-		_serverFd = o._serverFd;
-	}
+	(void)o;
 	return *this;
 }
+
+//======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ===================//
+
+Server::Server(int port, const std::string &password) : _serverName("ircserv"),
+														_port(port),
+														_password(password),
+														_serverFd(-1) {}
 
 Server::~Server() {}
 
@@ -131,19 +119,9 @@ int Server::getPort() const
 	return _port;
 }
 
-std::string Server::getPassword() const
+const std::string &Server::getServerName() const
 {
-	return _password;
-}
-
-//======================== NON-MEMBER OPERATORS ===============================//
-
-std::ostream &operator<<(std::ostream &os, const Server &o)
-{
-	os << "Port: " << o.getPort() << std::endl;
-	os << "Password: [hidden]" << std::endl;
-	os << "Password: " << o.getPassword() << std::endl; // TODO: hide. ONLY FOR DEBUG now
-	return os;
+	return _serverName;
 }
 
 //======================== PRIVATE: HELPER FUNCTIONS =========================//
@@ -217,23 +195,6 @@ bool Server::isValidNickname(const std::string &nickname)
 			continue;
 		}
 		return false;
-	}
-
-	return true;
-}
-
-bool Server::isValidPassword(const std::string &password)
-{
-	if (password.empty())
-		return false;
-	if (password.size() > 32)
-		return false;
-
-	for (std::string::size_type i = 0; i < password.size(); i++)
-	{
-		char c = password[i];
-		if (!isprint(c))
-			return false;
 	}
 
 	return true;
@@ -345,8 +306,16 @@ void Server::handleClientInput(size_t pollFdIndex)
 	}
 	else
 	{
-		checkResult(readBytes, "Failed to read from client TCP connection");
-		pollFdIndex++;
+		//TODO: change logic std::cout << "ERRNO=" << errno << "< bytes=" << readBytes << std::endl;
+		if (errno == EAGAIN && errno == EWOULDBLOCK)
+		{
+			// Non-blocking: No data available, normal, skip
+			pollFdIndex++;
+			// continue;
+		}
+		else
+			checkResult(readBytes, "Failed to read from client TCP connection");
+		// pollFdIndex++;
 	}
 }
 
@@ -550,4 +519,23 @@ std::string Server::intToString(int n)
 	std::ostringstream os;
 	os << n;
 	return os.str();
+}
+
+// ─────────────────── PUBLIC: bool ───────────────────
+// static to check server password too
+bool Server::isValidPassword(const std::string &password)
+{
+	if (password.empty())
+		return false;
+	if (password.size() > 32)
+		return false;
+
+	for (std::string::size_type i = 0; i < password.size(); i++)
+	{
+		char c = password[i];
+		if (!isprint(c))
+			return false;
+	}
+
+	return true;
 }

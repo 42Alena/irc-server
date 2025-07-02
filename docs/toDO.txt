@@ -1,4 +1,7 @@
 
+Add handle signals*ctrl+c, ctrl+D
+change logik for in handle client input(move out pollfd)
+
 
 02.07
 Branch: feat/nick
@@ -8,7 +11,11 @@ added:
 	isNicknameInUse()
 	Server::isValidNickname
 	broadcast after change nick to  client self and to all channles where this client is member
-
+changed:
+	moved constructors to private, because only 1 server according to subject
+	made isValid password static to check also server subject
+	deleted operator<<(need debug only)
+	changed check arguments in main, organized
 
 CLIENT:
 const std::vector<Channel*> &getChannels() const; // Get list of channels, where this client is a member
