@@ -6,25 +6,72 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 15:17:53 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/02 17:28:17 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Client.hpp"
 
 //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==================//
+Client::Client()
+    : _fd(-1),
+      _nickName(""),
+      _userName(""),
+      _hasProvidedPass(false),
+      _hasProvidedNick(false),
+      _hasProvidedUser(false),
+      _registered(false),
+      _channels(),
+      _channelOps(),
+      _sendData(""),
+      _receivedData("")
+{
+}
 
-Client::Client() : _fd(-1), _nickName(""), _userName(""), _registered(false), _receivedData("") {}
+Client::Client(int fd)
+    : _fd(fd),
+      _nickName(""),
+      _userName(""),
+      _hasProvidedPass(false),
+      _hasProvidedNick(false),
+      _hasProvidedUser(false),
+      _registered(false),
+      _channels(),
+      _channelOps(),
+      _sendData(""),
+      _receivedData("")
+{
+}
 
-Client::Client(int fd) : _fd(fd), _nickName(""), _userName(""), _registered(false), _receivedData("") {}
-
-Client::Client(int fd, std::string nickname, std::string receivedData)
-    : _fd(fd), _nickName(nickname), _userName(""), _registered(false), _receivedData(receivedData) {}
+Client::Client(int fd, const std::string &nickname, const std::string &receivedData)
+    : _fd(fd),
+      _nickName(nickname),
+      _userName(""),
+      _hasProvidedPass(false),
+      _hasProvidedNick(false),
+      _hasProvidedUser(false),
+      _registered(false),
+      _channels(),
+      _channelOps(),
+      _sendData(""),
+      _receivedData(receivedData)
+{
+}
 
 Client::Client(const Client &o)
-    : _fd(o._fd), _nickName(o._nickName), _userName(o._userName),
-      _registered(o._registered), _channels(o._channels), _channelOps(o._channelOps),
-      _sendData(o._sendData), _receivedData(o._receivedData) {}
+    : _fd(o._fd),
+      _nickName(o._nickName),
+      _userName(o._userName),
+      _hasProvidedPass(o._hasProvidedPass),
+      _hasProvidedNick(o._hasProvidedNick),
+      _hasProvidedUser(o._hasProvidedUser),
+      _registered(o._registered),
+      _channels(o._channels),
+      _channelOps(o._channelOps),
+      _sendData(o._sendData),
+      _receivedData(o._receivedData)
+{
+}
 
 Client &Client::operator=(const Client &o)
 {
@@ -33,6 +80,9 @@ Client &Client::operator=(const Client &o)
         _fd = o._fd;
         _nickName = o._nickName;
         _userName = o._userName;
+        _hasProvidedPass = o._hasProvidedPass;
+        _hasProvidedNick = o._hasProvidedNick;
+        _hasProvidedUser = o._hasProvidedUser;
         _registered = o._registered;
         _channels = o._channels;
         _channelOps = o._channelOps;
@@ -43,7 +93,6 @@ Client &Client::operator=(const Client &o)
 }
 
 Client::~Client() {}
-
 
 //======================== PUBLIC: GETTERS =====================================//
 
@@ -67,11 +116,27 @@ const std::string &Client::getReceivedData() const
     return _receivedData;
 }
 
-/* 
+/*
 Get list of channels, where this client is a member
  */
-const std::vector<Channel*> &Client::getChannels() const {
+const std::vector<Channel *> &Client::getChannels() const
+{
     return _channels;
+}
+
+bool Client::getHasProvidedPass() const
+{
+    return _hasProvidedPass;
+}
+
+bool Client::getHasProvidedNick() const
+{
+    return _hasProvidedNick;
+}
+
+bool Client::getHasProvidedUser() const
+{
+    return _hasProvidedUser;
 }
 
 //======================== PUBLIC: SETTERS =====================================//
@@ -86,6 +151,20 @@ void Client::setUser(const std::string &user)
     _userName = user;
 }
 
+void Client::setHasProvidedPass(bool val)
+{
+    _hasProvidedPass = val;
+}
+
+void Client::setHasProvidedNick(bool val)
+{
+    _hasProvidedNick = val;
+}
+
+void Client::setHasProvidedUser(bool val)
+{
+    _hasProvidedUser = val;
+}
 
 //======================== PUBLIC: DATA BUFFER FUNCTIONS =======================//
 
@@ -98,7 +177,6 @@ void Client::clearReceivedData()
 {
     _receivedData.clear();
 }
-
 
 //======================== PUBLIC: COMMAND PARSING =============================//
 
@@ -115,7 +193,6 @@ std::string Client::extractNextCmd()
     return extractedCommand;
 }
 
-
 //======================== PUBLIC: CHANNEL FUNCTIONS ===========================//
 
 bool Client::isRegistered() const
@@ -123,23 +200,23 @@ bool Client::isRegistered() const
     return _registered;
 }
 
-bool Client::isOperator(Channel* channel) const
+bool Client::isOperator(Channel *channel) const
 {
-    std::map<Channel*, bool>::const_iterator it = _channelOps.find(channel);
+    std::map<Channel *, bool>::const_iterator it = _channelOps.find(channel);
     if (it != _channelOps.end())
         return it->second;
     return false;
 }
 
-void Client::joinChannel(Channel* channel)
+void Client::joinChannel(Channel *channel)
 {
     _channels.push_back(channel);
 }
 
-void Client::leaveChannel(Channel* channel)
+void Client::leaveChannel(Channel *channel)
 {
-    std::vector<Channel*>::iterator it = _channels.begin();
-    for (  ; it != _channels.end(); ++it)
+    std::vector<Channel *>::iterator it = _channels.begin();
+    for (; it != _channels.end(); ++it)
     {
         if (*it == channel)
         {
@@ -149,16 +226,15 @@ void Client::leaveChannel(Channel* channel)
     }
 }
 
-void Client::addOperator(Channel* channel)
+void Client::addOperator(Channel *channel)
 {
     _channelOps[channel] = true;
 }
 
-void Client::removeOperator(Channel* channel)
+void Client::removeOperator(Channel *channel)
 {
     _channelOps[channel] = false;
 }
-
 
 //======================== NON-MEMBER OPERATORS ================================//
 

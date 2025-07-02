@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/30 17:42:53 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/02 16:32:59 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +164,9 @@ std::string replyErr461NeedMoreParams(const std::string &server, const std::stri
 
 /* 462 ERR_ALREADYREGISTRED
    ":Unauthorized command (already registered)"
-   - Sent when a registration command is sent after already registering.
+   - Returned by the server to any link which tries to
+    change part of the registered details (such as
+    password or user details from second USER message).
 */
 std::string replyErr462AlreadyRegistered(const std::string &server);
 

@@ -1,4 +1,6 @@
-01.07
+
+
+02.07
 Branch: feat/nick
 SERVER:
 added:
@@ -6,11 +8,18 @@ added:
 	isNicknameInUse()
 	Server::isValidNickname
 	broadcast after change nick to  client self and to all channles where this client is member
+
+
 CLIENT:
 const std::vector<Channel*> &getChannels() const; // Get list of channels, where this client is a member
 changed std::vector<std::string> _channels;  to std::vector<Channel*> _channels; 
 added:
 	getChannels()
+	//For correct registration steps (PASS, NICK, USER), sends welcome messages.
+	bool _hasProvidedPass;
+	bool _hasProvidedNick;
+	bool _hasProvidedUser;
+	+ getters/setters
 
 30.06
 Branch feat/nick-pass-auth
