@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 12:15:41 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/02 15:10:07 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,7 +206,7 @@ bool Server::isValidNickname(const std::string &nickname)
 
 	if (!isalpha(nickname[0]))
 		return false;
-	
+
 	int length = static_cast<int>(nickname.size());
 	for (int i = 1; i < length; i++)
 	{
@@ -222,7 +222,6 @@ bool Server::isValidNickname(const std::string &nickname)
 
 	return true;
 }
-
 
 bool Server::isValidPassword(const std::string &password)
 {
@@ -372,6 +371,27 @@ bool Server::isChannelName(const std::string &channelName)
 
 //======================== PRIVATE: Mandatory IRC Command Handlers ==================//
 
+/*
+https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.2
+Password message
+
+	Command: PASS
+   Parameters: <password>
+
+   The PASS command is used to set a 'connection password'.  The
+   optional password can and MUST be set before any attempt to register
+   the connection is made.  Currently this requires that user send a
+   PASS command before sending the NICK/USER combination.
+
+   Numeric Replies:
+
+		   ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+
+   Example:
+
+		   PASS secretpasswordhere
+
+*/
 void Server::handlePass(Client *client, const std::vector<std::string> &params)
 {
 	(void)client;
@@ -390,10 +410,10 @@ Nick message
 
    Numeric Replies:
 
-		   ERR_NONICKNAMEGIVEN             
-		   ERR_NICKNAMEINUSE              
-		   ERR_ERRONEUSNICKNAME             
-		   
+		   ERR_NONICKNAMEGIVEN
+		   ERR_NICKNAMEINUSE
+		   ERR_ERRONEUSNICKNAME
+
    Examples:
    NICK Wiz                ; Introducing new nick "Wiz" if session is
 						   still unregistered, or user changing his
@@ -419,26 +439,35 @@ void Server::handleNick(Client *client, const std::vector<std::string> &params)
 		sendToClient(client->getFd(), replyErr433NickInUse(_serverName, newNickname));
 		return;
 	}
-	
+
 	if (!isValidNickname(newNickname))
 	{
 		sendToClient(client->getFd(), replyErr432ErroneousNick(_serverName, newNickname));
 		return;
 	}
-	
+
 	const std::string oldNickname = client->getNickname();
 
 	client->setNickname(newNickname);
 
-	//TODO: for channels:
-	//broadcast after change nick to other
+	
+	// broadcast after change nick to  client self and to all channles where this client is member
 	//:<old_nick> NICK <new_nick>\r\n
-	// if(oldNickname.empty())
-	// {
-	// 	std::string message = oldNickname + "NICK" + newNickname;
-	//broadcast
-	// }
+	if (!oldNickname.empty())
+	{
+		// send message to client
+		std::string messageNickChange = ":" + oldNickname + " NICK " + newNickname + "\r\n";
+		sendToClient(client->getFd(), messageNickChange);
 
+		// Send message to all clients in the same channels
+		const std::vector<Channel *> &clientChannels = client->getChannels();
+
+		for (std::vector<Channel *>::const_iterator it = clientChannels.begin(); it != clientChannels.end(); ++it)
+		{
+			(*it)->broadCastMessage(messageNickChange, client);
+			std::cout << "Client is in channel: " << (*it)->getName() << std::endl;
+		}
+	}
 }
 
 void Server::handleUser(Client *client, const std::vector<std::string> &params)

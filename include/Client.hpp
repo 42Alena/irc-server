@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/27 17:36:24 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/02 15:15:20 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,9 @@ private:
     std::string _userName;                     // Username set by USER command
     bool _registered;                          // True if USER+NICK+PASS provided
 
-    std::vector<std::string> _channels;        // Channels the client has joined
-    std::map<std::string, bool> _channelOps;   // Channels where client is operator
+
+    std::vector<Channel*> _channels;           //Channels the client has joined
+    std::map<Channel*, bool> _channelOps;   // Channels where client is operator
 
     std::string _sendData;                     // Buffer for outgoing data (accumulates until \r\n)
     std::string _receivedData;                 // Buffer for incoming data (accumulates until \r\n)
@@ -54,6 +55,7 @@ public:
     std::string getNickname() const;           // Get client nickname
     std::string getUserName() const;           // Get client username
     const std::string &getReceivedData() const;// Get accumulated received data
+    const std::vector<Channel*> &getChannels() const; // Get list of channels, where this client is a member
 
     //======================== PUBLIC: SETTERS =================================//
     void setNickname(const std::string &nickname); // Set nickname (NICK cmd)
@@ -69,11 +71,11 @@ public:
 
     //======================== PUBLIC: CHANNEL FUNCTIONS =======================//
     bool isRegistered() const;                 // Check if fully registered (USER+NICK+PASS)
-    bool isOperator(const std::string &channel) const; // Check if operator in given channel
-    void joinChannel(const std::string &channel);      // Join a channel
-    void leaveChannel(const std::string &channel);     // Leave a channel
-    void addOperator(const std::string &channel);      // Add operator status in a channel
-    void removeOperator(const std::string &channel);   // Remove operator status from a channel
+    bool isOperator(Channel* channel) const; // Check if operator in given channel
+    void joinChannel(Channel* channel);      // Join a channel
+    void leaveChannel(Channel* channel);     // Leave a channel
+    void addOperator(Channel* channel);      // Add operator status in a channel
+    void removeOperator(Channel* channel);   // Remove operator status from a channel
 };
 
 //======================== NON-MEMBER OPERATORS ===============================//

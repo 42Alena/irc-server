@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/27 17:33:24 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/02 15:17:53 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,12 @@ const std::string &Client::getReceivedData() const
     return _receivedData;
 }
 
+/* 
+Get list of channels, where this client is a member
+ */
+const std::vector<Channel*> &Client::getChannels() const {
+    return _channels;
+}
 
 //======================== PUBLIC: SETTERS =====================================//
 
@@ -117,22 +123,23 @@ bool Client::isRegistered() const
     return _registered;
 }
 
-bool Client::isOperator(const std::string &channel) const
+bool Client::isOperator(Channel* channel) const
 {
-    std::map<std::string, bool>::const_iterator it = _channelOps.find(channel);
+    std::map<Channel*, bool>::const_iterator it = _channelOps.find(channel);
     if (it != _channelOps.end())
         return it->second;
     return false;
 }
 
-void Client::joinChannel(const std::string &channel)
+void Client::joinChannel(Channel* channel)
 {
     _channels.push_back(channel);
 }
 
-void Client::leaveChannel(const std::string &channel)
+void Client::leaveChannel(Channel* channel)
 {
-    for (std::vector<std::string>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+    std::vector<Channel*>::iterator it = _channels.begin();
+    for (  ; it != _channels.end(); ++it)
     {
         if (*it == channel)
         {
@@ -142,12 +149,12 @@ void Client::leaveChannel(const std::string &channel)
     }
 }
 
-void Client::addOperator(const std::string &channel)
+void Client::addOperator(Channel* channel)
 {
     _channelOps[channel] = true;
 }
 
-void Client::removeOperator(const std::string &channel)
+void Client::removeOperator(Channel* channel)
 {
     _channelOps[channel] = false;
 }
