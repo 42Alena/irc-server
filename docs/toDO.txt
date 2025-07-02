@@ -1,3 +1,10 @@
+01.07
+Branch: feat/nick
+added:
+	const std::string _serverName;
+	isNicknameInUse()
+	Server::isValidNickname
+
 30.06
 Branch feat/nick-pass-auth
  - added replies.hpp/cpp

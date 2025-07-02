@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/30 20:47:48 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/02 12:15:41 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,18 @@
 
 //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ===================//
 
-Server::Server() : _port(0),
+Server::Server() : _serverName("ircserv"),
+				   _port(0),
 				   _password(""),
 				   _serverFd(-1) {}
 
-Server::Server(int &port, std::string &password) : _port(port),
+Server::Server(int &port, std::string &password) : _serverName("ircserv"),
+												   _port(port),
 												   _password(password),
 												   _serverFd(-1) {}
 
-Server::Server(const Server &o) : _port(o._port),
+Server::Server(const Server &o) : _serverName(o._serverName),
+								  _port(o._port),
 								  _password(o._password),
 								  _serverFd(o._serverFd) {}
 
@@ -102,14 +105,14 @@ int Server::run()
 			{
 				handleClientInput(pollFdIndex);
 			}
-			
+
 			//==================== CLIENT DISCONNECT OR ERROR ====================//
 			else if (_pollFds[pollFdIndex].revents & (POLLHUP | POLLERR))
 			{
 				int fd = _pollFds[pollFdIndex].fd;
 				removeClient(fd, pollFdIndex);
 			}
-			
+
 			//==================== NO EVENTS, SKIP ====================//
 			else
 			{
@@ -175,27 +178,73 @@ void Server::handleCommand(Client *client, const std::string &line)
 	else if (command == "JOIN")
 		handleJoin(client, arguments);
 	else
-		sendToClient(client->getFd(), "Unknown command: " + command + "\r\n"); //TODO
+		sendToClient(client->getFd(), "Unknown command: " + command + "\r\n"); // TODO
 }
 
 //======================== PRIVATE: Connection & Client Management ==================//
 
-bool Server::isValidNickname(const std::string &nickname){
-	(void)nickname;
-	return true;
-}
-bool Server::isValidPassword(const std::string &password){
-	(void)password;
-	return true;
-}
-bool Server::isNicknameInUse(const std::string &nickname){
-	(void)nickname;
+/*
+https://www.rfc-editor.org/rfc/rfc1459.html#section-2.3.1
+"
+<nick>       ::= <letter> { <letter> | <number> | <special> }
+
+<letter>     ::= 'a' ... 'z' | 'A' ... 'Z'
+<number>     ::= '0' ... '9'
+<special>    ::= '-' | '[' | ']' | '\' | '`' | '^' | '{' | '}'
+..
+1.2 Clients
+nickname having a maximum length of nine (9) characters.
+"
+https://cplusplus.com/reference/cctype/
+*/
+bool Server::isValidNickname(const std::string &nickname)
+{
+	if (nickname.empty())
+		return false;
+	if (nickname.size() > 9)
+		return false;
+
+	if (!isalpha(nickname[0]))
+		return false;
+	
+	int length = static_cast<int>(nickname.size());
+	for (int i = 1; i < length; i++)
+	{
+		char c = nickname[i];
+		if (isalpha(c) ||
+			isdigit(c) ||
+			c == '-' || c == '[' || c == ']' || c == '\\' || c == '`' || c == '^' || c == '{' || c == '}')
+		{
+			continue;
+		}
+		return false;
+	}
+
 	return true;
 }
 
-Client* Server::getClientByNickname(const std::string &nickname){
-	
-	std::map<int, Client*>::iterator it;
+
+bool Server::isValidPassword(const std::string &password)
+{
+	(void)password;
+	return true;
+}
+
+bool Server::isNicknameInUse(const std::string &nickname)
+{
+	std::map<int, Client *>::iterator it;
+	for (it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		if (it->second->getNickname() == nickname)
+			return true;
+	}
+	return false;
+}
+
+Client *Server::getClientByNickname(const std::string &nickname)
+{
+
+	std::map<int, Client *>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		if (it->second->getNickname() == nickname)
@@ -203,7 +252,6 @@ Client* Server::getClientByNickname(const std::string &nickname){
 	}
 	return NULL;
 }
-
 
 void Server::acceptNewClient()
 {
@@ -245,10 +293,10 @@ void Server::acceptNewClient()
 		_pollFds.push_back(clientPollFd);
 	}
 }
-/* 
-* Close socket
-* Remove client from map
-* Remove fd from poll list
+/*
+ * Close socket
+ * Remove client from map
+ * Remove fd from poll list
  */
 void Server::removeClient(int fd, size_t pollFdIndex)
 {
@@ -260,9 +308,6 @@ void Server::removeClient(int fd, size_t pollFdIndex)
 	_clients.erase(fd);
 	_pollFds.erase(_pollFds.begin() + pollFdIndex);
 }
-
-
-
 
 void Server::handleClientInput(size_t pollFdIndex)
 {
@@ -310,18 +355,19 @@ void Server::sendToClient(int fd, const std::string &message)
 
 //======================== PRIVATE: Channel management ==============================//
 
-Channel *Server::getChannelByName(const std::string &channelName){
-	std::map<std::string, Channel*>::iterator it = _channels.find(channelName);
+Channel *Server::getChannelByName(const std::string &channelName)
+{
+	std::map<std::string, Channel *>::iterator it = _channels.find(channelName);
 	if (it != _channels.end())
 		return it->second;
 	return NULL;
 }
 
-
-bool Server::isChannelName(const std::string &channelName){
+bool Server::isChannelName(const std::string &channelName)
+{
 	if (_channels.find(channelName) != _channels.end())
-	return true;
-return false;
+		return true;
+	return false;
 }
 
 //======================== PRIVATE: Mandatory IRC Command Handlers ==================//
@@ -334,32 +380,65 @@ void Server::handlePass(Client *client, const std::vector<std::string> &params)
 	sendToClient(client->getFd(), "PASS received\r\n");
 }
 
+/*
+	https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.2
+"
+Nick message
+	Command: NICK
+   Parameters: <nickname>
+   NICK command is used to give user a nickname or change the existingone.
 
-/* 
-	https://www.rfc-editor.org/rfc/rfc1459.html
-	
- * NICK command (RFC 1459 §4.1.2)
- * -------------------------------
- * Allows a user to set or change their nickname.
- * Format: NICK <nickname>
- * 
- * If nickname is invalid or taken, server replies with:
- *  - 431 ERR_NONICKNAMEGIVEN
- *  - 432 ERR_ERRONEUSNICKNAME
- *  - 433 ERR_NICKNAMEINUSE
- * 
- * Nickname collisions (server-side) trigger KILL commands.
- * If client sends <hopcount>, it is ignored.
- * Example: NICK Wiz
+   Numeric Replies:
+
+		   ERR_NONICKNAMEGIVEN             
+		   ERR_NICKNAMEINUSE              
+		   ERR_ERRONEUSNICKNAME             
+		   
+   Examples:
+   NICK Wiz                ; Introducing new nick "Wiz" if session is
+						   still unregistered, or user changing his
+						   nickname to "Wiz"
+
+   :WiZ!jto@tolsun.oulu.fi NICK Kilroy
+						   ; Server telling that WiZ changed his
+						   nickname to Kilroy.
+"
  */
 void Server::handleNick(Client *client, const std::vector<std::string> &params)
 {
+	if (params.empty())
+	{
+		sendToClient(client->getFd(), replyErr431NoNickGiven(_serverName));
+		return;
+	}
+
+	const std::string newNickname = params[0];
+
+	if (isNicknameInUse(newNickname))
+	{
+		sendToClient(client->getFd(), replyErr433NickInUse(_serverName, newNickname));
+		return;
+	}
 	
-	(void)client;
-	(void)params;
-	sendToClient(client->getFd(), "NICK received\r\n");
+	if (!isValidNickname(newNickname))
+	{
+		sendToClient(client->getFd(), replyErr432ErroneousNick(_serverName, newNickname));
+		return;
+	}
 	
-	sendToClient(client->getFd(), "SERVER: NICK received\r\n");
+	const std::string oldNickname = client->getNickname();
+
+	client->setNickname(newNickname);
+
+	//TODO: for channels:
+	//broadcast after change nick to other
+	//:<old_nick> NICK <new_nick>\r\n
+	// if(oldNickname.empty())
+	// {
+	// 	std::string message = oldNickname + "NICK" + newNickname;
+	//broadcast
+	// }
+
 }
 
 void Server::handleUser(Client *client, const std::vector<std::string> &params)

@@ -11,6 +11,7 @@ SOURCES = \
 	./src/Server.cpp\
 	./src/Client.cpp\
 	./src/Channel.cpp\
+	./src/replies.cpp\
 
 
 OBJECTS = $(SOURCES:.cpp=.o)
