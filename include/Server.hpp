@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/30 20:32:10 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/02 10:46:10 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <map>       // std::map
 #include <algorithm> // std::transform
 #include <cstdlib>   // EXIT_SUCCESS, EXIT_FAILURE
+#include <cctype>   // isalpha, isalnum, isprint
 
 #include <cerrno>   // errno
 #include <cstring>  // strerror
@@ -34,7 +35,8 @@
 #include <fcntl.h>      // fcntl()
 
 //======================== PROJECT HEADERS ===================================//
-#include "colors.hpp"
+#include "../include/colors.hpp"
+#include "../include/replies.hpp"
 #include "../include/Client.hpp"
 #include "../include/Channel.hpp"
 
@@ -45,6 +47,7 @@ private:
     //======================== PRIVATE: ATTRIBUTES =============================//
 
     // Server Configuration
+    const std::string _serverName;
     int _port;
     std::string _password;
 
@@ -104,10 +107,10 @@ public:
     Server(const Server &o);
     Server &operator=(const Server &o);
     ~Server();
-
+    
     //======================== PUBLIC: MAIN SERVER METHODS =====================//
     int run();
-
+    
     //======================== PUBLIC: GETTERS =================================//
     int getPort() const;
     std::string getPassword() const;
