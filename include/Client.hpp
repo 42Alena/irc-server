@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/03 18:26:34 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/03 20:12:18 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,15 @@
 class Client
 {
 private:
+    //======================== PRIVATE: CONSTRUCTORS  (IRC clients are non-copyable)  ==============//
+    Client(const Client &o);
+    Client &operator=(const Client &o);
 
     //======================== SOCKET & IDENTIFICATION =========================//
     int _fd;                                    // Client socket file descriptor (-1 = no socket)
     std::string _nickName;                     // Nickname set by NICK command
     std::string _userName;                     // Username set by USER command
+    std::string _userModes;                    //UserModes  set by User command
 
     //======================== REGISTRATION TRACKING ===========================//
     bool _hasProvidedPass;                     // True if PASS command provided
@@ -52,9 +56,6 @@ public:
     //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==============//
     Client();
     Client(int fd);
-    Client(int fd, const std::string &nickname, const std::string &receivedData);
-    Client(const Client &o);
-    Client &operator=(const Client &o);
     ~Client();
 
     //======================== PUBLIC: GETTERS =================================//

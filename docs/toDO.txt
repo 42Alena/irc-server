@@ -1,19 +1,29 @@
 
 Add handle signals*ctrl+c, ctrl+D
 change logik for in handle client input(move out pollfd)
+replyRpl001Welcome
+TODO: move moved some orthodox stuff to private(Real-world irc objects are usually non-copyable) 
 
 03.07
 
 Server:
+	changed:
+	  moved some Orthodox Canonical Form to private (Server objects are non-copyable in real-world servers)
+
 	added:
-	handleUser()
-	client->setHasProvidedPass(true);
-	client->setHasProvidedNick(true);
-	isValidUsername()
+		handleUser()
+		client->setHasProvidedPass(true);
+		client->setHasProvidedNick(true);
+		isValidUsername()
+
 
 Client:
 	changed:
 		removed bool _isRegistered to isRegistered() inside function
+		moved  some Orthodox Canonical Form to private (Client objects are non-copyable in real-world servers)
+
+	added:
+	std::string _userModes; //for handleUser pararmeter. Dont need then to check according subject
 
 utils.cpp/hpp 
 	created and moved there :

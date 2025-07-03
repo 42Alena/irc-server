@@ -6,17 +6,31 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/03 18:44:44 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/03 20:13:25 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Client.hpp"
+
+//======================== PRIVATE: CONSTRUCTORS  (IRC clients are non-copyable)  ==============//
+
+Client::Client(const Client &o)
+{
+    (void)o;
+}
+
+Client &Client::operator=(const Client &o)
+{
+    (void)o;
+    return *this;
+}
 
 //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==================//
 Client::Client()
     : _fd(-1),
       _nickName(""),
       _userName(""),
+      _userModes(""),
       _hasProvidedPass(false),
       _hasProvidedNick(false),
       _hasProvidedUser(false),
@@ -31,6 +45,7 @@ Client::Client(int fd)
     : _fd(fd),
       _nickName(""),
       _userName(""),
+      _userModes(""),
       _hasProvidedPass(false),
       _hasProvidedNick(false),
       _hasProvidedUser(false),
@@ -41,51 +56,7 @@ Client::Client(int fd)
 {
 }
 
-Client::Client(int fd, const std::string &nickname, const std::string &receivedData)
-    : _fd(fd),
-      _nickName(nickname),
-      _userName(""),
-      _hasProvidedPass(false),
-      _hasProvidedNick(false),
-      _hasProvidedUser(false),
-      _channels(),
-      _channelOps(),
-      _sendData(""),
-      _receivedData(receivedData)
-{
-}
 
-Client::Client(const Client &o)
-    : _fd(o._fd),
-      _nickName(o._nickName),
-      _userName(o._userName),
-      _hasProvidedPass(o._hasProvidedPass),
-      _hasProvidedNick(o._hasProvidedNick),
-      _hasProvidedUser(o._hasProvidedUser),
-      _channels(o._channels),
-      _channelOps(o._channelOps),
-      _sendData(o._sendData),
-      _receivedData(o._receivedData)
-{
-}
-
-Client &Client::operator=(const Client &o)
-{
-    if (this != &o)
-    {
-        _fd = o._fd;
-        _nickName = o._nickName;
-        _userName = o._userName;
-        _hasProvidedPass = o._hasProvidedPass;
-        _hasProvidedNick = o._hasProvidedNick;
-        _hasProvidedUser = o._hasProvidedUser;
-        _channels = o._channels;
-        _channelOps = o._channelOps;
-        _sendData = o._sendData;
-        _receivedData = o._receivedData;
-    }
-    return *this;
-}
 
 Client::~Client() {}
 
