@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 17:28:17 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/03 18:44:44 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ Client::Client()
       _hasProvidedPass(false),
       _hasProvidedNick(false),
       _hasProvidedUser(false),
-      _registered(false),
       _channels(),
       _channelOps(),
       _sendData(""),
@@ -35,7 +34,6 @@ Client::Client(int fd)
       _hasProvidedPass(false),
       _hasProvidedNick(false),
       _hasProvidedUser(false),
-      _registered(false),
       _channels(),
       _channelOps(),
       _sendData(""),
@@ -50,7 +48,6 @@ Client::Client(int fd, const std::string &nickname, const std::string &receivedD
       _hasProvidedPass(false),
       _hasProvidedNick(false),
       _hasProvidedUser(false),
-      _registered(false),
       _channels(),
       _channelOps(),
       _sendData(""),
@@ -65,7 +62,6 @@ Client::Client(const Client &o)
       _hasProvidedPass(o._hasProvidedPass),
       _hasProvidedNick(o._hasProvidedNick),
       _hasProvidedUser(o._hasProvidedUser),
-      _registered(o._registered),
       _channels(o._channels),
       _channelOps(o._channelOps),
       _sendData(o._sendData),
@@ -83,7 +79,6 @@ Client &Client::operator=(const Client &o)
         _hasProvidedPass = o._hasProvidedPass;
         _hasProvidedNick = o._hasProvidedNick;
         _hasProvidedUser = o._hasProvidedUser;
-        _registered = o._registered;
         _channels = o._channels;
         _channelOps = o._channelOps;
         _sendData = o._sendData;
@@ -197,7 +192,7 @@ std::string Client::extractNextCmd()
 
 bool Client::isRegistered() const
 {
-    return _registered;
+    return  _hasProvidedPass && _hasProvidedNick && _hasProvidedUser;
 }
 
 bool Client::isOperator(Channel *channel) const

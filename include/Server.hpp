@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 21:01:07 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/03 18:28:11 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@
 
 //======================== PROJECT HEADERS ===================================//
 #include "../include/colors.hpp"
+#include "../include/utils.hpp"
 #include "../include/replies.hpp"
 #include "../include/Client.hpp"
 #include "../include/Channel.hpp"
@@ -69,8 +70,9 @@ private:
     // ─────────────────── Connection & Client Management ───────────────────
     bool isNicknameInUse(const std::string &nickname);
     Client *getClientByNickname(const std::string &nickname);
-    bool isValidNickname(const std::string &nickname);
-
+    static bool isValidNickname(const std::string &nickname);
+    static bool isValidUsername(const std::string &username);
+    
     void acceptNewClient();
     void removeClient(int fd, size_t pollFdIndex);
     void handleClientInput(size_t pollFdIndex);
@@ -120,10 +122,7 @@ public:
     const std::string &getServerName() const;
 
 
-    //======================== PUBLIC: HELPER FUNCTIONS ========================//
-    std::string intToString(int n);
 
-    // ─────────────────── PUBLIC: bool ───────────────────
-    static bool isValidPassword(const std::string &password); // static to check server password too
+   
 };
 
