@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/03 20:40:19 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/03 22:59:07 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -505,6 +505,8 @@ Parameters: <user> <mode> <unused> <realname>
 
 - <username>: non-space, non-control characters (max 9 chars recommended)
  - <mode>: numeric bitmask (bit 2 = 'w' mode, bit 3 = 'i' mode)
+ - <unused>  => ignore it present for historical reasons, but is ignored by modern servers.
+			It must be present in the command for correct syntax, but its value doesn't matter.
 - <realname>: can contain spaces, starts after ':'
 
 Numeric Replies:
@@ -525,10 +527,7 @@ https://www.rfc-editor.org/rfc/rfc2812.html#section-1.2.1
 Users
 	user       =  1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
 				  ; any octet except NUL, CR, LF, " " and "@"
-params[0] = <username>
-params[1] = <mode>
-params[2] = <unused>
-params[3] = <realname> (may include spaces, starts with ':')
+
 https://www.rfc-editor.org/rfc/rfc2812.html#section-1.2.1
 The <mode> parameter should be a numeric, and can be used to
    automatically set user modes when registering with the server.  This
@@ -536,20 +535,16 @@ The <mode> parameter should be a numeric, and can be used to
    the bit 2 is set, the user mode 'w' will be set and if the bit 3 is
    set, the user mode 'i' will be set.  (See Section 3.1.5 "User
    Modes").
-   https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.5 
+   https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.5
 <mode> Value	Meaning
-0	No modes
 4	'w' set (WHOIS visible)
 8	'i' set (invisible)
-12	Both 'w' and 'i' set
+
+
 
 */
 void Server::handleUser(Client *client, const std::vector<std::string> &params)
 {
-	const std::string &username = params[0];
-	// const std::string &modeStr = params[1];
-	// const std::string &unused = params[2];
-	// const std::string &realname = params[3];
 
 	// Parameters: <user> <mode> <unused> <realname>
 	if (params.size() < 4)
@@ -557,6 +552,11 @@ void Server::handleUser(Client *client, const std::vector<std::string> &params)
 		sendToClient(client->getFd(), replyErr461NeedMoreParams(_serverName, "USER"));
 		return;
 	}
+	
+	const std::string &username = params[0];
+	const std::string &modeStr = params[1];
+	// const std::string &unused = params[2]; // must ignore, only historical
+	const std::string &realname = params[3];
 
 	if (client->isRegistered())
 	{
@@ -570,13 +570,19 @@ void Server::handleUser(Client *client, const std::vector<std::string> &params)
 		return;
 	}
 
-	//WIP: here
-	//  Parse <mode> as an int, bits 2 and 3 apply for 'w' (WHOIS visible) and 'i' (invisible)
-	//modeStr 
-	
-	// <realname> starts after : and can contain spaces
+	int userMode = std::atoi(modeStr.c_str());
+	if (userMode & 4) // bit 2 = 'w' = (WHOIS visible)
+		client->addUserMode('w');
+	if (userMode & 8) // bit 3 =  'i' = (invisible)
+		client->addUserMode('i');
 
-	//client->setHasProvidedUser(true);
+
+	// <realname> starts after : and can contain spaces
+	if (!realname.empty() && realname[0] == ':')
+		client->setRealname(realname.substr(1)); //after leading ':' = after 1 pos 
+	else
+		client->setRealname(realname);
+
 }
 
 void Server::handleJoin(Client *client, const std::vector<std::string> &params)
