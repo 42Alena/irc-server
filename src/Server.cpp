@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/03 18:45:33 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/03 20:40:19 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,13 +188,10 @@ bool Server::isValidNickname(const std::string &nickname)
 	for (std::string::size_type i = 1; i < nickname.size(); i++)
 	{
 		char c = nickname[i];
-		if (isalpha(c) ||
-			isdigit(c) ||
-			c == '-' || c == '[' || c == ']' || c == '\\' || c == '`' || c == '^' || c == '{' || c == '}')
-		{
-			continue;
-		}
-		return false;
+		if (!(isalpha(c) ||
+			  isdigit(c) ||
+			  c == '-' || c == '[' || c == ']' || c == '\\' || c == '`' || c == '^' || c == '{' || c == '}'))
+			return false;
 	}
 
 	return true;
@@ -223,8 +220,27 @@ Client *Server::getClientByNickname(const std::string &nickname)
 	return NULL;
 }
 
-bool isValidUsername(const std::string &username){
-	(void)username;
+/*
+- <username>: non-space, non-control characters (max 9 chars recommended)
+<nonwhite>   ::= <any 8bit code except SPACE (0x20), NUL (0x0), CR
+					 (0xd), and LF (0xa)>
+ user       =  1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
+				  ; any octet except NUL(\0), CR('\r'), LF('\n'), " " and "@"
+*/
+bool Server::isValidUsername(const std::string &username)
+{
+	if (username.empty())
+		return false;
+
+	if (username.size() > 9)
+		return false;
+
+	for (std::string::size_type i = 1; i < username.size(); i++)
+	{
+		char c = username[i];
+		if (c == '\0' || c == '\n' || c == '\r' || c == ' ' || c == '@' || !isprint(c))
+			return false;
+	}
 	return true;
 }
 
@@ -256,7 +272,7 @@ void Server::acceptNewClient()
 		}
 		else
 		{
-			_clients[clientFd] = new Client(clientFd, "", ""); // Create new client object
+			_clients[clientFd] = new Client(clientFd); // Create new client object
 			std::cout << "New client connected on fd " << clientFd << std::endl;
 		}
 
@@ -283,7 +299,6 @@ void Server::removeClient(int fd, size_t pollFdIndex)
 	_clients.erase(fd);
 	_pollFds.erase(_pollFds.begin() + pollFdIndex);
 }
-
 
 void Server::handleClientInput(size_t pollFdIndex)
 {
@@ -514,30 +529,54 @@ params[0] = <username>
 params[1] = <mode>
 params[2] = <unused>
 params[3] = <realname> (may include spaces, starts with ':')
+https://www.rfc-editor.org/rfc/rfc2812.html#section-1.2.1
+The <mode> parameter should be a numeric, and can be used to
+   automatically set user modes when registering with the server.  This
+   parameter is a bitmask, with only 2 bits having any signification: if
+   the bit 2 is set, the user mode 'w' will be set and if the bit 3 is
+   set, the user mode 'i' will be set.  (See Section 3.1.5 "User
+   Modes").
+   https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.5 
+<mode> Value	Meaning
+0	No modes
+4	'w' set (WHOIS visible)
+8	'i' set (invisible)
+12	Both 'w' and 'i' set
+
 */
 void Server::handleUser(Client *client, const std::vector<std::string> &params)
 {
-	//Parameters: <user> <mode> <unused> <realname>
+	const std::string &username = params[0];
+	// const std::string &modeStr = params[1];
+	// const std::string &unused = params[2];
+	// const std::string &realname = params[3];
+
+	// Parameters: <user> <mode> <unused> <realname>
 	if (params.size() < 4)
 	{
 		sendToClient(client->getFd(), replyErr461NeedMoreParams(_serverName, "USER"));
 		return;
 	}
-	
+
 	if (client->isRegistered())
 	{
 		sendToClient(client->getFd(), replyErr462AlreadyRegistered(_serverName));
 		return;
 	}
-	
 
+	if (!isValidUsername(username))
+	{
+		sendToClient(client->getFd(), replyErr461NeedMoreParams(_serverName, "USER"));
+		return;
+	}
+
+	//WIP: here
+	//  Parse <mode> as an int, bits 2 and 3 apply for 'w' (WHOIS visible) and 'i' (invisible)
+	//modeStr 
 	
-	// Validate <username> (nonwhite characters, no space, NUL, CR, LF, or @)
-	
-	// ✅ Parse <mode> as an int, bits 2 and 3 apply for 'w' (WHOIS visible) and 'i' (invisible)
-	// ✅ <realname> starts after : and can contain spaces
-	
-	client->setHasProvidedUser(true);
+	// <realname> starts after : and can contain spaces
+
+	//client->setHasProvidedUser(true);
 }
 
 void Server::handleJoin(Client *client, const std::vector<std::string> &params)
@@ -574,6 +613,3 @@ void Server::logInfo(const std::string &msg)
 	// prints: SRV=  🤖🔥
 	std::cout << BLU << SRV << " " << msg << RST << std::endl;
 }
-
-
-
