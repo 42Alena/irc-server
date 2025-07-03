@@ -6,13 +6,13 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/03 20:13:25 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/03 22:57:26 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Client.hpp"
 
-//======================== PRIVATE: CONSTRUCTORS  (IRC clients are non-copyable)  ==============//
+//======================== PRIVATE: CONSTRUCTORS  (IRC clients are non-copyable)  ===//
 
 Client::Client(const Client &o)
 {
@@ -28,8 +28,8 @@ Client &Client::operator=(const Client &o)
 //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==================//
 Client::Client()
     : _fd(-1),
-      _nickName(""),
-      _userName(""),
+      _nickname(""),
+      _username(""),
       _userModes(""),
       _hasProvidedPass(false),
       _hasProvidedNick(false),
@@ -43,8 +43,8 @@ Client::Client()
 
 Client::Client(int fd)
     : _fd(fd),
-      _nickName(""),
-      _userName(""),
+      _nickname(""),
+      _username(""),
       _userModes(""),
       _hasProvidedPass(false),
       _hasProvidedNick(false),
@@ -55,7 +55,6 @@ Client::Client(int fd)
       _receivedData("")
 {
 }
-
 
 
 Client::~Client() {}
@@ -69,12 +68,17 @@ int Client::getFd() const
 
 std::string Client::getNickname() const
 {
-    return _nickName;
+    return _nickname;
 }
 
-std::string Client::getUserName() const
+std::string Client::getUsername() const
 {
-    return _userName;
+    return _username;
+}
+
+std::string Client::getRealname() const
+{
+    return _realname;
 }
 
 const std::string &Client::getReceivedData() const
@@ -82,6 +86,12 @@ const std::string &Client::getReceivedData() const
     return _receivedData;
 }
 
+
+std::string Client::getUserModes() const
+{
+    return _userModes;
+}
+    
 /*
 Get list of channels, where this client is a member
  */
@@ -109,12 +119,23 @@ bool Client::getHasProvidedUser() const
 
 void Client::setNickname(const std::string &nickname)
 {
-    _nickName = nickname;
+    _nickname = nickname;
 }
 
-void Client::setUser(const std::string &user)
+void Client::setUsername(const std::string &user)
 {
-    _userName = user;
+    _username = user;
+}
+
+void Client::setRealname(const std::string &realname)
+{
+    _realname = realname;
+}
+
+void Client::addUserMode(char modeChar)
+{
+    if (_userModes.find(modeChar) == std::string::npos)
+    _userModes += modeChar;
 }
 
 void Client::setHasProvidedPass(bool val)
@@ -208,7 +229,7 @@ const std::ostream &operator<<(std::ostream &os, const Client &o)
 {
     os << "Client(fd: " << o.getFd();
     os << ", nickname: " << o.getNickname();
-    os << ", username: " << o.getUserName();
+    os << ", username: " << o.getUsername();
     os << ", receivedData: " << o.getReceivedData();
     os << ");" << std::endl;
     return os;
