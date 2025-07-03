@@ -2,6 +2,24 @@
 Add handle signals*ctrl+c, ctrl+D
 change logik for in handle client input(move out pollfd)
 
+03.07
+
+Server:
+	added:
+	handleUser()
+	client->setHasProvidedPass(true);
+	client->setHasProvidedNick(true);
+	isValidUsername()
+
+Client:
+	changed:
+		removed bool _isRegistered to isRegistered() inside function
+
+utils.cpp/hpp 
+	created and moved there :
+		check pass(server and client)
+		intToString()
+
 
 02.07
 Branch: feat/nick

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 17:30:34 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/03 18:26:34 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 //======================== PROJECT HEADERS ===================================//
 #include "../include/Server.hpp"
 #include "../include/Channel.hpp"
+#include "../include/utils.hpp"
 
 //======================== CLASS DEFINITION ==================================//
 class Client
@@ -37,7 +38,7 @@ private:
     bool _hasProvidedPass;                     // True if PASS command provided
     bool _hasProvidedNick;                     // True if NICK command provided
     bool _hasProvidedUser;                     // True if USER command provided
-    bool _registered;                          // True if full registration completed (PASS + NICK + USER)
+    
 
     //======================== CHANNEL TRACKING ================================//
     std::vector<Channel*> _channels;           // Channels the client has joined

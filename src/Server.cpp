@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 21:29:25 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/03 18:45:33 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,6 +223,11 @@ Client *Server::getClientByNickname(const std::string &nickname)
 	return NULL;
 }
 
+bool isValidUsername(const std::string &username){
+	(void)username;
+	return true;
+}
+
 void Server::acceptNewClient()
 {
 	while (true) // accept() all pending  TCP connections
@@ -279,6 +284,7 @@ void Server::removeClient(int fd, size_t pollFdIndex)
 	_pollFds.erase(_pollFds.begin() + pollFdIndex);
 }
 
+
 void Server::handleClientInput(size_t pollFdIndex)
 {
 	//(read) Incoming data from client over TCP connection
@@ -306,7 +312,7 @@ void Server::handleClientInput(size_t pollFdIndex)
 	}
 	else
 	{
-		//TODO: change logic std::cout << "ERRNO=" << errno << "< bytes=" << readBytes << std::endl;
+		// TODO: change logic std::cout << "ERRNO=" << errno << "< bytes=" << readBytes << std::endl;
 		if (errno == EAGAIN && errno == EWOULDBLOCK)
 		{
 			// Non-blocking: No data available, normal, skip
@@ -398,7 +404,7 @@ void Server::handlePass(Client *client, const std::vector<std::string> &params)
 		return;
 	}
 
-	sendToClient(client->getFd(), "PASS received\r\n");
+	client->setHasProvidedPass(true);
 }
 
 /*
@@ -468,13 +474,70 @@ void Server::handleNick(Client *client, const std::vector<std::string> &params)
 			std::cout << "Client is in channel: " << (*it)->getName() << std::endl;
 		}
 	}
+
+	client->setHasProvidedNick(true);
 }
 
+/*
+https://www.rfc-editor.org/rfc/rfc1459.html#section-2.3.1
+   <user>       ::= <nonwhite> { <nonwhite> }
+   <nonwhite>   ::= <any 8bit code except SPACE (0x20), NUL (0x0), CR
+					 (0xd), and LF (0xa)
+3.1.3 User message
+ Command: USER
+Parameters: <user> <mode> <unused> <realname>
+=>	must have at least 4 parameters. Else send ERR_NEEDMOREPARAMS
+
+- <username>: non-space, non-control characters (max 9 chars recommended)
+ - <mode>: numeric bitmask (bit 2 = 'w' mode, bit 3 = 'i' mode)
+- <realname>: can contain spaces, starts after ':'
+
+Numeric Replies:
+		ERR_NEEDMOREPARAMS      replyErr461NeedMoreParams
+		ERR_ALREADYREGISTRED	replyErr462AlreadyRegistered
+Example:
+   USER guest 0 * :Ronnie Reagan   ; User registering themselves with a
+								   username of "guest" and real name
+								   "Ronnie Reagan".
+
+   USER guest 8 * :Ronnie Reagan   ; User registering themselves with a
+								   username of "guest" and real name
+								   "Ronnie Reagan", and asking to be set
+								   invisible.
+
+
+https://www.rfc-editor.org/rfc/rfc2812.html#section-1.2.1
+Users
+	user       =  1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
+				  ; any octet except NUL, CR, LF, " " and "@"
+params[0] = <username>
+params[1] = <mode>
+params[2] = <unused>
+params[3] = <realname> (may include spaces, starts with ':')
+*/
 void Server::handleUser(Client *client, const std::vector<std::string> &params)
 {
-	(void)client;
-	(void)params;
-	sendToClient(client->getFd(), "USER received\r\n");
+	//Parameters: <user> <mode> <unused> <realname>
+	if (params.size() < 4)
+	{
+		sendToClient(client->getFd(), replyErr461NeedMoreParams(_serverName, "USER"));
+		return;
+	}
+	
+	if (client->isRegistered())
+	{
+		sendToClient(client->getFd(), replyErr462AlreadyRegistered(_serverName));
+		return;
+	}
+	
+
+	
+	// Validate <username> (nonwhite characters, no space, NUL, CR, LF, or @)
+	
+	// ✅ Parse <mode> as an int, bits 2 and 3 apply for 'w' (WHOIS visible) and 'i' (invisible)
+	// ✅ <realname> starts after : and can contain spaces
+	
+	client->setHasProvidedUser(true);
 }
 
 void Server::handleJoin(Client *client, const std::vector<std::string> &params)
@@ -512,30 +575,5 @@ void Server::logInfo(const std::string &msg)
 	std::cout << BLU << SRV << " " << msg << RST << std::endl;
 }
 
-//======================== PUBLIC: HELPER FUNCTIONS ===========================//
 
-std::string Server::intToString(int n)
-{
-	std::ostringstream os;
-	os << n;
-	return os.str();
-}
 
-// ─────────────────── PUBLIC: bool ───────────────────
-// static to check server password too
-bool Server::isValidPassword(const std::string &password)
-{
-	if (password.empty())
-		return false;
-	if (password.size() > 32)
-		return false;
-
-	for (std::string::size_type i = 0; i < password.size(); i++)
-	{
-		char c = password[i];
-		if (!isprint(c))
-			return false;
-	}
-
-	return true;
-}

@@ -6,13 +6,15 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:32:27 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 21:35:54 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/03 18:42:42 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "include/Server.hpp"
 #include "include/Client.hpp"
 #include "include/Channel.hpp"
+#include "include/utils.hpp"
+
 #include <cstdlib> // atoi
 
 std::pair<int, std::string> parsePortPassword(const char *portArg, const char *passwordArg)
@@ -27,7 +29,7 @@ std::pair<int, std::string> parsePortPassword(const char *portArg, const char *p
         throw std::runtime_error("Invalid port: out of range");
 
     std::string password = passwordArg;
-    if (!Server::isValidPassword(password))
+    if (!isValidPassword(password))
         throw std::runtime_error("Invalid password");
 
     return std::make_pair(static_cast<int>(port), password);
