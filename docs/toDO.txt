@@ -1,8 +1,79 @@
 
+
+
+TODO in Channel:
+
+	[] move some orthodox stuff (copy constructor and operator=) to private  
+	   // Real-world IRC channel objects are usually non-copyable — prevents accidental copies  
+
+	REPLACE:  
+		[] std::vector<Client*> _members;  
+		   => std::map<int, Client*> _members;  
+		   // Faster lookup by fd, avoids duplicates, standard for server-side user tracking  
+
+		[] std::vector<Client*> _operators;  
+		   => std::set<int> _operators;  
+		   // Store only fds of operators, no need to store full Client* here  
+
+		[] removeUser(Client* client)  
+		   => void removeUser(int fd);  
+		   // Server works with fd — avoid searching by pointer  
+
+		[] void broadCastMessage(const std::string &message, Client *sender) const;  
+		   => void broadcast(const std::string &message, int excludeFd) const;  
+		   // Simpler to exclude sender by fd, members stored by fd  
+
+	CHANGE:  
+		[] Remove either _key or _password — only one field for channel key should exist (suggest: keep _key)  
+		   // Subject requires "key" for +k mode — no need for both  
+
+	ADD:  
+		[] std::set<int> _invited;  
+		   // Store fds of invited clients for invite-only channels (+i)  
+
+		[] void inviteUser(int fd);  
+		   // Add client to invited list  
+
+		[] bool isInvited(int fd) const;  
+		   // Check if client is invited  
+
+		[] bool _inviteOnly;      // +i — invite-only channel  
+		[] bool _topicLocked;     // +t — only operators can change topic  
+		[] bool _hasKey;          // +k — key/password is set  
+		[] bool _hasUserLimit;    // +l — user limit active  
+
+		[] bool isInviteOnly() const;  
+		[] bool isTopicLocked() const;  
+		[] bool hasKey() const;  
+		[] bool hasUserLimit() const;  
+		   // Simple getters to check channel modes — server uses these  
+
+TODO SERVER?CLIENT?ELSE:
 Add handle signals*ctrl+c, ctrl+D
 change logik for in handle client input(move out pollfd)
 replyRpl001Welcome
-TODO: move moved some orthodox stuff to private(Real-world irc objects are usually non-copyable) 
+Server:
+	replyRpl001Welcome
+	ping-pong
+add:
+	handlePing()
+	void sendToClient(int fd, const std::string &message);
+    void sendPong(Client &client, const std::string &message);
+    void sendWelcome(Client &client);
+	update : void handleUser(Server &server, Client &client, const std::vector<std::string> &params)
+
+
+
+
+04.07
+DONE:
+	made a new folder called commands
+	took all the command functions (like handlePass, handleNick, etc.) out of the big Server and Client files
+	put each command into its own small .cpp files inside the commands folder
+	made the project look cleaner and easier to understand
+	cChanged the functions so they get the Server as input when they need it
+	fixed the code so things like sendToClient and getServerName still work after moving the functions
+	
 
 03.07
 

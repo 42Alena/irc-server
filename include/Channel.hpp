@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/03 18:27:14 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/04 11:04:16 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include "../include/Server.hpp"
 #include "../include/Client.hpp"
 #include "../include/utils.hpp"
+#include "../include/commands.hpp"
 
 class Client;
 
@@ -37,7 +38,7 @@ private:
 	int _userLimit;					  // Limit on the number of users in the channel
 
 public:
-	// TODO (Alena): Function definition for 'Channel' not found.
+	
 	//Adding the Channel constructors and destructor
 	Channel();// Default constructor
 	Channel(const std::string& name, Client createdBy); // Constructor with channel name and channel creator
@@ -45,7 +46,7 @@ public:
 	Channel &operator=(const Channel &other); // Assignment operator
 	~Channel();// Destructor
 	
-	// TODO (Alena): commented out, _limit is not declared in Channel.cpp, causes error C/C++(292)
+
 
 	void addUser(Client *client); //done
 	void addOperator(Client *client); //done
@@ -71,3 +72,57 @@ public:
 };
 
 #endif
+
+/* 
+COPY from todo.txt. You can delete here if it
+
+TODO in Channel:
+
+	[] move some orthodox stuff (copy constructor and operator=) to private  
+	   // Real-world IRC channel objects are usually non-copyable — prevents accidental copies  
+
+	REPLACE:  
+		[] std::vector<Client*> _members;  
+		   => std::map<int, Client*> _members;  
+		   // Faster lookup by fd, avoids duplicates, standard for server-side user tracking  
+
+		[] std::vector<Client*> _operators;  
+		   => std::set<int> _operators;  
+		   // Store only fds of operators, no need to store full Client* here  
+
+		[] removeUser(Client* client)  
+		   => void removeUser(int fd);  
+		   // Server works with fd — avoid searching by pointer  
+
+		[] void broadCastMessage(const std::string &message, Client *sender) const;  
+		   => void broadcast(const std::string &message, int excludeFd) const;  
+		   // Simpler to exclude sender by fd, members stored by fd  
+
+	CHANGE:  
+		[] Remove either _key or _password — only one field for channel key should exist (suggest: keep _key)  
+		   // Subject requires "key" for +k mode — no need for both  
+
+	ADD:  
+		[] std::set<int> _invited;  
+		   // Store fds of invited clients for invite-only channels (+i)  
+
+		[] void inviteUser(int fd);  
+		   // Add client to invited list  
+
+		[] bool isInvited(int fd) const;  
+		   // Check if client is invited  
+
+		[] bool _inviteOnly;      // +i — invite-only channel  
+		[] bool _topicLocked;     // +t — only operators can change topic  
+		[] bool _hasKey;          // +k — key/password is set  
+		[] bool _hasUserLimit;    // +l — user limit active  
+
+		[] bool isInviteOnly() const;  
+		[] bool isTopicLocked() const;  
+		[] bool hasKey() const;  
+		[] bool hasUserLimit() const;  
+		   // Simple getters to check channel modes — server uses these  
+
+
+
+*/
