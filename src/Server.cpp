@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/03 22:59:07 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/04 11:32:19 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,55 +147,21 @@ void Server::handleCommand(Client *client, const std::string &line)
 		arguments.push_back(arg);
 
 	// WIP: Basic test dispatch
-	if (command == "PASS")
-		handlePass(client, arguments);
+	if (command == "PING")
+		handlePing(*this, *client, arguments);
+	else if (command == "PASS")
+		handlePass(*this, *client, arguments);
 	else if (command == "NICK")
-		handleNick(client, arguments);
+		handleNick(*this, *client, arguments);
 	else if (command == "USER")
-		handleUser(client, arguments);
+		handleUser(*this, *client, arguments);
 	else if (command == "JOIN")
-		handleJoin(client, arguments);
+		handleJoin(*this, *client, arguments);
 	else
 		sendToClient(client->getFd(), "Unknown command: " + command + "\r\n"); // TODO
 }
 
 //======================== PRIVATE: Connection & Client Management ==================//
-
-/*
-https://www.rfc-editor.org/rfc/rfc1459.html#section-2.3.1
-"
-<nick>       ::= <letter> { <letter> | <number> | <special> }
-
-<letter>     ::= 'a' ... 'z' | 'A' ... 'Z'
-<number>     ::= '0' ... '9'
-<special>    ::= '-' | '[' | ']' | '\' | '`' | '^' | '{' | '}'
-..
-1.2 Clients
-nickname having a maximum length of nine (9) characters.
-"
-https://cplusplus.com/reference/cctype/
-*/
-bool Server::isValidNickname(const std::string &nickname)
-{
-	if (nickname.empty())
-		return false;
-	if (nickname.size() > 9)
-		return false;
-
-	if (!isalpha(nickname[0]))
-		return false;
-
-	for (std::string::size_type i = 1; i < nickname.size(); i++)
-	{
-		char c = nickname[i];
-		if (!(isalpha(c) ||
-			  isdigit(c) ||
-			  c == '-' || c == '[' || c == ']' || c == '\\' || c == '`' || c == '^' || c == '{' || c == '}'))
-			return false;
-	}
-
-	return true;
-}
 
 bool Server::isNicknameInUse(const std::string &nickname)
 {
@@ -218,30 +184,6 @@ Client *Server::getClientByNickname(const std::string &nickname)
 			return it->second;
 	}
 	return NULL;
-}
-
-/*
-- <username>: non-space, non-control characters (max 9 chars recommended)
-<nonwhite>   ::= <any 8bit code except SPACE (0x20), NUL (0x0), CR
-					 (0xd), and LF (0xa)>
- user       =  1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
-				  ; any octet except NUL(\0), CR('\r'), LF('\n'), " " and "@"
-*/
-bool Server::isValidUsername(const std::string &username)
-{
-	if (username.empty())
-		return false;
-
-	if (username.size() > 9)
-		return false;
-
-	for (std::string::size_type i = 1; i < username.size(); i++)
-	{
-		char c = username[i];
-		if (c == '\0' || c == '\n' || c == '\r' || c == ' ' || c == '@' || !isprint(c))
-			return false;
-	}
-	return true;
 }
 
 void Server::acceptNewClient()
@@ -352,6 +294,12 @@ void Server::sendToClient(int fd, const std::string &message)
 	checkResult(sendMsgResult, "Failed to send a message on socket");
 }
 
+void Server::sendPong(Client &client, const std::string &message)
+{
+	// TODO: complete function
+	sendToClient(client.getFd(), "PONG:" + message);
+}
+
 //======================== PRIVATE: Channel management ==============================//
 
 Channel *Server::getChannelByName(const std::string &channelName)
@@ -367,236 +315,6 @@ bool Server::isChannelName(const std::string &channelName)
 	if (_channels.find(channelName) != _channels.end())
 		return true;
 	return false;
-}
-
-//======================== PRIVATE: Mandatory IRC Command Handlers ==================//
-
-/*
-https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.2
-Password message
-
-	Command: PASS
-   Parameters: <password>
-
-   The PASS command is used to set a 'connection password'.  The
-   optional password can and MUST be set before any attempt to register
-   the connection is made.  Currently this requires that user send a
-   PASS command before sending the NICK/USER combination.
-
-   Numeric Replies:
-
-	   ERR_NEEDMOREPARAMS                        ERR_ALREADYREGISTRED
-		replyErr461NeedMoreParams()				replyErr462AlreadyRegistered()
-
-		ERR_PASSWDMISMATCH
-		replyErr464PasswordMismatch
-   Example:
-
-		   PASS secretpasswordhere
-"
-std::string replyErr461NeedMoreParams(const std::string &server, const std::string &command)
-{
-	return ":" + server + " " + ERR_NEEDMOREPARAMS + " " + command + " :Not enough parameters\r\n";
-}
-	std::string replyErr462AlreadyRegistered(const std::string &server)
-{
-	return ":" + server + " " + ERR_ALREADYREGISTRED + " :Unauthorized command (already registered)\r\n";
-}
-Typical raw IRC message from client:
-PASS mysecretpassword
-*/
-void Server::handlePass(Client *client, const std::vector<std::string> &params)
-{
-	if (params.empty())
-	{
-		sendToClient(client->getFd(), replyErr461NeedMoreParams(_serverName, "PASS"));
-		return;
-	}
-
-	if (!isValidPassword(params[0]))
-	{
-		sendToClient(client->getFd(), replyErr464PasswordMismatch(_serverName));
-		return;
-	}
-
-	client->setHasProvidedPass(true);
-}
-
-/*
-	https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.2
-"
-Nick message
-	Command: NICK
-   Parameters: <nickname>
-   NICK command is used to give user a nickname or change the existingone.
-
-   Numeric Replies:
-
-		   ERR_NONICKNAMEGIVEN
-		   ERR_NICKNAMEINUSE
-		   ERR_ERRONEUSNICKNAME
-
-   Examples:
-   NICK Wiz                ; Introducing new nick "Wiz" if session is
-						   still unregistered, or user changing his
-						   nickname to "Wiz"
-
-   :WiZ!jto@tolsun.oulu.fi NICK Kilroy
-						   ; Server telling that WiZ changed his
-						   nickname to Kilroy.
-"
- */
-void Server::handleNick(Client *client, const std::vector<std::string> &params)
-{
-	if (params.empty())
-	{
-		sendToClient(client->getFd(), replyErr431NoNickGiven(_serverName));
-		return;
-	}
-
-	const std::string newNickname = params[0];
-
-	if (isNicknameInUse(newNickname))
-	{
-		sendToClient(client->getFd(), replyErr433NickInUse(_serverName, newNickname));
-		return;
-	}
-
-	if (!isValidNickname(newNickname))
-	{
-		sendToClient(client->getFd(), replyErr432ErroneousNick(_serverName, newNickname));
-		return;
-	}
-
-	const std::string oldNickname = client->getNickname();
-
-	client->setNickname(newNickname);
-
-	// broadcast after change nick to  client self and to all channles where this client is member
-	//:<old_nick> NICK <new_nick>\r\n
-	if (!oldNickname.empty())
-	{
-		// send message to client
-		std::string messageNickChange = ":" + oldNickname + " NICK " + newNickname + "\r\n";
-		sendToClient(client->getFd(), messageNickChange);
-
-		// Send message to all clients in the same channels
-		const std::vector<Channel *> &clientChannels = client->getChannels();
-
-		for (std::vector<Channel *>::const_iterator it = clientChannels.begin(); it != clientChannels.end(); ++it)
-		{
-			(*it)->broadCastMessage(messageNickChange, client);
-			std::cout << "Client is in channel: " << (*it)->getName() << std::endl;
-		}
-	}
-
-	client->setHasProvidedNick(true);
-}
-
-/*
-https://www.rfc-editor.org/rfc/rfc1459.html#section-2.3.1
-   <user>       ::= <nonwhite> { <nonwhite> }
-   <nonwhite>   ::= <any 8bit code except SPACE (0x20), NUL (0x0), CR
-					 (0xd), and LF (0xa)
-3.1.3 User message
- Command: USER
-Parameters: <user> <mode> <unused> <realname>
-=>	must have at least 4 parameters. Else send ERR_NEEDMOREPARAMS
-
-- <username>: non-space, non-control characters (max 9 chars recommended)
- - <mode>: numeric bitmask (bit 2 = 'w' mode, bit 3 = 'i' mode)
- - <unused>  => ignore it present for historical reasons, but is ignored by modern servers.
-			It must be present in the command for correct syntax, but its value doesn't matter.
-- <realname>: can contain spaces, starts after ':'
-
-Numeric Replies:
-		ERR_NEEDMOREPARAMS      replyErr461NeedMoreParams
-		ERR_ALREADYREGISTRED	replyErr462AlreadyRegistered
-Example:
-   USER guest 0 * :Ronnie Reagan   ; User registering themselves with a
-								   username of "guest" and real name
-								   "Ronnie Reagan".
-
-   USER guest 8 * :Ronnie Reagan   ; User registering themselves with a
-								   username of "guest" and real name
-								   "Ronnie Reagan", and asking to be set
-								   invisible.
-
-
-https://www.rfc-editor.org/rfc/rfc2812.html#section-1.2.1
-Users
-	user       =  1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
-				  ; any octet except NUL, CR, LF, " " and "@"
-
-https://www.rfc-editor.org/rfc/rfc2812.html#section-1.2.1
-The <mode> parameter should be a numeric, and can be used to
-   automatically set user modes when registering with the server.  This
-   parameter is a bitmask, with only 2 bits having any signification: if
-   the bit 2 is set, the user mode 'w' will be set and if the bit 3 is
-   set, the user mode 'i' will be set.  (See Section 3.1.5 "User
-   Modes").
-   https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.5
-<mode> Value	Meaning
-4	'w' set (WHOIS visible)
-8	'i' set (invisible)
-
-
-
-*/
-void Server::handleUser(Client *client, const std::vector<std::string> &params)
-{
-
-	// Parameters: <user> <mode> <unused> <realname>
-	if (params.size() < 4)
-	{
-		sendToClient(client->getFd(), replyErr461NeedMoreParams(_serverName, "USER"));
-		return;
-	}
-	
-	const std::string &username = params[0];
-	const std::string &modeStr = params[1];
-	// const std::string &unused = params[2]; // must ignore, only historical
-	const std::string &realname = params[3];
-
-	if (client->isRegistered())
-	{
-		sendToClient(client->getFd(), replyErr462AlreadyRegistered(_serverName));
-		return;
-	}
-
-	if (!isValidUsername(username))
-	{
-		sendToClient(client->getFd(), replyErr461NeedMoreParams(_serverName, "USER"));
-		return;
-	}
-
-	int userMode = std::atoi(modeStr.c_str());
-	if (userMode & 4) // bit 2 = 'w' = (WHOIS visible)
-		client->addUserMode('w');
-	if (userMode & 8) // bit 3 =  'i' = (invisible)
-		client->addUserMode('i');
-
-
-	// <realname> starts after : and can contain spaces
-	if (!realname.empty() && realname[0] == ':')
-		client->setRealname(realname.substr(1)); //after leading ':' = after 1 pos 
-	else
-		client->setRealname(realname);
-
-}
-
-void Server::handleJoin(Client *client, const std::vector<std::string> &params)
-{
-	(void)client;
-	(void)params;
-	sendToClient(client->getFd(), "JOIN received\r\n");
-}
-
-void Server::handlePrivateMessage(Client *client, const std::vector<std::string> &params)
-{
-	(void)client;
-	(void)params;
-	logInfo("handlePrivateMessage() called - Not implemented yet.");
 }
 
 //======================== PRIVATE:Internal Utilities ==================//
