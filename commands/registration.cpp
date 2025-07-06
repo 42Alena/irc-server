@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   registration.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 11:15:08 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/04 12:06:55 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/06 11:53:36 by luifer           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,7 +220,9 @@ void handleNick(Server &server, Client &client, const std::vector<std::string> &
         // Send message to all clients in the same channels
         const std::vector<Channel *> &clientChannels = client.getChannels();
         for (std::vector<Channel *>::const_iterator it = clientChannels.begin(); it != clientChannels.end(); ++it)
-            (*it)->broadCastMessage(messageNickChange, &client);
+          (*it)->broadCastMessage(messageNickChange, client.getFd());
+		//Luis: I added this line here since I change the broadCastMessage function and was having a compilation error  
+		//(*it)->broadCastMessage(messageNickChange, &client);
     }
 
     client.setHasProvidedNick(true);
