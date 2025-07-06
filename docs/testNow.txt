@@ -21,3 +21,10 @@ To stop:
 
 1.terminal
 	CTRL+C
+
+_________________
+irssi --help
+
+irssi -c localhost -p 6667 -n abc
+/connect localhost
+/quit
