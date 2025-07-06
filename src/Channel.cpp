@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
+/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/01 17:34:06 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/07/06 11:46:23 by luifer           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ Channel::Channel(const std::string &name, Client createdBy) : _name(name), _user
 	_modes['k'] = false; // Key mode
 	_modes['l'] = false; // User limit mode
 	_modes['n'] = false; // No external messages mode
-	addUser(&createdBy); // Add the creator to the channel members
+	addUser(createdBy.getFd(), &createdBy); // Add the creator to the channel members
 }
 
 // Copy constructor
@@ -86,6 +86,7 @@ Channel::~Channel() {
 	std::cout << RED << "Channel " << _name << " destroyed." << RST << std::endl;
 }
 
+
 //======================== SETTERS ===================================//
 // Function to set the topic of the channel
 void Channel::setTopic(const std::string &topic) { _topic = topic; }
@@ -106,6 +107,7 @@ void Channel::setKey(const std::string &key) { _key = key; }
 void Channel::setLimit(int limit) {
 	_userLimit = limit;
 }
+
 
 //======================== GETTERS ===================================//
 
@@ -135,78 +137,117 @@ std::string Channel::getKey() const {
 }
 
 // Function to get the members of the channel
-std::vector<Client *> Channel::getMembers() const {
+std::map<int, Client *> Channel::getMembers() const {
 	return _members; // Return the vector of members in the channel
 }
 
 // Function to get the operators of the channel
-std::vector<Client *> Channel::getOperators() const {
+std::set<int> Channel::getOperators() const {
 	return _operators; // Return the vector of operators in the channel
 }
+
 
 //======================== MEMBER FUNCTIONS ===========================//
 
 // Function to add a clients to the _members vector inside the channel
-void Channel::addUser(Client *client) {	_members.push_back(client); }
-
+void Channel::addUser(int fd, Client *client) {
+	_members[fd] = client; // Add the client to the _members map using their file descriptor (fd) as the key
+	std::cout << BLU << "Client added to channel: " << client->getNickname() << RST << std::endl; 
+}
 
 // Function to add a client to the _operators vector inside the channel
-void Channel::addOperator(Client *client) {	_operators.push_back(client); }
-
+void Channel::addOperator(int fd) {	
+	_operators.insert(fd); // Add the client's file descriptor (fd) to the _operators set
+	std::cout << BLU << "Client added as operator: " << fd << RST << std::endl;
+}
 
 // This function checks if the user is an operator before removing them
 // If the user is an operator, it prints an error message and does not remove them
 // If the user is not an operator, it searches for the user in the _members vector and removes them if found
-void Channel::removeUser(Client *client)
+void Channel::removeUser(int fd, Client *client)
 {
 	if (isOperator(client))
 	{
 		std::cout << RED << "Error: Cannot remove operator from channel." << RST << std::endl;
-		return;
 	}
-	for (std::vector<Client *>::iterator it = _members.begin(); it != _members.end(); ++it){
-		if(*it == client){
-			_members.erase(it); // Erase the client from the _members vector if found
-			std::cout << RED << "Client removed from channel: " << RST << std::endl;
-			return;
-		}
+	std::map<int, Client *>::iterator it = _members.find(fd);
+	if(it != _members.end() && it->second == client){
+		_members.erase(it); // Erase the client from the _members map if found
+		std::cout << RED << "Client removed from channel: " << client->getNickname() << RST << std::endl;
 	}
-	std::cout << BLU << "Client not found in this channel, are you sure is here?." << RST << std::endl;
+	else {
+		std::cout << BLU << "Client not found in this channel, are you sure is here?." << RST << std::endl;
+	}
 }
-
 
 // Function to check if a client is a member of the channel
 bool Channel::hasMembers(Client *client) const
 {
-	for (std::vector<Client *>::const_iterator it = _members.begin(); it != _members.end(); ++it)
+	std::map<int, Client *>::const_iterator it = _members.find(client->getFd());
+	if (it != _members.end())
 	{
-		if (*it == client)
-		{
-			return true; // If the client is found in the members vector, return true
-		}
+		return true; // If the client is found in the members map, return true
 	}
-	return false; // If the client is not found, return false
+	else 
+	{
+		return false; // If the client is not found, return false
+	}
 }
-
 
 // Function to check if a client is an operator of the channel
 bool Channel::isOperator(Client *client) const
 {
-	for (std::vector<Client *>::const_iterator it = _operators.begin(); it != _operators.end(); ++it)
-	{
-		if (*it == client)
-			return true; // If the client is found in the operators vector, return true
-	}
-	return false;	 // If the client is not found, return false
+	std::map<int, Client *>::const_iterator it = _members.find(client->getFd());
+	if(it == _members.end())
+		return false; // If the client is not found in the members map, return false
+	else if (_operators.find(client->getFd()) != _operators.end())
+		return true; // If the client is found in the operators set, return true)
+	else
+		return false; // If the client is not found in the operators set, return false
 }
 
 // Function to broadcast a message to all members of the channel
-void Channel::broadCastMessage(const std::string &message, Client *sender) const {
-	for (std::vector<Client *>::const_iterator it = _members.begin(); it != _members.end(); ++it)
-	{
-		if (*it != sender) // Don't send the message to the sender
-		{
-			(*it)->appendToReceivedData(message); // Append the message to the client's received data
-		}
-	}
+void Channel::broadCastMessage(const std::string &message, int excludeFd) const {
+    // Iterate through the _members map
+    for (std::map<int, Client *>::const_iterator it = _members.begin(); it != _members.end(); ++it) {
+        int fd = it->first;         // Get the file descriptor
+        Client *client = it->second; // Get the client pointer
+        // Skip the sender (excludeFd)
+        if (fd == excludeFd) {
+            continue;
+        }
+        // Send the message to the client
+        client->appendToReceivedData(message);
+    }
+}
+
+//Function to invite a user to the channel
+void Channel::inviteUser(int fd) {
+	_invited.insert(fd); // Add the user's file descriptor (fd) to the _invited set
+	std::cout << BLU << "User with fd " << fd << " invited to channel: " << _name << RST << std::endl;
+}
+
+// Fcuntion to check if the user's file descriptor (fd) is in the _invited set
+bool Channel::isInvited(int fd) const {
+	return _invited.find(fd) != _invited.end(); // Return true if the user is invited, false otherwise
+}
+
+// Function to check if the channel is invite-only
+bool Channel::isInviteOnly() const {
+	return _modes.at('i'); // Return true if the 'i' mode is enabled, false otherwise
+}
+
+// Function to check if the topic is locked for changes
+bool Channel::isTopicLocked() const {
+	return _modes.at('t'); // Return true if the 't' mode is enabled, false otherwise
+}
+
+// Function to check if the channel has a key/password set
+bool Channel::hasKey() const {
+	return !_key.empty(); // Return true if the key is not empty, false otherwise
+}
+
+// Function to check if the channel has a user limit set
+bool Channel::hasUserLimit() const {
+	return _modes.at('l'); // Return true if the 'l' mode is enabled, false otherwise
 }
