@@ -64,6 +64,11 @@ add:
 
 
 
+07.07
+DONE:
+GIT BRANCH: "feature/ping-pong"
+  - handlePing()
+  - sendPong()
 
 04.07
 DONE:

@@ -18,7 +18,7 @@ SOURCES = \
 	./commands/kick.cpp\
 	./commands/mode.cpp\
 	./commands/part.cpp\
-	./commands/ping.cpp\
+	./commands/pingPong.cpp\
 	./commands/privmsg.cpp\
 	./commands/quit.cpp\
 	./commands/registration.cpp\
