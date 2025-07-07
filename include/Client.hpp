@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/03 22:55:42 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/07 20:22:35 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,18 @@ class Client
 {
 private:
     //======================== PRIVATE: CONSTRUCTORS  (IRC clients are non-copyable)  ==============//
+    Client();
     Client(const Client &o);
     Client &operator=(const Client &o);
 
     //======================== SOCKET & IDENTIFICATION =========================//
     int _fd;                   // Client socket file descriptor (-1 = no socket)
+    std::string _host; // Client's IP address (used in welcome message)
     std::string _nickname;     // Nickname set by NICK command
     std::string _username;    // Username from USER command
     std::string _realname;     // Realname from USER command
     std::string _userModes;    // Modes from USER command
+
 
     //======================== REGISTRATION TRACKING ===========================//
     bool _hasProvidedPass; // True if PASS command provided
@@ -54,8 +57,7 @@ private:
 
 public:
     //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==============//
-    Client();
-    Client(int fd);
+    Client(int fd, const std::string &host);
     ~Client();
 
     //======================== PUBLIC: GETTERS =================================//
@@ -63,6 +65,7 @@ public:
     std::string getNickname() const; // Get client nickname
     std::string getUsername() const; // Get client username
     std::string getRealname() const; // Get client username
+    std::string getHost() const;    // Get client IP address(used in welcome message)
     std::string getUserModes() const;
 
     const std::string &getReceivedData() const;        // Get accumulated received data

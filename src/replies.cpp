@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:13:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/30 17:45:06 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/07 22:07:32 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 
 std::string replyRpl001Welcome(const std::string &server, const std::string &nick, const std::string &user, const std::string &host)
 {
-    return ":" + server + " " + RPL_WELCOME + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n";
+    return ":" + server + " " + RPL_WELCOME + " " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n";
 }
+
+
 
 std::string replyRpl002YourHost(const std::string &server)
 {

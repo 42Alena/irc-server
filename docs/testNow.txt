@@ -1,5 +1,8 @@
 28.06
 STEps to test:
+0. Check if your previous server is still running
+lsof -i :6667
+kill -9 PID
 
 1.terminal:
 
@@ -7,6 +10,12 @@ STEps to test:
  ./ircserv 6667 password123
 
 2.terminal (netcat)
+echo -ne "PASS password123\r\nNICK testUser\r\nUSER testUser 0 * :Real Name\r\n" | nc localhost 6667
+
+
+//
+
+
  nc localhost 6667
 
  //test what you need
@@ -27,10 +36,26 @@ To stop:
 _________________
 irssi --help
 
-//not working now:Received command from client fd 4: CAP LS 302
-irssi -c localhost -p 6667 -n abc
+
+
+irssi
+/connect localhost 6667
+/pass password123
+/nick testUser
+/user testUser 0 * :Real Name
+
 
 with port/user/password:
-irssi -h localhost -p 6667 -n abc -w 123
+1)
+-c  "connect immediately" (problem with old irssi versions)
+irssi -c localhost -p 6667 -n testUser -w password123
+
+or 
+2)
+irssi -h localhost -p 6667 -n testUser -w password123
+    Connect to localhost on port 6667
+    Use nickname testUser
+    Send PASS password123 automatically
 /connect localhost
+
 /quit

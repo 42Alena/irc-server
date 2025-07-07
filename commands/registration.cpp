@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   registration.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 11:15:08 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/06 11:53:36 by luifer           ###   ########.fr       */
+/*   Updated: 2025/07/07 22:09:25 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 // handleNick
 // handleUser
 // sendWelcome
-
 
 /*
 https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.2
@@ -68,10 +67,12 @@ void handlePass(Server &server, Client &client, const std::vector<std::string> &
 	}
 
 	client.setHasProvidedPass(true);
+
+	if (client.isRegistered())
+	{
+		sendWelcome(server, client);
+	}
 }
-
-
-
 
 /*
 https://www.rfc-editor.org/rfc/rfc1459.html#section-2.3.1
@@ -145,6 +146,7 @@ void handleUser(Server &server, Client &client, const std::vector<std::string> &
 		server.sendToClient(client.getFd(), replyErr461NeedMoreParams(server.getServerName(), "USER"));
 		return;
 	}
+	client.setUsername(username);
 
 	int userMode = std::atoi(modeStr.c_str());
 	if (userMode & 4) // bit 2 = 'w' = (WHOIS visible)
@@ -157,8 +159,14 @@ void handleUser(Server &server, Client &client, const std::vector<std::string> &
 		client.setRealname(realname.substr(1)); // after leading ':'
 	else
 		client.setRealname(realname);
-}
 
+	client.setHasProvidedUser(true);
+
+	if (client.isRegistered())
+	{
+		sendWelcome(server, client);
+	}
+}
 
 /*
 	https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.2
@@ -186,51 +194,79 @@ Nick message
  */
 void handleNick(Server &server, Client &client, const std::vector<std::string> &params)
 {
-    if (params.empty())
-    {
-        server.sendToClient(client.getFd(), replyErr431NoNickGiven(server.getServerName()));
-        return;
-    }
+	if (params.empty())
+	{
+		server.sendToClient(client.getFd(), replyErr431NoNickGiven(server.getServerName()));
+		return;
+	}
 
-    const std::string newNickname = params[0];
+	const std::string newNickname = params[0];
 
-    if (server.isNicknameInUse(newNickname))
-    {
-        server.sendToClient(client.getFd(), replyErr433NickInUse(server.getServerName(), newNickname));
-        return;
-    }
+	if (server.isNicknameInUse(newNickname))
+	{
+		server.sendToClient(client.getFd(), replyErr433NickInUse(server.getServerName(), newNickname));
+		return;
+	}
 
-    if (!isValidNickname(newNickname))
-    {
-        server.sendToClient(client.getFd(), replyErr432ErroneousNick(server.getServerName(), newNickname));
-        return;
-    }
+	if (!isValidNickname(newNickname))
+	{
+		server.sendToClient(client.getFd(), replyErr432ErroneousNick(server.getServerName(), newNickname));
+		return;
+	}
 
-    const std::string oldNickname = client.getNickname();
-    client.setNickname(newNickname);
+	const std::string oldNickname = client.getNickname();
+	client.setNickname(newNickname);
 
-    // Broadcast nick change to client and all channels they are in
-    if (!oldNickname.empty())
-    {
-        std::string messageNickChange = ":" + oldNickname + " NICK " + newNickname + "\r\n";
+	// Broadcast nick change to client and all channels they are in
+	if (!oldNickname.empty())
+	{
+		std::string messageNickChange = ":" + oldNickname + " NICK " + newNickname + "\r\n";
 
-        // Send message to the client
-        server.sendToClient(client.getFd(), messageNickChange);
+		// Send message to the client
+		server.sendToClient(client.getFd(), messageNickChange);
 
-        // Send message to all clients in the same channels
-        const std::vector<Channel *> &clientChannels = client.getChannels();
-        for (std::vector<Channel *>::const_iterator it = clientChannels.begin(); it != clientChannels.end(); ++it)
-          (*it)->broadCastMessage(messageNickChange, client.getFd());
-		//Luis: I added this line here since I change the broadCastMessage function and was having a compilation error  
-		//(*it)->broadCastMessage(messageNickChange, &client);
-    }
+		// Send message to all clients in the same channels
+		const std::vector<Channel *> &clientChannels = client.getChannels();
+		for (std::vector<Channel *>::const_iterator it = clientChannels.begin(); it != clientChannels.end(); ++it)
+			(*it)->broadCastMessage(messageNickChange, client.getFd());
+	}
 
-    client.setHasProvidedNick(true);
+	client.setHasProvidedNick(true);
+
+	if (client.isRegistered())
+	{
+		sendWelcome(server, client);
+	}
 }
 
+/*
+https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.5
+3.1 Connection Registration
 
-void sendWelcome(Server &server, Client &client) {
-	(void)server;
-	(void)client;
-	
+   The commands described here are used to register a connection with an
+   IRC server as a user as well as to correctly disconnect.
+
+   A "PASS" command is not required for a client connection to be registered,
+   but it MUST precede the latter of the NICK/USER
+   combination (for a user connection) or the SERVICE command (for a
+   service connection). The RECOMMENDED order for a client to register
+   is as follows:
+
+						   1. Pass message
+		   2. Nick message                 2. Service message
+		   3. User message
+
+   Upon success, the client will receive an RPL_WELCOME (for users) or
+   RPL_YOURESERVICE (for services) message indicating that the
+   connection is now registered and known the to the entire IRC network.
+   The reply message MUST contain the full client identifier upon which
+   it was registered.
+																	_host
+   :serverName 001 nick :Welcome to the IRC network nick!username@127.0.0.1
+																@localhost
+*/
+void sendWelcome(Server &server, Client &client)
+{
+	server.sendToClient(client.getFd(),
+						replyRpl001Welcome(server.getServerName(), client.getNickname(), client.getUsername(), client.getHost()));
 }
