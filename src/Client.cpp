@@ -6,13 +6,16 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/03 22:57:26 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/07 20:11:13 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Client.hpp"
 
 //======================== PRIVATE: CONSTRUCTORS  (IRC clients are non-copyable)  ===//
+Client::Client()
+{
+}
 
 Client::Client(const Client &o)
 {
@@ -26,23 +29,10 @@ Client &Client::operator=(const Client &o)
 }
 
 //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==================//
-Client::Client()
-    : _fd(-1),
-      _nickname(""),
-      _username(""),
-      _userModes(""),
-      _hasProvidedPass(false),
-      _hasProvidedNick(false),
-      _hasProvidedUser(false),
-      _channels(),
-      _channelOps(),
-      _sendData(""),
-      _receivedData("")
-{
-}
 
-Client::Client(int fd)
+Client::Client(int fd, const std::string &host)
     : _fd(fd),
+      _host(host),
       _nickname(""),
       _username(""),
       _userModes(""),
@@ -55,7 +45,6 @@ Client::Client(int fd)
       _receivedData("")
 {
 }
-
 
 Client::~Client() {}
 
@@ -81,17 +70,21 @@ std::string Client::getRealname() const
     return _realname;
 }
 
+std::string Client::getHost() const
+{
+    return _host;
+}
+
 const std::string &Client::getReceivedData() const
 {
     return _receivedData;
 }
 
-
 std::string Client::getUserModes() const
 {
     return _userModes;
 }
-    
+
 /*
 Get list of channels, where this client is a member
  */
@@ -135,7 +128,7 @@ void Client::setRealname(const std::string &realname)
 void Client::addUserMode(char modeChar)
 {
     if (_userModes.find(modeChar) == std::string::npos)
-    _userModes += modeChar;
+        _userModes += modeChar;
 }
 
 void Client::setHasProvidedPass(bool val)
@@ -184,7 +177,7 @@ std::string Client::extractNextCmd()
 
 bool Client::isRegistered() const
 {
-    return  _hasProvidedPass && _hasProvidedNick && _hasProvidedUser;
+    return _hasProvidedPass && _hasProvidedNick && _hasProvidedUser;
 }
 
 bool Client::isOperator(Channel *channel) const

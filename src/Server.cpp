@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/04 11:32:19 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/07 22:27:54 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,9 +146,16 @@ void Server::handleCommand(Client *client, const std::string &line)
 	while (iss >> arg)
 		arguments.push_back(arg);
 
-	// WIP: Basic test dispatch
 	if (command == "PING")
 		handlePing(*this, *client, arguments);
+	else if (command == "CAP")
+	{
+		if (arguments.size() > 0 && arguments[0] == "LS")
+		{
+			std::string message = "CAP * LS :\r\n";
+			sendToClient(client->getFd(), message);
+		}
+	}
 	else if (command == "PASS")
 		handlePass(*this, *client, arguments);
 	else if (command == "NICK")
@@ -194,6 +201,12 @@ void Server::acceptNewClient()
 		socklen_t clientAddressrLen = sizeof(clientAddress);
 		int clientFd = accept(_serverFd, reinterpret_cast<struct sockaddr *>(&clientAddress), &clientAddressrLen);
 
+		// get client ip(need for welcome message)
+		char ipStr[INET_ADDRSTRLEN];
+		// Convert binary IP to C-style string
+		inet_ntop(AF_INET, &(clientAddress.sin_addr), ipStr, INET_ADDRSTRLEN);
+		std::string clientIP = ipStr;
+
 		if (clientFd == -1)
 		{
 			if (errno != EAGAIN && errno != EWOULDBLOCK) // Real error, not just no more connections
@@ -214,8 +227,8 @@ void Server::acceptNewClient()
 		}
 		else
 		{
-			_clients[clientFd] = new Client(clientFd); // Create new client object
-			std::cout << "New client connected on fd " << clientFd << std::endl;
+			_clients[clientFd] = new Client(clientFd, clientIP);
+			std::cout << "New client connected on fd " << clientFd << " (" << clientIP << ")" << std::endl;
 		}
 
 		// (pollfd) Add new client to poll() monitoring
@@ -226,6 +239,7 @@ void Server::acceptNewClient()
 		_pollFds.push_back(clientPollFd);
 	}
 }
+
 /*
  * Close socket
  * Remove client from map
@@ -292,12 +306,6 @@ void Server::sendToClient(int fd, const std::string &message)
 {
 	int sendMsgResult = send(fd, message.data(), message.size(), 0);
 	checkResult(sendMsgResult, "Failed to send a message on socket");
-}
-
-void Server::sendPong(Client &client, const std::string &message)
-{
-	// TODO: complete function
-	sendToClient(client.getFd(), "PONG:" + message);
 }
 
 //======================== PRIVATE: Channel management ==============================//

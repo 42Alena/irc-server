@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/02 16:32:59 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/07 21:03:37 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,10 @@
 // =============================================================
 //                         Replies.hpp
 //     Full IRC Replies with Original RFC Comments - ft_irc
+// 5.1 Command responses
+ //  Numerics   001 to 099 are used for client-server
+ //  connections only and should never travel between servers.
+//     200-399 Replies  generated in the response to commands
 // https://www.rfc-editor.org/rfc/rfc1459.html#section-2.4
 // =============================================================
 

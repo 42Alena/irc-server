@@ -70,6 +70,27 @@ GIT BRANCH: "feature/ping-pong"
   - handlePing()
   - sendPong()
 
+GIT BRANCH: "feature/welcome"  
+in registration.cpp:
+ add check if registered 
+ add send welcome
+ Client:
+	added:
+	std::string _host;
+	getHost()
+	get ip 
+	21:21 -!- Unknown command: CAP
+	CAP -IRC Capability Negotiation.Need ignore
+	
+	changed:
+	//for welocme message:
+	Client(int fd); to 
+	Client(int fd, const std::string &host);
+	put Client() in private. Only creating with fd and host
+	
+	21:21 -!- Irssi: Connection to localhost established
+
+
 04.07
 DONE:
 	made a new folder called commands
