@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/07 20:22:35 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/08 00:55:08 by luifer           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@ private:
     std::string _realname;     // Realname from USER command
     std::string _userModes;    // Modes from USER command
 
+    //luis: added the attribute here since will be needed it to join channels
+    std::string _password; // Password set by PASS command (if any to use in channels when want to join)
+
 
     //======================== REGISTRATION TRACKING ===========================//
     bool _hasProvidedPass; // True if PASS command provided
@@ -74,6 +77,9 @@ public:
     bool getHasProvidedPass() const;
     bool getHasProvidedNick() const;
     bool getHasProvidedUser() const;
+
+    //Luis: added the getter of the password
+    std::string getPassword() const; // Get password set by PASS command
 
     //======================== PUBLIC: SETTERS =================================//
     void setNickname(const std::string &nickname); // Set nickname (NICK cmd)

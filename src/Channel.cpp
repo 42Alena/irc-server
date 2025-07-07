@@ -6,7 +6,7 @@
 /*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/06 11:46:23 by luifer           ###   ########.fr       */
+/*   Updated: 2025/07/08 00:51:38 by luifer           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ Channel::Channel() {
 }
 
 // Constructor with channel name and creator
-Channel::Channel(const std::string &name, Client createdBy) : _name(name), _userLimit(0) {
+Channel::Channel(const std::string &name, Client &createdBy) : _name(name), _userLimit(0) {
 	// Initialize the channel with the given name and default values
 	_topic = "";
 	_password = "";
@@ -221,13 +221,7 @@ void Channel::broadCastMessage(const std::string &message, int excludeFd) const 
     }
 }
 
-//Function to invite a user to the channel
-void Channel::inviteUser(int fd) {
-	_invited.insert(fd); // Add the user's file descriptor (fd) to the _invited set
-	std::cout << BLU << "User with fd " << fd << " invited to channel: " << _name << RST << std::endl;
-}
-
-// Fcuntion to check if the user's file descriptor (fd) is in the _invited set
+// Function to check if the user's file descriptor (fd) is in the _invited set
 bool Channel::isInvited(int fd) const {
 	return _invited.find(fd) != _invited.end(); // Return true if the user is invited, false otherwise
 }
@@ -250,4 +244,129 @@ bool Channel::hasKey() const {
 // Function to check if the channel has a user limit set
 bool Channel::hasUserLimit() const {
 	return _modes.at('l'); // Return true if the 'l' mode is enabled, false otherwise
+}
+
+//----------------------- COMMANDS HANDLERS -----------------------//
+//Function to invite a user to the channel
+void Channel::inviteUser(int fd) {
+	_invited.insert(fd); // Add the user's file descriptor (fd) to the _invited set
+	std::cout << BLU << "User with fd " << fd << " invited to channel: " << _name << RST << std::endl;
+}
+
+// Function to handle a user joining the channel
+//it check if the channel is not created and created it if needed 
+//it check if the user is already a member of the channel
+//it check if the channel is invite-only and if the user is invited
+//it check if the channel has a key and if the user provided the correct key
+//it check if the channel has a user limit and if it is reached
+//after all checks, it adds the user to the channel and broadcasts a message to other members
+void Channel::handleJoin(Client *client, Server &server) {
+	if (!server.isChannelName(_name)){
+		//Channel *newChannel = new Channel(_name, *client); // Create a new channel with the client's nickname
+		// ToDo -> when defined the method to add a new channel in Server class, call it here
+		std::cout << BLU << "Channel " << _name << " created by " << client->getNickname() << RST << std::endl;
+	}
+	if (hasMembers(client)) {
+		std::cout << RED << "Error: User already in channel." << RST << std::endl;
+		return; // If the user is already a member, return with an error message
+	}
+	if (isInviteOnly() && !isInvited(client->getFd())) {
+		std::cout << RED << "Error: Channel is invite-only." << RST << std::endl;
+		return; // If the channel is invite-only and the user is not invited, return with an error message
+	}
+	if (hasKey() && client->getPassword() != _key) {
+		std::cout << RED << "Error: Incorrect channel key." << RST << std::endl;
+		return; // If the channel has a key and the user's password does not match, return with an error message
+	}
+	if (hasUserLimit() && static_cast<int>(_members.size()) >= _userLimit) {
+		std::cout << RED << "Error: Channel user limit reached." << RST << std::endl;
+		return; // If the channel has a user limit and it is reached, return with an error message
+	}
+	addUser(client->getFd(), client); // Add the user to the channel
+	broadCastMessage(client->getNickname() + " has joined the channel.", client->getFd()); // Notify other members
+	std::cout << BLU << "User " << client->getNickname() << " joined channel: " << _name << RST << std::endl;
+}
+
+// Function to handle a user leaving the channel
+void Channel::handlePart(Client *client, Server &server) {
+	(void)server; // Unused parameter for now
+	if (!hasMembers(client)) {
+		std::cout << RED << "Error: User not in channel." << RST << std::endl;
+		return; // If the user is not a member, return with an error message
+	}
+	removeUser(client->getFd(), client); // Remove the user from the channel
+	broadCastMessage(client->getNickname() + " has left the channel.", client->getFd()); // Notify other members
+	std::cout << BLU << "User " << client->getNickname() << " left channel: " << _name << RST << std::endl;
+}
+
+// Function to handle the change of the topic in the channel
+// it checks if the user is an operator before allowing them to change the topic
+// after this check if set the new topic and broadcasts a message to other members
+void Channel::handleTopic(Client *client, const std::string &newTopic) {
+	if (!isOperator(client)) {
+		std::cout << RED << "Error: Only operators can change the topic." << RST << std::endl;
+		return; // If the user is not an operator, return with an error message
+	}
+	setTopic(newTopic); // Use the setter to change the topic
+	broadCastMessage("Topic changed to: " + _topic, client->getFd()); // Notify other members
+	std::cout << BLU << "Topic changed to: " << _topic << " by " << client->getNickname() << RST << std::endl;
+}
+
+// Function to handle the change of modes in the channel
+// it checks if the user is an operator before allowing them to change modes
+// after this check it sets the mode and captures the boolean enable to determine if the mode is being enabled or disabled
+// and then broadcasts a message to other members notifying them of the change
+void Channel::handleMode(Client *client, char mode, bool enable) {
+	if (!isOperator(client)) {
+		std::cout << RED << "Error: Only operators can change modes." << RST << std::endl;
+		return; // If the user is not an operator, return with an error message
+	}
+	setMode(mode, enable); // Use the setter to change the mode
+	std::string modeStatus = enable ? "enabled" : "disabled";
+	broadCastMessage("Mode '" + std::string(1, mode) + "' has been " + modeStatus + ".", client->getFd()); // Notify other members
+	std::cout << BLU << "Mode '" << mode << "' has been " << modeStatus << " by " << client->getNickname() << RST << std::endl;
+}
+
+// Function to handle inviting a user to the channel
+// it checks if the user is an operator before allowing them to invite others
+// if the user is already invited, it returns with an error message
+// if the user is not invited, it adds them to the invited list and broadcasts a message to other members
+void Channel::handleInvite(Client *client, int targetFd) {
+	if (!isOperator(client)) {
+		std::cout << RED << "Error: Only operators can invite users." << RST << std::endl;
+		return; // If the user is not an operator, return with an error message
+	}
+	if (isInvited(targetFd)) {
+		std::cout << RED << "Error: User already invited." << RST << std::endl;
+		return; // If the user is already invited, return with an error message
+	}
+	inviteUser(targetFd); // Add the user to the invited list
+	broadCastMessage(client->getNickname() + " has invited a user to the channel.", client->getFd()); // Notify other members
+	std::cout << BLU << "User with fd " << targetFd << " invited to channel: " << _name << RST << std::endl;
+}
+
+// Function to handle kicking a user from the channel
+void Channel::handleKick(Client *client, int targetFd, const std::string &reason) {
+	if (!isOperator(client)) {
+		std::cout << RED << "Error: Only operators can kick users." << RST << std::endl;
+		return; // If the user is not an operator, return with an error message
+	}
+	if (!hasMembers(client)) {
+		std::cout << RED << "Error: User not in channel." << RST << std::endl;
+		return; // If the user is not a member, return with an error message
+	}
+	removeUser(targetFd, client); // Remove the user from the channel
+	broadCastMessage(client->getNickname() + " has kicked a user from the channel. Reason: " + reason, client->getFd()); // Notify other members
+	std::cout << BLU << "User with fd " << targetFd << " kicked from channel: " << _name << RST << std::endl;
+}
+
+// Function to handle setting a key for the channel
+void Channel::handleKey(Client *client, const std::string &key) {
+	if (!isOperator(client)) {
+		std::cout << RED << "Error: Only operators can set a key." << RST << std::endl;
+		return; // If the user is not an operator, return with an error message
+	}
+	setKey(key); // Use the setter to change the key
+	broadCastMessage("Channel key has been changed", client->getFd()); // Notify other members
+	std::cout << BLU << "Channel key has been set by " << client->getNickname() << RST << std::endl;
 }
