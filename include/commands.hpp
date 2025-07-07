@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:03 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/04 11:25:43 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/07 18:19:59 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ void handlePrivateMessage(Server &server, Client &client, const std::vector<std:
 //======================== PUBLIC: SERVER INTERACTION =============================//
 
 void handlePing(Server &server, Client &client, const std::vector<std::string> &params);
+void sendPong(Server &server, Client &client, const std::string &originMessage);
 void handleQuit(Server &server, Client &client, const std::vector<std::string> &params);
 void sendWelcome(Server &server, Client &client); //registration.cpp
 

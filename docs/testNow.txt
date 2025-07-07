@@ -14,6 +14,8 @@ STEps to test:
  or
  echo -e "PASS test\r\n" | nc localhost 6667
  
+ test ping:
+  echo -e "PING test\r\n" | nc localhost 6667
 
 To stop: 
 2.terminal (netcat) 
@@ -25,6 +27,10 @@ To stop:
 _________________
 irssi --help
 
+//not working now:Received command from client fd 4: CAP LS 302
 irssi -c localhost -p 6667 -n abc
+
+with port/user/password:
+irssi -h localhost -p 6667 -n abc -w 123
 /connect localhost
 /quit
