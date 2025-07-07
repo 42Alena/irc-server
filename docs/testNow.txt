@@ -36,7 +36,11 @@ To stop:
 _________________
 irssi --help
 
+irssi
+/server add localhost localhost 6667 -auto -password password123
+/connect localhost
 
+/server add localhost localhost 6667 -auto -password password123
 
 irssi
 /connect localhost 6667

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/07 22:23:19 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/07 22:27:54 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,14 @@ void Server::handleCommand(Client *client, const std::string &line)
 
 	if (command == "PING")
 		handlePing(*this, *client, arguments);
+	else if (command == "CAP")
+	{
+		if (arguments.size() > 0 && arguments[0] == "LS")
+		{
+			std::string message = "CAP * LS :\r\n";
+			sendToClient(client->getFd(), message);
+		}
+	}
 	else if (command == "PASS")
 		handlePass(*this, *client, arguments);
 	else if (command == "NICK")
