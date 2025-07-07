@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/07 20:11:13 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/08 00:56:37 by luifer           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,11 @@ const std::string &Client::getReceivedData() const
 std::string Client::getUserModes() const
 {
     return _userModes;
+}
+
+//Luis: added the implementation of the getter of the password from client to use in channel when joining
+std::string Client::getPassword() const {
+    return _password;
 }
 
 /*
