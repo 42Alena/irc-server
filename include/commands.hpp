@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:03 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/07 18:19:59 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/08 21:33:27 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ void handleKick(Server &server, Client &client, const std::vector<std::string> &
 //======================== PUBLIC: PRIVATE MESSAGING ==============================//
 
 void handlePrivateMessage(Server &server, Client &client, const std::vector<std::string> &params);
+
+
 
 //======================== PUBLIC: SERVER INTERACTION =============================//
 

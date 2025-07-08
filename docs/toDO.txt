@@ -51,12 +51,20 @@ TODO in Channel:
 TODO SERVER?CLIENT?ELSE:
 []Add handle signals*ctrl+c, ctrl+D
 []change logik for in handle client input(move out pollfd)
-
+PASS Check if called *before* USER/NICK
+NICK Validate uniqueness, RFC rules, reject
 
 
 08.07
+handleClientInput:
+	added all commands to handle for client/channel/server
+
+Branch: "feature/privmsg-notice"
+
 TODO:
 private message:
+
+notice:
 
 
 
@@ -88,7 +96,7 @@ in registration.cpp:
 	get ip 
 	21:21 -!- Unknown command: CAP
 	CAP -IRC Capability Negotiation.Need ignore
-	
+
 	changed:
 	//for welocme message:
 	Client(int fd); to 
