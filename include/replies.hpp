@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/07 21:03:37 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/09 00:05:41 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,24 @@ std::string replyErr403NoSuchChannel(const std::string &server, const std::strin
    - Sent when a message cannot be delivered to the specified channel.
 */
 std::string replyErr404CannotSendToChan(const std::string &server, const std::string &channel);
+
+/* 411 ERR_NORECIPIENT
+   ":No recipient given (<command>)"
+   - Returned when no recipient is given with a command like PRIVMSG.
+*/
+std::string replyErr411NoRecipient(const std::string &server, const std::string &command)
+{
+    return ":" + server + " 411 * :No recipient given (" + command + ")\r\n";
+}
+
+/* 412 ERR_NOTEXTTOSEND
+   ":No text to send"
+   - Returned when no text is provided with a PRIVMSG or NOTICE.
+*/
+std::string replyErr412NoTextToSend(const std::string &server)
+{
+    return ":" + server + " 412 * :No text to send\r\n";
+}
 
 /* 431 ERR_NONICKNAMEGIVEN
    ":No nickname given"

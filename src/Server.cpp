@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/08 21:50:22 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/09 00:26:48 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -351,11 +351,15 @@ Channel *Server::getChannelByName(const std::string &channelName)
 	return NULL;
 }
 
-bool Server::isChannelName(const std::string &channelName)
+//======================== PUBLIC: CHANNEL UTILITIES ============================//
+bool Server::isChannelName(const std::string &name)
 {
-	if (_channels.find(channelName) != _channels.end())
-		return true;
-	return false;
+    return !name.empty() && name[0] == '#';
+}
+
+bool Server::channelExists(const std::string &name)
+{
+    return _channels.find(name) != _channels.end();
 }
 
 //======================== PRIVATE:Internal Utilities ==================//

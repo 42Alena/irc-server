@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   privmsgNotice.cpp                                  :+:      :+:    :+:   */
+/*   privmsg.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/08 21:33:08 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/09 00:18:19 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,33 @@ void handlePrivateMessage(Server &server, Client &client, const std::vector<std:
 	(void)server;
 	(void)client;
 	(void)params;
+        if (!client.isRegistered())
+        {
+                server.sendToClient(client.getFd(), replyErr451NotRegistered(server.getServerName()));
+        }
+        if (params.size() == 0) //no recipient
+        {
+                server.sendToClient(client.getFd(), replyErr411NoRecipient(server.getServerName(), "PRIVMSG"));
+        }
+        if (params.size() == 1) //no recipient
+        {
+                server.sendToClient(client.getFd(), replyErr412NoTextToSend(server.getServerName()));
+        }
+        const std::string receiver = params[0];
+        const std::string message = params[1];
+        if(receiver[0] == "#")
+        {
+                isChannelName(const std::string &channelName)
+        }
+        
 }
 
 
+| Code | Name                  | When to send                         |
+| ---- | --------------------- | ------------------------------------ |
+| 401  | ERR\_NOSUCHNICK       | Nickname target doesn't exist        |
+| 403  | ERR\_NOSUCHCHANNEL    | Channel target doesn't exist         |
+| 404  | ERR\_CANNOTSENDTOCHAN | Sender not in the channel            |
+| 411  | ERR\_NORECIPIENT      | Missing target                       |
+| 412  | ERR\_NOTEXTTOSEND     | Missing message content              |
+| 451  | ERR\_NOTREGISTERED    | Client hasn't completed registration |

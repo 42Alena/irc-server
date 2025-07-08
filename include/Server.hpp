@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/08 00:35:57 by luifer           ###   ########.fr       */
+/*   Updated: 2025/07/09 00:25:53 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,8 +97,10 @@ public:
     void sendToClient(int fd, const std::string &message);
 
     bool isNicknameInUse(const std::string &nickname);
-    // luis: moved into public section for use in Channel.cpp
+    
+    //======================== PUBLIC: CHANNEL UTILITIES ============================//
     bool isChannelName(const std::string &channelName);
+    bool channelExists(const std::string &name);
 
     //======================== PUBLIC: GETTERS =====================================//
     int getPort() const;

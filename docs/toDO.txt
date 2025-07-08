@@ -63,6 +63,8 @@ handleClientInput:
 Branch: "feature/privmsg-notice"
 
 TODO:
+commands;
+	added numeric replies 411,412
 private message:
 
 notice:
