@@ -49,8 +49,19 @@ TODO in Channel:
 		   // Simple getters to check channel modes — server uses these  
 
 TODO SERVER?CLIENT?ELSE:
-Add handle signals*ctrl+c, ctrl+D
-change logik for in handle client input(move out pollfd)
+[]Add handle signals*ctrl+c, ctrl+D
+[]change logik for in handle client input(move out pollfd)
+
+
+
+08.07
+TODO:
+private message:
+
+
+
+
+07.07
 replyRpl001Welcome
 Server:
 	replyRpl001Welcome
@@ -61,10 +72,6 @@ add:
     void sendPong(Client &client, const std::string &message);
     void sendWelcome(Client &client);
 	update : void handleUser(Server &server, Client &client, const std::vector<std::string> &params)
-
-
-
-07.07
 DONE:
 GIT BRANCH: "feature/ping-pong"
   - handlePing()
