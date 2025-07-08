@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/07 22:27:54 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/08 21:50:22 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,23 +131,31 @@ void Server::handleCommand(Client *client, const std::string &line)
 {
 	std::cout << SRV << " Received command from client fd " << client->getFd() << ": " << line << RST << std::endl;
 
+	// Create a stream from the input line to parse it
 	std::istringstream iss(line);
 	std::string command;
 	iss >> command;
 
+	// Ignore empty lines
 	if (command.empty())
 		return;
-
+	// Convert command to uppercase (IRC commands are case-insensitive)
 	std::transform(command.begin(), command.end(), command.begin(), ::toupper);
 
+	// Parse the remaining tokens into arguments
 	std::string arg;
 	std::vector<std::string> arguments;
 
 	while (iss >> arg)
 		arguments.push_back(arg);
 
-	if (command == "PING")
+	// ---------- Handle IRC commands ----------
+
+	// Basic communication
+	if (command == "PING") // must reply with PONG
 		handlePing(*this, *client, arguments);
+
+	// Capability negotiation (minimal support for CAP LS)
 	else if (command == "CAP")
 	{
 		if (arguments.size() > 0 && arguments[0] == "LS")
@@ -156,14 +164,39 @@ void Server::handleCommand(Client *client, const std::string &line)
 			sendToClient(client->getFd(), message);
 		}
 	}
-	else if (command == "PASS")
+	// ---------- Authentication ----------
+	else if (command == "PASS") // Set connection password
 		handlePass(*this, *client, arguments);
-	else if (command == "NICK")
+	else if (command == "NICK") // Set nickname
 		handleNick(*this, *client, arguments);
-	else if (command == "USER")
+	else if (command == "USER") // Set username + real name
 		handleUser(*this, *client, arguments);
-	else if (command == "JOIN")
+
+	// ---------- Private + Channel Messaging ----------
+	else if (command == "PRIVMSG") // Send private or channel message
+		handlePrivateMessage(*this, *client, arguments);
+
+	// ---------- Channel Interaction ----------
+	else if (command == "JOIN") // join to the channel
 		handleJoin(*this, *client, arguments);
+	else if (command == "PART") // leave a channel
+		handlePart(*this, *client, arguments);
+
+	// ---------- Session / Disconnection ----------
+	else if (command == "QUIT") // disconnect from the server: remove client+inform others
+		handleQuit(*this, *client, arguments);
+
+	// ---------- Channel Operator Commands ----------
+	else if (command == "KICK") // kick a user from a channel
+		handleKick(*this, *client, arguments);
+	else if (command == "INVITE") // invite a user to a channel
+		handleInvite(*this, *client, arguments);
+	else if (command == "TOPIC") // change or view the topic
+		handleTopic(*this, *client, arguments);
+	else if (command == "MODE") // channel modes:i(invites),t(topic),k(password),o(privileges),l(limit)
+		handleMode(*this, *client, arguments);
+		
+	// ---------- Unknown Command ----------
 	else
 		sendToClient(client->getFd(), "Unknown command: " + command + "\r\n"); // TODO
 }
