@@ -6,15 +6,14 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 00:18:19 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/09 11:14:16 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/commands.hpp"
 
-
-/* 
-https://www.rfc-editor.org/rfc/rfc1459.html#section-2.3.1 
+/*
+https://www.rfc-editor.org/rfc/rfc1459.html#section-2.3.1
 
 4.4.1 Private messages
 
@@ -74,36 +73,92 @@ PRIVMSG #*.edu :NSFNet is undergoing work, expect interruptions
 */
 void handlePrivateMessage(Server &server, Client &client, const std::vector<std::string> &params)
 {
-	(void)server;
-	(void)client;
-	(void)params;
+
         if (!client.isRegistered())
         {
                 server.sendToClient(client.getFd(), replyErr451NotRegistered(server.getServerName()));
+                return;
         }
-        if (params.size() == 0) //no recipient
+        if (params.size() == 0) // no recipient
         {
                 server.sendToClient(client.getFd(), replyErr411NoRecipient(server.getServerName(), "PRIVMSG"));
+                return;
         }
-        if (params.size() == 1) //no recipient
+        if (params.size() == 1) // recipient is present, but no message
         {
                 server.sendToClient(client.getFd(), replyErr412NoTextToSend(server.getServerName()));
+                return;
         }
+
         const std::string receiver = params[0];
-        const std::string message = params[1];
-        if(receiver[0] == "#")
+        bool isChannel = (receiver[0] == '#');
+        if (isChannel)
         {
-                isChannelName(const std::string &channelName)
+                if (!server.isChannelName(receiver))
+                {
+                        server.sendToClient(client.getFd(), replyErr403NoSuchChannel(server.getServerName(), receiver));
+                        return;
+                }
+                if (!client.isInChannel(receiver))
+                {
+                        server.sendToClient(client.getFd(), replyErr404CannotSendToChan(server.getServerName(), receiver));
+                        return;
+                }
         }
-        
+        else
+        {
+                if (!server.isNicknameInUse(receiver))
+                {
+                        server.sendToClient(client.getFd(), replyErr401NoSuchNick(server.getServerName(), receiver));
+                        return;
+                }
+        }
+
+        // extract message
+        std::string message;
+
+        // PRIVMSG must have exactly one recipient before ':'
+        size_t colonIndex = 1;
+        for (; colonIndex < params.size(); ++colonIndex)
+        {
+                if (!params[colonIndex].empty() && params[colonIndex][0] == ':')
+                {
+                        message = params[colonIndex].substr(1); // Remove ':'
+                        ++colonIndex;
+                        break;
+                }
+        }
+
+        // if no ':' was found or more than one parameter before message
+        if (colonIndex == params.size() || colonIndex > 2)
+        {
+                server.sendToClient(client.getFd(), replyErr461NeedMoreParams(server.getServerName(), "PRIVMSG"));
+                return;
+        }
+
+        // join all remaining parts into one clean message string
+        for (; colonIndex < params.size(); ++colonIndex)
+        {
+                message += " " + params[colonIndex];
+        }
+
+        // Format for message ":<sender_nick>!<username>@<hostname> PRIVMSG <target> :<message>\r\n"
+        std::string messageFormated =
+            ":" + client.getNickname() + "!" + client.getUsername() +
+            "@" + client.getHost() + " PRIVMSG " + receiver +
+            " :" + message + "\r\n";
+
+        if (isChannel)
+        {
+                Channel *channel = server.getChannel(receiver);
+                if (channel)
+                        channel->sendToChannelExcept(messageFormated, client); // or *client if pointer
+        }
+
+        else
+        {
+                Client *clientReceiver = server.getClientByNickname(receiver);
+                if (clientReceiver)
+                        server.sendToClient(clientReceiver->getFd(), messageFormated);
+        }
 }
-
-
-| Code | Name                  | When to send                         |
-| ---- | --------------------- | ------------------------------------ |
-| 401  | ERR\_NOSUCHNICK       | Nickname target doesn't exist        |
-| 403  | ERR\_NOSUCHCHANNEL    | Channel target doesn't exist         |
-| 404  | ERR\_CANNOTSENDTOCHAN | Sender not in the channel            |
-| 411  | ERR\_NORECIPIENT      | Missing target                       |
-| 412  | ERR\_NOTEXTTOSEND     | Missing message content              |
-| 451  | ERR\_NOTREGISTERED    | Client hasn't completed registration |

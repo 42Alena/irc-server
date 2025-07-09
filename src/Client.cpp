@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/08 00:56:37 by luifer           ###   ########.fr       */
+/*   Updated: 2025/07/09 07:29:52 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,18 @@ bool Client::isOperator(Channel *channel) const
         return it->second;
     return false;
 }
+
+bool Client::isInChannel(const std::string &channelName) const
+{
+    for (std::vector<Channel *>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)
+    {
+        if ((*it)->getName() == channelName)
+            return true;
+    }
+    return false;
+}
+
+
 
 void Client::joinChannel(Channel *channel)
 {

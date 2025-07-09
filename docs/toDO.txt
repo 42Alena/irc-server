@@ -19,7 +19,7 @@ TODO in Channel:
 		   => void removeUser(int fd);  
 		   // Server works with fd — avoid searching by pointer  
 
-		[] void broadCastMessage(const std::string &message, Client *sender) const;  
+		[] void sendToChannelExcept(const std::string &message, Client *sender) const;  
 		   => void broadcast(const std::string &message, int excludeFd) const;  
 		   // Simpler to exclude sender by fd, members stored by fd  
 
@@ -54,6 +54,26 @@ TODO SERVER?CLIENT?ELSE:
 PASS Check if called *before* USER/NICK
 NICK Validate uniqueness, RFC rules, reject
 
+    //Luis ToDo: Add a method to add a new channel to the server when needed 
+    // also a method to remove a channel when needed
+
+09.07
+Server:
+	add:
+		getChannel()
+Client: 
+	added:
+		isInChannel()
+privmsg:
+	add:
+		 handlePrivateMessage
+Server:
+	changed:
+		// Alena: renamed from broadCastMessage(const std::string &message, int excludeFd) const
+		//        to sendToChannelExcept(const std::string &message, const Client &clientExcluded) const
+		//        for clarity+common purpose.
+
+		//Alena: changed multiple // before function to /* blockcomment */ for more clean and readable
 
 08.07
 Branch: refactor/handle-command

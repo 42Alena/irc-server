@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:13:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 00:04:42 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/09 11:20:56 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,12 +67,12 @@ std::string replyErr404CannotSendToChan(const std::string &server, const std::st
 
 std::string replyErr411NoRecipient(const std::string &serverName, const std::string &command)
 {
-    return ":" + serverName + " 411 * :No recipient given (" + command + ")\r\n";
+    return ":" + serverName + " " ERR_NORECIPIENT " * :No recipient given (" + command + ")\r\n";
 }
 
 std::string replyErr412NoTextToSend(const std::string &serverName)
 {
-    return ":" + serverName + " 412 * :No text to send\r\n";
+    return ":" + serverName + " " ERR_NOTEXTTOSEND " * :No text to send\r\n";
 }
 
 std::string replyErr431NoNickGiven(const std::string &server)

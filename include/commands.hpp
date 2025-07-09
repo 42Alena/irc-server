@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:03 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/08 21:33:27 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/09 07:49:16 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include "../include/replies.hpp"
+#include "../include/Server.hpp"
 #include "../include/Client.hpp"
 #include "../include/Channel.hpp"
 
