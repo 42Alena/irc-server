@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 11:15:08 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/07 22:09:25 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/09 11:22:44 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,7 +228,7 @@ void handleNick(Server &server, Client &client, const std::vector<std::string> &
 		// Send message to all clients in the same channels
 		const std::vector<Channel *> &clientChannels = client.getChannels();
 		for (std::vector<Channel *>::const_iterator it = clientChannels.begin(); it != clientChannels.end(); ++it)
-			(*it)->broadCastMessage(messageNickChange, client.getFd());
+			(*it)->sendToChannelExcept(messageNickChange, client);
 	}
 
 	client.setHasProvidedNick(true);

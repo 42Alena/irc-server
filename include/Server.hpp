@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/08 00:35:57 by luifer           ###   ########.fr       */
+/*   Updated: 2025/07/09 11:08:31 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,42 +68,46 @@ private:
 
     //======================== PRIVATE: CONNECTION & CLIENT MANAGEMENT =============//
    
-    Client *getClientByNickname(const std::string &nickname);
     void acceptNewClient();
     void removeClient(int fd, size_t pollFdIndex);
     void handleClientInput(size_t pollFdIndex);
-
+    
     //======================== PRIVATE: CHANNEL MANAGEMENT =========================//
     Channel *getChannelByName(const std::string &channelName);
-
+    
     //======================== PRIVATE: COMMAND DISPATCH & PARSING =================//
     void handleCommand(Client *client, const std::string &line);
-
+    
     //======================== PRIVATE: INTERNAL UTILITIES =========================//
     void checkResult(int result, const std::string &errMsg);
     void logInfo(const std::string &msg);
     void logErrAndThrow(const std::string &msg);
-
-
-public:
+    
+    
+    public:
     //======================== PUBLIC: CONSTRUCTORS & DESTRUCTOR ===================//
     Server(int port, const std::string &password);
     ~Server();
-
+    
     //======================== PUBLIC: MAIN SERVER METHODS =========================//
     int run();
-
+    
     //======================== PUBLIC: CLIENT UTILITIES ============================//
+    Client *getClientByNickname(const std::string &nickname);
     void sendToClient(int fd, const std::string &message);
 
     bool isNicknameInUse(const std::string &nickname);
-    // luis: moved into public section for use in Channel.cpp
+    
+    //======================== PUBLIC: CHANNEL UTILITIES ============================//
     bool isChannelName(const std::string &channelName);
+    bool channelExists(const std::string &name);
+    Channel* getChannel(const std::string &name);
 
+    //Luis ToDo: Add a method to add a new channel to the server when needed 
+    // also a method to remove a channel when needed
+    
     //======================== PUBLIC: GETTERS =====================================//
     int getPort() const;
     const std::string &getServerName() const;
 
-    //Luis ToDo: Add a method to add a new channel to the server when needed 
-    // also a method to remove a channel when needed
 };

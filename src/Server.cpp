@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/08 21:50:22 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/09 11:10:12 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,17 +203,6 @@ void Server::handleCommand(Client *client, const std::string &line)
 
 //======================== PRIVATE: Connection & Client Management ==================//
 
-bool Server::isNicknameInUse(const std::string &nickname)
-{
-	std::map<int, Client *>::iterator it;
-	for (it = _clients.begin(); it != _clients.end(); ++it)
-	{
-		if (it->second->getNickname() == nickname)
-			return true;
-	}
-	return false;
-}
-
 Client *Server::getClientByNickname(const std::string &nickname)
 {
 
@@ -225,6 +214,19 @@ Client *Server::getClientByNickname(const std::string &nickname)
 	}
 	return NULL;
 }
+
+bool Server::isNicknameInUse(const std::string &nickname)
+{
+	std::map<int, Client *>::iterator it;
+	for (it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		if (it->second->getNickname() == nickname)
+			return true;
+	}
+	return false;
+}
+
+
 
 void Server::acceptNewClient()
 {
@@ -351,12 +353,25 @@ Channel *Server::getChannelByName(const std::string &channelName)
 	return NULL;
 }
 
-bool Server::isChannelName(const std::string &channelName)
+//======================== PUBLIC: CHANNEL UTILITIES ============================//
+bool Server::isChannelName(const std::string &name)
 {
-	if (_channels.find(channelName) != _channels.end())
-		return true;
-	return false;
+    return !name.empty() && name[0] == '#';
 }
+
+bool Server::channelExists(const std::string &name)
+{
+    return _channels.find(name) != _channels.end();
+}
+
+Channel* Server::getChannel(const std::string &name)
+{
+    std::map<std::string, Channel *>::iterator it = _channels.find(name);
+    if (it != _channels.end())
+        return it->second;
+    return NULL;
+}
+
 
 //======================== PRIVATE:Internal Utilities ==================//
 

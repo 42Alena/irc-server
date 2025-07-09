@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/07 21:03:37 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/09 11:19:26 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,42 +17,43 @@
 //                         Replies.hpp
 //     Full IRC Replies with Original RFC Comments - ft_irc
 // 5.1 Command responses
- //  Numerics   001 to 099 are used for client-server
- //  connections only and should never travel between servers.
+//  Numerics   001 to 099 are used for client-server
+//  connections only and should never travel between servers.
 //     200-399 Replies  generated in the response to commands
 // https://www.rfc-editor.org/rfc/rfc1459.html#section-2.4
 // =============================================================
-
 
 // =============================================================
 //                         Numeric Codes
 // =============================================================
 
-#define RPL_WELCOME       "001"
-#define RPL_YOURHOST      "002"
-#define RPL_CREATED       "003"
-#define RPL_MYINFO        "004"
-#define RPL_TOPIC         "332"
-#define RPL_NAMREPLY      "353"
-#define RPL_ENDOFNAMES    "366"
+#define RPL_WELCOME "001"
+#define RPL_YOURHOST "002"
+#define RPL_CREATED "003"
+#define RPL_MYINFO "004"
+#define RPL_TOPIC "332"
+#define RPL_NAMREPLY "353"
+#define RPL_ENDOFNAMES "366"
 
-#define ERR_NOSUCHNICK        "401"
-#define ERR_NOSUCHCHANNEL     "403"
-#define ERR_CANNOTSENDTOCHAN  "404"
-#define ERR_NONICKNAMEGIVEN   "431"
-#define ERR_ERRONEUSNICKNAME  "432"
-#define ERR_NICKNAMEINUSE     "433"
-#define ERR_USERNOTINCHANNEL  "441"
-#define ERR_NOTONCHANNEL      "442"
-#define ERR_USERONCHANNEL     "443"
-#define ERR_NOTREGISTERED     "451"
-#define ERR_NEEDMOREPARAMS    "461"
-#define ERR_ALREADYREGISTRED  "462"
-#define ERR_PASSWDMISMATCH    "464"
-#define ERR_CHANNELISFULL     "471"
-#define ERR_INVITEONLYCHAN    "473"
-#define ERR_BADCHANNELKEY     "475"
-#define ERR_CHANOPRIVSNEEDED  "482"
+#define ERR_NOSUCHNICK "401"
+#define ERR_NOSUCHCHANNEL "403"
+#define ERR_NORECIPIENT "411"
+#define ERR_NOTEXTTOSEND "412"
+#define ERR_CANNOTSENDTOCHAN "404"
+#define ERR_NONICKNAMEGIVEN "431"
+#define ERR_ERRONEUSNICKNAME "432"
+#define ERR_NICKNAMEINUSE "433"
+#define ERR_USERNOTINCHANNEL "441"
+#define ERR_NOTONCHANNEL "442"
+#define ERR_USERONCHANNEL "443"
+#define ERR_NOTREGISTERED "451"
+#define ERR_NEEDMOREPARAMS "461"
+#define ERR_ALREADYREGISTRED "462"
+#define ERR_PASSWDMISMATCH "464"
+#define ERR_CHANNELISFULL "471"
+#define ERR_INVITEONLYCHAN "473"
+#define ERR_BADCHANNELKEY "475"
+#define ERR_CHANOPRIVSNEEDED "482"
 
 // =============================================================
 //                     Reply Builders with RFC Comments
@@ -118,6 +119,18 @@ std::string replyErr403NoSuchChannel(const std::string &server, const std::strin
 */
 std::string replyErr404CannotSendToChan(const std::string &server, const std::string &channel);
 
+/* 411 ERR_NORECIPIENT
+   ":No recipient given (<command>)"
+   - Returned when no recipient is given with a command like PRIVMSG.
+*/
+std::string replyErr411NoRecipient(const std::string &server, const std::string &command);
+
+/* 412 ERR_NOTEXTTOSEND
+   ":No text to send"
+   - Returned when no text is provided with a PRIVMSG or NOTICE.
+*/
+std::string replyErr412NoTextToSend(const std::string &server);
+
 /* 431 ERR_NONICKNAMEGIVEN
    ":No nickname given"
    - Returned when a nickname parameter is expected but missing.
@@ -169,8 +182,8 @@ std::string replyErr461NeedMoreParams(const std::string &server, const std::stri
 /* 462 ERR_ALREADYREGISTRED
    ":Unauthorized command (already registered)"
    - Returned by the server to any link which tries to
-    change part of the registered details (such as
-    password or user details from second USER message).
+	change part of the registered details (such as
+	password or user details from second USER message).
 */
 std::string replyErr462AlreadyRegistered(const std::string &server);
 
@@ -203,4 +216,3 @@ std::string replyErr475BadChannelKey(const std::string &server, const std::strin
    - Sent when a privileged command is issued by a non-operator.
 */
 std::string replyErr482ChanOpPrivsNeeded(const std::string &server, const std::string &channel);
-

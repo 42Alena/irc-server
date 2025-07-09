@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/08 00:55:08 by luifer           ###   ########.fr       */
+/*   Updated: 2025/07/09 07:26:11 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ private:
     Client(const Client &o);
     Client &operator=(const Client &o);
 
-    //======================== SOCKET & IDENTIFICATION =========================//
+    //======================== PRIVATE: SOCKET & IDENTIFICATION =========================//
     int _fd;                   // Client socket file descriptor (-1 = no socket)
     std::string _host; // Client's IP address (used in welcome message)
     std::string _nickname;     // Nickname set by NICK command
@@ -45,16 +45,16 @@ private:
     std::string _password; // Password set by PASS command (if any to use in channels when want to join)
 
 
-    //======================== REGISTRATION TRACKING ===========================//
+    //======================== PRIVATE: REGISTRATION TRACKING ===========================//
     bool _hasProvidedPass; // True if PASS command provided
     bool _hasProvidedNick; // True if NICK command provided
     bool _hasProvidedUser; // True if USER command provided
 
-    //======================== CHANNEL TRACKING ================================//
+    //======================== PRIVATE: CHANNEL MEMBERSHIP ================================//
     std::vector<Channel *> _channels;      // Channels the client has joined
     std::map<Channel *, bool> _channelOps; // Channels where client is operator
 
-    //======================== DATA BUFFERS ====================================//
+    //======================== PRIVATE: DATA BUFFERS ====================================//
     std::string _sendData;     // Buffer for outgoing data (accumulates until \r\n)
     std::string _receivedData; // Buffer for incoming data (accumulates until \r\n)
 
@@ -70,6 +70,7 @@ public:
     std::string getRealname() const; // Get client username
     std::string getHost() const;    // Get client IP address(used in welcome message)
     std::string getUserModes() const;
+    std::string getPassword() const; // Get password set by PASS command
 
     const std::string &getReceivedData() const;        // Get accumulated received data
     const std::vector<Channel *> &getChannels() const; // Get list of channels, where this client is a member
@@ -78,8 +79,7 @@ public:
     bool getHasProvidedNick() const;
     bool getHasProvidedUser() const;
 
-    //Luis: added the getter of the password
-    std::string getPassword() const; // Get password set by PASS command
+    
 
     //======================== PUBLIC: SETTERS =================================//
     void setNickname(const std::string &nickname); // Set nickname (NICK cmd)
@@ -98,10 +98,12 @@ public:
     //======================== PUBLIC: COMMAND PARSING =========================//
     bool hasCompleteCommandRN();  // Check if a complete command (\r\n) exists
     std::string extractNextCmd(); // Extract next complete command
+    
 
     //======================== PUBLIC: CHANNEL FUNCTIONS =======================//
     bool isRegistered() const;               // Check if fully registered (USER+NICK+PASS)
-    bool isOperator(Channel *channel) const; // Check if operator in given channel
+    bool isInChannel(const std::string &channelName) const;
+    bool isOperator(Channel *channel) const; // Check if client is operator(flag '@') in given channel
     void joinChannel(Channel *channel);      // Join a channel
     void leaveChannel(Channel *channel);     // Leave a channel
     void addOperator(Channel *channel);      // Add operator status in a channel
