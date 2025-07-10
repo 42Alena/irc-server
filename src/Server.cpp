@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 11:10:12 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/10 16:41:38 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -370,6 +370,20 @@ Channel* Server::getChannel(const std::string &name)
     if (it != _channels.end())
         return it->second;
     return NULL;
+}
+
+//Luis: added the add channel method here in order to add channels to the server
+void Server::addChannel(const std::string &channelName, Client &creator){
+	if (channelExists(channelName))
+	{
+		logErrAndThrow("Channel " + channelName + " already exists");
+	}
+
+	// Create new channel and add it to the server's channel map
+	Channel *newChannel = new Channel(channelName, creator);
+	_channels[channelName] = newChannel;
+
+	std::cout << BLU << "Channel " << channelName << " created by " << creator.getNickname() << RST << std::endl;
 }
 
 

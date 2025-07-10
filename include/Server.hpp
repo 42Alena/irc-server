@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 11:08:31 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/10 16:38:53 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,8 @@ private:
     bool isChannelName(const std::string &channelName);
     bool channelExists(const std::string &name);
     Channel* getChannel(const std::string &name);
+	//Luis: added the add channel method here in order to add channels to the server
+	void addChannel(const std::string &channelName, Client &creator);
 
     //Luis ToDo: Add a method to add a new channel to the server when needed 
     // also a method to remove a channel when needed
