@@ -12,6 +12,7 @@ SOURCES = \
 	./src/Client.cpp\
 	./src/Channel.cpp\
 	./src/replies.cpp\
+	./src/commands.cpp\
 	./src/utils.cpp\
 	./commands/invite.cpp\
 	./commands/join.cpp\

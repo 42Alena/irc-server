@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 10:37:23 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/10 15:55:50 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,13 +69,13 @@ public:
 	bool hasUserLimit() const;	  // Check if channel has a user limit set -> done
 
 	// Command handlers in Channel class
-	void handleJoin(Client *client, Server &server);						  // Handle user joining the channel ->ToDo
-	void handlePart(Client *client, Server &server);						  // Handle user leaving the channel ->ToDo
-	void handleTopic(Client *client, const std::string &newTopic);			  // Handle topic changes ->ToDo
-	void handleMode(Client *client, char mode, bool enable);				  // Handle mode changes ->ToDo
-	void handleInvite(Client *client, int targetFd);						  // Handle user invitation ->ToDo
-	void handleKick(Client *client, int targetFd, const std::string &reason); // Handle user kick ->ToDo
-	void handleKey(Client *client, const std::string &key);					  // Handle setting channel key ->ToDo
+	//void handleJoin(Client *client, Server &server);						  // Handle user joining the channel ->ToDo
+	//void handlePart(Client *client, Server &server);						  // Handle user leaving the channel ->ToDo
+	//void handleTopic(Client *client, const std::string &newTopic);			  // Handle topic changes ->ToDo
+	//void handleMode(Client *client, char mode, bool enable);				  // Handle mode changes ->ToDo
+	//void handleInvite(Client *client, int targetFd);						  // Handle user invitation ->ToDo
+	//void handleKick(Client *client, int targetFd, const std::string &reason); // Handle user kick ->ToDo
+	//void handleKey(Client *client, const std::string &key);					  // Handle setting channel key ->ToDo
 
 	// Setters
 	void setTopic(const std::string &topic); // done

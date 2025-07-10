@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   join.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:11 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/04 11:58:22 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/10 17:39:05 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/commands.hpp"
 
+/*
 void handleJoin(Server &server, Client &client, const std::vector<std::string> &params)
 {
 	
@@ -19,4 +20,4 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
 	(void)client;
 	(void)params;
 
-}
+}*/
