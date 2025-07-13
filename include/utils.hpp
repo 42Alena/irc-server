@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 18:20:44 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/04 10:59:10 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 13:33:19 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,10 @@
 #include <string>
 #include <iostream>
 #include <sstream> // std::stringstream for intToString
+#include "colors.hpp"
+
+//======================== PUBLIC: welcome to cIRCus             ==================//
+void printWelcomeMessage();
 
 //======================== PUBLIC: NICKNAME & USERNAME VALIDATION ==================//
 bool isValidNickname(const std::string &nickname);

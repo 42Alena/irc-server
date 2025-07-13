@@ -47,15 +47,33 @@ TODO in Channel:
 		[] bool hasKey() const;  
 		[] bool hasUserLimit() const;  
 		   // Simple getters to check channel modes — server uses these  
+//____________________________________________________________________________//
 
-TODO SERVER?CLIENT?ELSE:
+TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 []Add handle signals*ctrl+c, ctrl+D
 []change logik for in handle client input(move out pollfd)
-PASS Check if called *before* USER/NICK
-NICK Validate uniqueness, RFC rules, reject
+[]add order check:  NICK is sent first, then USER, and JOIN only after successful registration.
 
-    //Luis ToDo: Add a method to add a new channel to the server when needed 
-    // also a method to remove a channel when needed
+[] 	Server:
+	   //Luis ToDo: Add a method to add a new channel to the server when needed 
+   		 // also a method to remove a channel when needed
+	 =>
+		// Add a new channel and assign the creator as operator
+		void addChannel(const std::string &channelName, Client &creator);
+
+
+
+ 
+
+12.07
+Branch: feature/welcome-2-cIRCus
+makefile:
+add:
+	mesage how to start programm
+main:
+add:
+	printWelcomeMessage()
+
 
 09.07
 Server:
