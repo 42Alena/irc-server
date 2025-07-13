@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 17:49:25 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 18:49:10 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,7 @@ private:
     //======================== PRIVATE: INTERNAL UTILITIES =========================//
     void checkResult(int result, const std::string &errMsg);
     void logInfo(const std::string &msg);
+    void logError(const std::string &msg);
     void logErrAndThrow(const std::string &msg);
     
     

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 07:26:11 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 19:09:55 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,16 +34,15 @@ private:
     Client &operator=(const Client &o);
 
     //======================== PRIVATE: SOCKET & IDENTIFICATION =========================//
-    int _fd;                   // Client socket file descriptor (-1 = no socket)
-    std::string _host; // Client's IP address (used in welcome message)
-    std::string _nickname;     // Nickname set by NICK command
-    std::string _username;    // Username from USER command
-    std::string _realname;     // Realname from USER command
-    std::string _userModes;    // Modes from USER command
+    int _fd;                // Client socket file descriptor (-1 = no socket)
+    std::string _host;      // Client's IP address (used in welcome message)
+    std::string _nickname;  // Nickname set by NICK command
+    std::string _username;  // Username from USER command
+    std::string _realname;  // Realname from USER command
+    std::string _userModes; // Modes from USER command
 
-    //luis: added the attribute here since will be needed it to join channels
+    // luis: added the attribute here since will be needed it to join channels
     std::string _password; // Password set by PASS command (if any to use in channels when want to join)
-
 
     //======================== PRIVATE: REGISTRATION TRACKING ===========================//
     bool _hasProvidedPass; // True if PASS command provided
@@ -58,6 +57,10 @@ private:
     std::string _sendData;     // Buffer for outgoing data (accumulates until \r\n)
     std::string _receivedData; // Buffer for incoming data (accumulates until \r\n)
 
+    //======================== PRIVATE: INTERNAL UTILITIES =========================//
+    void logInfo(const std::string &msg);   //cyan
+    void logError(const std::string &msg); // red - error
+
 public:
     //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==============//
     Client(int fd, const std::string &host);
@@ -68,7 +71,7 @@ public:
     std::string getNickname() const; // Get client nickname
     std::string getUsername() const; // Get client username
     std::string getRealname() const; // Get client username
-    std::string getHost() const;    // Get client IP address(used in welcome message)
+    std::string getHost() const;     // Get client IP address(used in welcome message)
     std::string getUserModes() const;
     std::string getPassword() const; // Get password set by PASS command
 
@@ -79,12 +82,10 @@ public:
     bool getHasProvidedNick() const;
     bool getHasProvidedUser() const;
 
-    
-
     //======================== PUBLIC: SETTERS =================================//
     void setNickname(const std::string &nickname); // Set nickname (NICK cmd)
-    void setUsername(const std::string &username);         // Set username (USER cmd)
-    void setRealname(const std::string &realname);         // Set user realname (USER cmd)
+    void setUsername(const std::string &username); // Set username (USER cmd)
+    void setRealname(const std::string &realname); // Set user realname (USER cmd)
     void addUserMode(char modeChar);
 
     void setHasProvidedPass(bool val);
@@ -98,10 +99,9 @@ public:
     //======================== PUBLIC: COMMAND PARSING =========================//
     bool hasCompleteCommandRN();  // Check if a complete command (\r\n) exists
     std::string extractNextCmd(); // Extract next complete command
-    
 
     //======================== PUBLIC: CHANNEL FUNCTIONS =======================//
-    bool isRegistered() const;               // Check if fully registered (USER+NICK+PASS)
+    bool isRegistered() const; // Check if fully registered (USER+NICK+PASS)
     bool isInChannel(const std::string &channelName) const;
     bool isOperator(Channel *channel) const; // Check if client is operator(flag '@') in given channel
     void joinChannel(Channel *channel);      // Join a channel

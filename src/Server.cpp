@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 18:07:37 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 19:12:55 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,9 +276,10 @@ void Server::acceptNewClient()
 }
 
 /*
-  Close socket
-  Remove client from map
-  Remove fd from poll list
+   get the client object using their socket fd
+   remove   client from all joined channels and delete  client object
+    erase from client map and poll list
+	close the socket
  */
 void Server::removeClient(int fd, size_t pollFdIndex)
 {
@@ -437,13 +438,19 @@ void Server::checkResult(int result, const std::string &errMsg)
 
 void Server::logErrAndThrow(const std::string &msg)
 {
-	// prints: ESRV=  "🤖🔥 "
-	std::cerr << RED << ESRV  << msg << RST << std::endl;
+	
+	logError(msg);
 	throw std::runtime_error("SERVER(errno):  " + std::string(strerror(errno)));
 }
 
+/* blue + "Server🎟️🤖: " */
 void Server::logInfo(const std::string &msg)
 {
-	// prints: SRV=  "🤖  "
-	std::cout << BLU << SRV  << msg << RST << std::endl;
+	std::cout << SRV  << msg << RST << std::endl;
+}
+
+/* red + "Server🎟️🤖🔥: " */
+void Server::logError(const std::string &msg)
+{
+	std::cerr << ESRV  << msg << RST << std::endl;
 }

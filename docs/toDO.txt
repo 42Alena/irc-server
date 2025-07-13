@@ -62,6 +62,11 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 12.07
 Branch: feature/server-channel-handling
+
+[] colors	
+	changed:
+		emoji 
+		added colors already + need RST only
 [] 	Server:
 	   add:
 	   		removeChannel();

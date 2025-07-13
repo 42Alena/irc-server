@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 17:51:27 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 19:08:49 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,20 @@
 #include "../include/Channel.hpp"
 #include "../include/colors.hpp"
 
-// TODO (Alena):: commented out, "_limit" is not a nonstatic data member or base class of class "Channel"C/C++(292)
-// constructor with channel name
-// Channel::Channel(const std::string& name) : _name(name), _limit(0) {}
+// Alena: added for consistent logs across Channel/Client/Server + color
+//======================== PRIVATE: INTERNAL UTILITIES =========================//
+void Channel::logInfo(const std::string &msg)
+{
+	//magenta + "Channel🎪💬🔥: "
+	std::cout << CHN << msg << RST << std::endl;
+}
+
+void Channel::logError(const std::string &msg)
+{
+	//red + "Channel🎪💬🔥: "
+	std::cerr << ECHN << msg << RST << std::endl;
+}
+
 
 //======================== CONSTRUCTORS ===========================//
 // Default constructor
@@ -174,8 +185,7 @@ void Channel::addOperator(int fd)
 	std::cout << BLU << "Client added as operator: " << fd << RST << std::endl;
 }
 
-
-/* 
+/*
 This function checks if the user is an operator before removing them
 - If the user is an operator, it prints an error message and does not remove them
 - If the user is not an operator, it searches for the user in the _members vector and removes them if found
@@ -224,7 +234,6 @@ bool Channel::isOperator(Client *client) const
 		return false; // If the client is not found in the operators set, return false
 }
 
-
 void Channel::sendToChannelExcept(const std::string &message, const Client &clientExcluded) const
 {
 	// Iterate through the _members map
@@ -232,7 +241,7 @@ void Channel::sendToChannelExcept(const std::string &message, const Client &clie
 	{
 		int fd = it->first;			 // Get the file descriptor
 		Client *client = it->second; // Get the client pointer
-		
+
 		// Skip the sender (excludeFd)
 		if (fd == clientExcluded.getFd())
 		{
@@ -280,4 +289,3 @@ void Channel::inviteUser(int fd)
 	_invited.insert(fd); // Add the user's file descriptor (fd) to the _invited set
 	std::cout << BLU << "User with fd " << fd << " invited to channel: " << _name << RST << std::endl;
 }
-
