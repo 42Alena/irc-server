@@ -6,13 +6,37 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 18:20:37 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/04 11:03:28 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 14:44:24 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/utils.hpp"
 
+void printWelcomeMessage()
+{
+	std::cout << std::endl;
+	std::cout << std::endl;
 
+	std::cout << RED << "🌟✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨🌟" << RST << std::endl;
+	std::cout << ORG << "✨      W E L C O M E      T O   T H E          c I R C u s !               ✨" << RST << std::endl;
+	std::cout << YEL << "✨                     Launch the  🎆magic below!                           ✨" << RST << std::endl;
+	std::cout << RED << "🌟✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨🌟" << RST << std::endl;
+
+	std::cout << std::endl;
+
+	std::cout << CYN << "💫     🎟️   NICK  juggler               " << AQU << "// NICK <nickname>                 " << RST << std::endl;
+	std::cout << BLU << "💫     🤡   USER  clown 0 * :BigTop      " << PNK << "// USER <username> <hostname>...   " << RST << std::endl;
+	std::cout << MAG << "💫     🎪   JOIN  #tent                  " << RED << "// JOIN <#channel>                 " << RST << std::endl;
+
+	std::cout << std::endl;
+	std::cout << std::endl;
+
+	std::cout << WHT << "                        🌟 Let the magic begin! 🌟            " << RST << std::endl;
+	std::cout << ORG << "🌟✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨🌟" << RST << std::endl;
+
+	std::cout << std::endl;
+	std::cout << std::endl;
+}
 
 /*
 https://www.rfc-editor.org/rfc/rfc1459.html#section-2.3.1
@@ -50,8 +74,6 @@ bool isValidNickname(const std::string &nickname)
 	return true;
 }
 
-
-
 /*
 - <username>: non-space, non-control characters (max 9 chars recommended)
 <nonwhite>   ::= <any 8bit code except SPACE (0x20), NUL (0x0), CR
@@ -76,8 +98,7 @@ bool isValidUsername(const std::string &username)
 	return true;
 }
 
-
-bool  isValidPassword(const std::string &password)
+bool isValidPassword(const std::string &password)
 {
 	if (password.empty())
 		return false;
@@ -94,9 +115,7 @@ bool  isValidPassword(const std::string &password)
 	return true;
 }
 
-
-
-std::string  intToString(int n)
+std::string intToString(int n)
 {
 	std::ostringstream os;
 	os << n;

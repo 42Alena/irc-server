@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:32:27 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/03 18:42:42 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 13:34:04 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 
 std::pair<int, std::string> parsePortPassword(const char *portArg, const char *passwordArg)
 {
+	printWelcomeMessage();
     char *endptr;
     long port = std::strtol(portArg, &endptr, 10);
 
