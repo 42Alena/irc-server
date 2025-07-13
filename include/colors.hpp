@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/23 17:27:02 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/06/26 14:46:25 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 18:59:58 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,15 @@
 #define AQU "\033[1;38;5;14m"
 #define RST "\033[0m"
 
-// __________Symbols_______________
-const std::string SRV = "🤖 ";			// Server messages
-const std::string CLT = "👩‍💻 "; // Client messages
-const std::string CHN = "💬 ";			// Channel messages
-const std::string ERR = "🔥 ";			// Error messages
-const std::string OK = "🎉 ";			// Success / Confirm
 
-//________combined Symbols___________
-const std::string ESRV = std::string(RED) + "🤖🔥";
-const std::string ECLT = std::string(RED) + "👩‍💻🔥";
-const std::string ECHN = std::string(RED) + "💬🔥";
+// Server logs + color
+const std::string SRV  = std::string(BLU) + "Server🎟️🤖: ";
+const std::string ESRV = std::string(RED) + "Server🎟️🤖🔥: ";
+
+// Client logs + color
+const std::string CLT  = std::string(CYN) + "Client🎭👩‍💻: ";
+const std::string ECLT = std::string(RED) + "Client🎭👩‍💻🔥: ";
+
+// Channel logs + color
+const std::string CHN  = std::string(MAG) + "Channel🎪💬: ";
+const std::string ECHN = std::string(RED) + "Channel🎪💬🔥: ";

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 07:29:52 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 19:12:11 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,6 +162,20 @@ void Client::clearReceivedData()
 {
     _receivedData.clear();
 }
+
+   //======================== PRIVATE: INTERNAL UTILITIES =========================//
+   /*magenta + "Client🎭👩‍💻🔥:   */
+   void Client::logInfo(const std::string &msg)
+   {
+       std::cout << CLT << msg << RST << std::endl;
+   }
+   
+   /*  red + "Client🎭👩‍💻🔥: " */
+   void Client::logError(const std::string &msg)
+   {
+       std::cerr << ECLT << msg << RST << std::endl;
+   }
+   
 
 //======================== PUBLIC: COMMAND PARSING =============================//
 
