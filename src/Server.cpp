@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/10 16:41:38 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/07/13 18:07:37 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,7 +227,7 @@ bool Server::isNicknameInUse(const std::string &nickname)
 }
 
 
-
+   //======================== PRIVATE: CONNECTION & CLIENT MANAGEMENT =============//
 void Server::acceptNewClient()
 {
 	while (true) // accept() all pending  TCP connections
@@ -276,19 +276,30 @@ void Server::acceptNewClient()
 }
 
 /*
- * Close socket
- * Remove client from map
- * Remove fd from poll list
+  Close socket
+  Remove client from map
+  Remove fd from poll list
  */
 void Server::removeClient(int fd, size_t pollFdIndex)
 {
+	// get the client object using their socket fd
+	Client *client = _clients[fd];
+	
+	// remove   client from all joined channels and delete  client object
+	removeClientFromAllChannels(client);
+	
+	delete client;
+	
+	// erase from client map and poll list
+	_clients.erase(fd);
+	_pollFds.erase(_pollFds.begin() + pollFdIndex);
+	
+	// close the socket
 	int fdCloseResult = close(fd);
 	checkResult(fdCloseResult, "Failed to close client TCP connection on fd " + intToString(fd));
 
 	logInfo("Closed client TCP connection on fd " + intToString(fd));
 
-	_clients.erase(fd);
-	_pollFds.erase(_pollFds.begin() + pollFdIndex);
 }
 
 void Server::handleClientInput(size_t pollFdIndex)
@@ -331,6 +342,7 @@ void Server::handleClientInput(size_t pollFdIndex)
 	}
 }
 
+
 /*
 	   send - send a message on a socket
 	   ssize_t send(int sockfd, const void buf[.size], size_t size, int flags);
@@ -372,7 +384,7 @@ Channel* Server::getChannel(const std::string &name)
     return NULL;
 }
 
-//Luis: added the add channel method here in order to add channels to the server
+
 void Server::addChannel(const std::string &channelName, Client &creator){
 	if (channelExists(channelName))
 	{
@@ -383,7 +395,35 @@ void Server::addChannel(const std::string &channelName, Client &creator){
 	Channel *newChannel = new Channel(channelName, creator);
 	_channels[channelName] = newChannel;
 
-	std::cout << BLU << "Channel " << channelName << " created by " << creator.getNickname() << RST << std::endl;
+	logInfo("Created channel " + channelName + " by user " + creator.getNickname());
+
+}
+
+void Server::removeChannel(const std::string &channelName){
+	
+	std::map<std::string, Channel *>::iterator it = _channels.find(channelName);
+	if (it != _channels.end())
+	{
+		delete it->second;      // deallocate the Channel object with its destructor
+		_channels.erase(it);    // remove pointer from the map
+		logInfo ("Channel " + channelName + " removed from server.");
+	}
+}
+
+
+void Server::removeClientFromAllChannels(Client *client)
+{
+	const std::vector<Channel *> &channels = client->getChannels();
+	int fd = client->getFd();
+
+	for (size_t i = 0; i < channels.size(); ++i)
+	{
+		Channel *ch = channels[i];
+		ch->removeUser(fd, client);
+
+		if (ch->getMembers().empty())
+			removeChannel(ch->getName());
+	}
 }
 
 
@@ -397,13 +437,13 @@ void Server::checkResult(int result, const std::string &errMsg)
 
 void Server::logErrAndThrow(const std::string &msg)
 {
-	// prints: ESRV=  🤖🔥
-	std::cerr << ESRV << msg << RST << std::endl;
+	// prints: ESRV=  "🤖🔥 "
+	std::cerr << RED << ESRV  << msg << RST << std::endl;
 	throw std::runtime_error("SERVER(errno):  " + std::string(strerror(errno)));
 }
 
 void Server::logInfo(const std::string &msg)
 {
-	// prints: SRV=  🤖🔥
-	std::cout << BLU << SRV << " " << msg << RST << std::endl;
+	// prints: SRV=  "🤖  "
+	std::cout << BLU << SRV  << msg << RST << std::endl;
 }

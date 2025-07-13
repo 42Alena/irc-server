@@ -54,18 +54,20 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 []change logik for in handle client input(move out pollfd)
 []add order check:  NICK is sent first, then USER, and JOIN only after successful registration.
 
-[] 	Server:
-	   //Luis ToDo: Add a method to add a new channel to the server when needed 
-   		 // also a method to remove a channel when needed
-	 =>
-		// Add a new channel and assign the creator as operator
-		void addChannel(const std::string &channelName, Client &creator);
+
 
 
 
  
 
 12.07
+Branch: feature/server-channel-handling
+[] 	Server:
+	   add:
+	   		removeChannel();
+			removeClientFromAllChannels();
+
+
 Branch: feature/welcome-2-cIRCus
 makefile:
 add:

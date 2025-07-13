@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/10 15:57:00 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/07/13 17:51:27 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,7 @@ void Channel::addOperator(int fd)
 	std::cout << BLU << "Client added as operator: " << fd << RST << std::endl;
 }
 
-//Alena: changed multiple // before function to /* blockcomment */ for more clean and readable
+
 /* 
 This function checks if the user is an operator before removing them
 - If the user is an operator, it prints an error message and does not remove them
@@ -225,10 +225,6 @@ bool Channel::isOperator(Client *client) const
 }
 
 
-// Alena: renamed from broadCastMessage(const std::string &message, int excludeFd) const
-//        to sendToChannelExcept(const std::string &message, const Client &clientExcluded) const
-//        for clarity+common purpose.
-// Function to broadcast(send message) to all channel members except the given client (e.g., for PRIVMSG, TOPIC, KICK).
 void Channel::sendToChannelExcept(const std::string &message, const Client &clientExcluded) const
 {
 	// Iterate through the _members map

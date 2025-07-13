@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/10 15:55:50 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/07/13 17:07:47 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,6 @@ public:
 	bool hasMembers(Client *client) const; // done
 	bool isOperator(Client *client) const; // done
 
-	// Alena: renamed from broadCastMessage(const std::string &message, int excludeFd) const
-	//        to sendToChannelExcept(const std::string &message, const Client &clientExcluded) const
-	//        for clarity+common purpose.
 	void sendToChannelExcept(const std::string &message, const Client &clientExcluded) const; // done
 
 	void inviteUser(int fd);	  // Add user to invited list -> done
