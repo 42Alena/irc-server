@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 19:08:49 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 21:08:24 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,8 @@ Channel::~Channel()
 {
 	// No dynamic memory allocation, so nothing to clean up
 	// The vectors and maps will be automatically cleaned up by the destructor
-	std::cout << RED << "Channel " << _name << " destroyed." << RST << std::endl;
+	logInfo("Channel " + _name  +  " destroyed.");
+	
 }
 
 //======================== SETTERS ===================================//
@@ -175,14 +176,16 @@ std::set<int> Channel::getOperators() const
 void Channel::addUser(int fd, Client *client)
 {
 	_members[fd] = client; // Add the client to the _members map using their file descriptor (fd) as the key
-	std::cout << BLU << "Client added to channel: " << client->getNickname() << RST << std::endl;
+	logInfo("Client added to channel: "  +  client->getNickname());
+
 }
+
 
 // Function to add a client to the _operators vector inside the channel
 void Channel::addOperator(int fd)
 {
 	_operators.insert(fd); // Add the client's file descriptor (fd) to the _operators set
-	std::cout << BLU << "Client added as operator: " << fd << RST << std::endl;
+	logInfo("Client added as operator: " + intToString(fd) );
 }
 
 /*
@@ -194,17 +197,17 @@ void Channel::removeUser(int fd, Client *client)
 {
 	if (isOperator(client))
 	{
-		std::cout << RED << "Error: Cannot remove operator from channel." << RST << std::endl;
+		logError("Error: Cannot remove operator from channel.");
 	}
 	std::map<int, Client *>::iterator it = _members.find(fd);
 	if (it != _members.end() && it->second == client)
 	{
 		_members.erase(it); // Erase the client from the _members map if found
-		std::cout << RED << "Client removed from channel: " << client->getNickname() << RST << std::endl;
+		logError("Client removed from channel: " + client->getNickname());
 	}
 	else
 	{
-		std::cout << BLU << "Client not found in this channel, are you sure is here?." << RST << std::endl;
+		logInfo("Client not found in this channel, are you sure is here?");
 	}
 }
 
@@ -287,5 +290,5 @@ bool Channel::hasUserLimit() const
 void Channel::inviteUser(int fd)
 {
 	_invited.insert(fd); // Add the user's file descriptor (fd) to the _invited set
-	std::cout << BLU << "User with fd " << fd << " invited to channel: " << _name << RST << std::endl;
+	logInfo("User with fd " + intToString(fd) + " invited to channel: " +  _name );
 }
