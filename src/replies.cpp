@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   replies.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:13:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 11:20:56 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 21:08:26 by luifer           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,11 @@ std::string replyRpl003Created(const std::string &server, const std::string &dat
 std::string replyRpl004MyInfo(const std::string &server)
 {
     return ":" + server + " " + RPL_MYINFO + " " + server + " 1.0 o oitkl\r\n";
+}
+
+std::string replyRpl331NoTopic(const std::string &server, const std::string &channel, const std::string &topic)
+{
+    return ":" + server + " " + RPL_NOTOPIC + " " + channel + " :" + topic + "\r\n";
 }
 
 std::string replyRpl332Topic(const std::string &server, const std::string &channel, const std::string &topic)

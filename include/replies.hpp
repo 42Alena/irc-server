@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 11:19:26 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/13 20:56:32 by luifer           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 #define RPL_YOURHOST "002"
 #define RPL_CREATED "003"
 #define RPL_MYINFO "004"
+#define RPL_NOTOPIC "331"
 #define RPL_TOPIC "332"
 #define RPL_NAMREPLY "353"
 #define RPL_ENDOFNAMES "366"
@@ -53,6 +54,7 @@
 #define ERR_CHANNELISFULL "471"
 #define ERR_INVITEONLYCHAN "473"
 #define ERR_BADCHANNELKEY "475"
+#define ERR_NOPRIVILEGES "481"
 #define ERR_CHANOPRIVSNEEDED "482"
 
 // =============================================================
