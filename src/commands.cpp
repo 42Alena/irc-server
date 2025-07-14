@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/13 23:00:09 by luifer           ###   ########.fr       */
+/*   Updated: 2025/07/14 16:21:23 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
 		replyErr461NeedMoreParams(server.getServerName(), "JOIN");
 	std::string channelName = params[0]; // Get the channel name from the parameters
 	//luis: should we check if the channel name starts with '#'?
+	//Alena: yes! I am already checking in Server with function isChannelName
 	Channel *channel = server.getChannel(channelName); // Get the channel by name from the server
 	if(!channel){
 		server.addChannel(channelName, client); 
