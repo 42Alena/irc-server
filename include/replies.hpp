@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 20:56:32 by luifer           ###   ########.fr       */
+/*   Updated: 2025/07/14 21:21:42 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,8 +172,9 @@ std::string replyErr443UserOnChannel(const std::string &server, const std::strin
 /* 451 ERR_NOTREGISTERED
    ":You have not registered"
    - Sent when a command is issued before completing registration.
+   :ircserv 451 <command> :You have not registered
 */
-std::string replyErr451NotRegistered(const std::string &server);
+std::string replyErr451NotRegistered(const std::string &server, const std::string &command);
 
 /* 461 ERR_NEEDMOREPARAMS
    "<command> :Not enough parameters"

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 19:12:55 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/14 19:08:18 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int Server::run()
 
 	//==================== POLL SETUP ====================//
 
-	std::cout << "Registering server socket with poll() to monitor for new TCP connections..." << std::endl;
+	logInfo("Registering server socket with poll() to monitor for new TCP connections...");
 	struct pollfd serverPollFd;
 	serverPollFd.fd = _serverFd;
 	serverPollFd.events = POLLIN; // Interested in incoming connections
@@ -129,7 +129,8 @@ const std::string &Server::getServerName() const
 // Command Dispatch & Parsing
 void Server::handleCommand(Client *client, const std::string &line)
 {
-	std::cout << SRV << " Received command from client fd " << client->getFd() << ": " << line << RST << std::endl;
+	
+	logInfo("Received command from client fd " +intToString(client->getFd()) + ": " + line);
 
 	// Create a stream from the input line to parse it
 	std::istringstream iss(line);
@@ -263,7 +264,7 @@ void Server::acceptNewClient()
 		else
 		{
 			_clients[clientFd] = new Client(clientFd, clientIP);
-			std::cout << "New client connected on fd " << clientFd << " (" << clientIP << ")" << std::endl;
+			logInfo( "New client connected on fd " + intToString(clientFd) + " (" + clientIP + ")" );
 		}
 
 		// (pollfd) Add new client to poll() monitoring

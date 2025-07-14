@@ -52,7 +52,6 @@ TODO in Channel:
 TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 []Add handle signals*ctrl+c, ctrl+D
 []change logik for in handle client input(move out pollfd)
-[]add order check:  NICK is sent first, then USER, and JOIN only after successful registration.
 
 
 13.07
@@ -60,6 +59,20 @@ Brunch: feature/quit
  add:
 	quit()
 
+Branch: "fix/registration-order" 	
+	registration.cpp:
+registration.cpp
+	changed: 
+	parsing message for user: now realname can have many names with spaces
+	add correct order: PASS->NICK>USERo:
+				NICK missingPass
+				:ircserv 451 NICK :You have not registered
+				PASS abc
+				NICK aaa
+				USER myuser 0 * :Real Me
+				:ircserv 001 aaa :Welcome to the Internet Relay Network aaa!myuser@127.0.0.1
+
+Branch feature/signals:
 
  
 

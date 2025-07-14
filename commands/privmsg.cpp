@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 11:14:16 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/14 21:22:30 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void handlePrivateMessage(Server &server, Client &client, const std::vector<std:
 
         if (!client.isRegistered())
         {
-                server.sendToClient(client.getFd(), replyErr451NotRegistered(server.getServerName()));
+                server.sendToClient(client.getFd(), replyErr451NotRegistered(server.getServerName(), "PRIVMSG"));
                 return;
         }
         if (params.size() == 0) // no recipient

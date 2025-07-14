@@ -63,3 +63,11 @@ irssi -h localhost -p 6667 -n testUser -w password123
 /connect localhost
 
 /quit
+
+with netcat:
+nc -C 127.0.0.1 6667
+
+correct order:
+PASS myPassword
+NICK myNick
+USER myUser 0 * :Real Name
