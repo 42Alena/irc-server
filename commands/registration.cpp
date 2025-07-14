@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 11:15:08 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 11:22:44 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/14 21:24:13 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,15 +40,7 @@ Password message
    Example:
 
 		   PASS secretpasswordhere
-"
-std::string replyErr461NeedMoreParams(const std::string &server, const std::string &command)
-{
-	return ":" + server + " " + ERR_NEEDMOREPARAMS + " " + command + " :Not enough parameters\r\n";
-}
-	std::string replyErr462AlreadyRegistered(const std::string &server)
-{
-	return ":" + server + " " + ERR_ALREADYREGISTRED + " :Unauthorized command (already registered)\r\n";
-}
+
 Typical raw IRC message from client:
 PASS mysecretpassword
 */
@@ -133,7 +125,15 @@ void handleUser(Server &server, Client &client, const std::vector<std::string> &
 	const std::string &username = params[0];
 	const std::string &modeStr = params[1];
 	// const std::string &unused = params[2]; // must ignore, only historical
-	const std::string &realname = params[3];
+
+	// join all parts of realname in case it's split across params
+	std::string realname;
+	for (size_t i = 3; i < params.size(); ++i)
+	{
+		if (!realname.empty())
+			realname += " ";
+		realname += params[i];
+	}
 
 	if (client.isRegistered())
 	{
@@ -202,6 +202,13 @@ void handleNick(Server &server, Client &client, const std::vector<std::string> &
 
 	const std::string newNickname = params[0];
 
+	// block if PASS not sent
+	if (!client.getHasProvidedPass()) 
+	{
+		server.sendToClient(client.getFd(), replyErr451NotRegistered(server.getServerName(), "NICK"));
+		return;
+	}
+
 	if (server.isNicknameInUse(newNickname))
 	{
 		server.sendToClient(client.getFd(), replyErr433NickInUse(server.getServerName(), newNickname));
@@ -216,6 +223,7 @@ void handleNick(Server &server, Client &client, const std::vector<std::string> &
 
 	const std::string oldNickname = client.getNickname();
 	client.setNickname(newNickname);
+	client.setHasProvidedNick(true);
 
 	// Broadcast nick change to client and all channels they are in
 	if (!oldNickname.empty())

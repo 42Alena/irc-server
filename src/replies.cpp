@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   replies.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luifer <luifer@student.42.fr>              +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:13:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 21:08:26 by luifer           ###   ########.fr       */
+/*   Updated: 2025/07/14 21:20:41 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,9 +110,9 @@ std::string replyErr443UserOnChannel(const std::string &server, const std::strin
     return ":" + server + " " + ERR_USERONCHANNEL + " " + user + " " + channel + " :is already on channel\r\n";
 }
 
-std::string replyErr451NotRegistered(const std::string &server)
+std::string replyErr451NotRegistered(const std::string &server, const std::string &command)
 {
-    return ":" + server + " " + ERR_NOTREGISTERED + " :You have not registered\r\n";
+    return ":" + server + " 451 " + command + " :You have not registered\r\n";
 }
 
 std::string replyErr461NeedMoreParams(const std::string &server, const std::string &command)
