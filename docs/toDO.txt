@@ -55,7 +55,10 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 []add order check:  NICK is sent first, then USER, and JOIN only after successful registration.
 
 
-
+13.07
+Brunch: feature/quit
+ add:
+	quit()
 
 
  
