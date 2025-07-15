@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/14 19:08:18 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/15 19:28:52 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,17 @@ Server &Server::operator=(const Server &o)
 
 //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ===================//
 
-Server::Server(int port, const std::string &password) : _serverName("ircserv"),
+Server::Server(int port, const std::string &password) : _runningMainLoop(true),
+														_serverName("ircserv"),
 														_port(port),
 														_password(password),
 														_serverFd(-1) {}
 
-Server::~Server() {}
+Server::~Server()
+{
+
+	logInfo("Server destructor called. All resources cleaned up.");
+}
 
 //======================== PUBLIC: MAIN SERVER METHODS ==========================//
 int Server::run()
@@ -72,15 +77,17 @@ int Server::run()
 
 	//==================== MAIN SERVER LOOP to hanndle events====================//
 
-	while (true)
+	while (_runningMainLoop) // accept() all pending  TCP connections, when no SIGINT(CTRL+C)
 	{
-		// (poll) Wait for events on all monitored file descriptors
-		int serverPollResult = poll(_pollFds.data(), _pollFds.size(), 0); // Wait for events on all fds
+		// only one (poll) Wait for events on all monitored file descriptors
+		int serverPollResult = poll(_pollFds.data(), _pollFds.size(), 0); // Wait for events on all fds. 0=nonblocking mode
 		checkResult(serverPollResult, "Failed to poll() while waiting for events");
 
 		nfds_t pollFdIndex = 0;
 		while (pollFdIndex < _pollFds.size())
 		{
+			int fd = _pollFds[pollFdIndex].fd;
+
 			//==================== NEW CLIENT CONNECTION HANDLING ====================//
 			if (_pollFds[pollFdIndex].fd == _serverFd && (_pollFds[pollFdIndex].revents & POLLIN))
 			{
@@ -92,13 +99,14 @@ int Server::run()
 			else if (_pollFds[pollFdIndex].revents & POLLIN)
 			{
 				handleClientInput(pollFdIndex);
+				pollFdIndex++;
 			}
 
 			//==================== CLIENT DISCONNECT OR ERROR ====================//
 			else if (_pollFds[pollFdIndex].revents & (POLLHUP | POLLERR))
 			{
-				int fd = _pollFds[pollFdIndex].fd;
 				removeClient(fd, pollFdIndex);
+				// not incrementing pollfd while removing client
 			}
 
 			//==================== NO EVENTS, SKIP ====================//
@@ -110,6 +118,24 @@ int Server::run()
 	}
 
 	return EXIT_SUCCESS;
+}
+
+/* called after signal SIGINT(CTRL+C) */
+void Server::shutdown()
+{
+
+	if (!_runningMainLoop) // prevent double shutdown
+		return;
+
+	logInfo("💥Shutdown requested by signal 💥CTRL+C (SIGINT).");
+
+	// notifying all clients
+	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		sendToClient(it->first, "NOTICE * :💥 Server is 💥shutting down now\r\n");
+	}
+	_runningMainLoop = false;
+	logInfo("Shutdown requested by signal CTRL+C (SIGINT).");
 }
 
 //======================== PUBLIC: GETTERS ====================================//
@@ -129,8 +155,8 @@ const std::string &Server::getServerName() const
 // Command Dispatch & Parsing
 void Server::handleCommand(Client *client, const std::string &line)
 {
-	
-	logInfo("Received command from client fd " +intToString(client->getFd()) + ": " + line);
+
+	logInfo("Received command from client fd " + intToString(client->getFd()) + ": " + line);
 
 	// Create a stream from the input line to parse it
 	std::istringstream iss(line);
@@ -196,7 +222,7 @@ void Server::handleCommand(Client *client, const std::string &line)
 		handleTopic(*this, *client, arguments);
 	else if (command == "MODE") // channel modes:i(invites),t(topic),k(password),o(privileges),l(limit)
 		handleMode(*this, *client, arguments);
-		
+
 	// ---------- Unknown Command ----------
 	else
 		sendToClient(client->getFd(), "Unknown command: " + command + "\r\n"); // TODO
@@ -227,11 +253,10 @@ bool Server::isNicknameInUse(const std::string &nickname)
 	return false;
 }
 
-
-   //======================== PRIVATE: CONNECTION & CLIENT MANAGEMENT =============//
+//======================== PRIVATE: CONNECTION & CLIENT MANAGEMENT =============//
 void Server::acceptNewClient()
 {
-	while (true) // accept() all pending  TCP connections
+	while (_runningMainLoop) // accept() all pending  TCP connections, when no SIGINT(CTRL+C)
 	{
 		struct sockaddr_in clientAddress;
 		socklen_t clientAddressrLen = sizeof(clientAddress);
@@ -264,7 +289,7 @@ void Server::acceptNewClient()
 		else
 		{
 			_clients[clientFd] = new Client(clientFd, clientIP);
-			logInfo( "New client connected on fd " + intToString(clientFd) + " (" + clientIP + ")" );
+			logInfo("New client connected on fd " + intToString(clientFd) + " (" + clientIP + ")");
 		}
 
 		// (pollfd) Add new client to poll() monitoring
@@ -279,35 +304,37 @@ void Server::acceptNewClient()
 /*
    get the client object using their socket fd
    remove   client from all joined channels and delete  client object
-    erase from client map and poll list
+	erase from client map and poll list
 	close the socket
  */
 void Server::removeClient(int fd, size_t pollFdIndex)
 {
 	// get the client object using their socket fd
 	Client *client = _clients[fd];
-	
+
 	// remove   client from all joined channels and delete  client object
 	removeClientFromAllChannels(client);
-	
+
 	delete client;
-	
+
 	// erase from client map and poll list
 	_clients.erase(fd);
 	_pollFds.erase(_pollFds.begin() + pollFdIndex);
-	
+
 	// close the socket
 	int fdCloseResult = close(fd);
 	checkResult(fdCloseResult, "Failed to close client TCP connection on fd " + intToString(fd));
 
 	logInfo("Closed client TCP connection on fd " + intToString(fd));
-
 }
 
 void Server::handleClientInput(size_t pollFdIndex)
 {
 	//(read) Incoming data from client over TCP connection
 	int fd = _pollFds[pollFdIndex].fd;
+	if (_clients.count(fd) == 0)
+		return; // fd not found — client was already removed or invalid
+
 	char buf[512];
 	ssize_t readBytes = read(fd, buf, sizeof(buf)); // Read incoming data
 
@@ -326,24 +353,18 @@ void Server::handleClientInput(size_t pollFdIndex)
 			std::string cmdClient = _clients[fd]->extractNextCmd();
 			handleCommand(_clients[fd], cmdClient);
 		}
-
-		pollFdIndex++;
 	}
 	else
 	{
-		// TODO: change logic std::cout << "ERRNO=" << errno << "< bytes=" << readBytes << std::endl;
-		if (errno == EAGAIN && errno == EWOULDBLOCK)
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
 		{
-			// Non-blocking: No data available, normal, skip
-			pollFdIndex++;
-			// continue;
+			// Non-blocking read: no data available — expected situation, skip
+			return;
 		}
 		else
 			checkResult(readBytes, "Failed to read from client TCP connection");
-		// pollFdIndex++;
 	}
 }
-
 
 /*
 	   send - send a message on a socket
@@ -370,24 +391,24 @@ Channel *Server::getChannelByName(const std::string &channelName)
 //======================== PUBLIC: CHANNEL UTILITIES ============================//
 bool Server::isChannelName(const std::string &name)
 {
-    return !name.empty() && name[0] == '#';
+	return !name.empty() && name[0] == '#';
 }
 
 bool Server::channelExists(const std::string &name)
 {
-    return _channels.find(name) != _channels.end();
+	return _channels.find(name) != _channels.end();
 }
 
-Channel* Server::getChannel(const std::string &name)
+Channel *Server::getChannel(const std::string &name)
 {
-    std::map<std::string, Channel *>::iterator it = _channels.find(name);
-    if (it != _channels.end())
-        return it->second;
-    return NULL;
+	std::map<std::string, Channel *>::iterator it = _channels.find(name);
+	if (it != _channels.end())
+		return it->second;
+	return NULL;
 }
 
-
-void Server::addChannel(const std::string &channelName, Client &creator){
+void Server::addChannel(const std::string &channelName, Client &creator)
+{
 	if (channelExists(channelName))
 	{
 		logErrAndThrow("Channel " + channelName + " already exists");
@@ -398,20 +419,19 @@ void Server::addChannel(const std::string &channelName, Client &creator){
 	_channels[channelName] = newChannel;
 
 	logInfo("Created channel " + channelName + " by user " + creator.getNickname());
-
 }
 
-void Server::removeChannel(const std::string &channelName){
-	
+void Server::removeChannel(const std::string &channelName)
+{
+
 	std::map<std::string, Channel *>::iterator it = _channels.find(channelName);
 	if (it != _channels.end())
 	{
-		delete it->second;      // deallocate the Channel object with its destructor
-		_channels.erase(it);    // remove pointer from the map
-		logInfo ("Channel " + channelName + " removed from server.");
+		delete it->second;	 // deallocate the Channel object with its destructor
+		_channels.erase(it); // remove pointer from the map
+		logInfo("Channel " + channelName + " removed from server.");
 	}
 }
-
 
 void Server::removeClientFromAllChannels(Client *client)
 {
@@ -428,9 +448,14 @@ void Server::removeClientFromAllChannels(Client *client)
 	}
 }
 
+//======================== PUBLIC: Internal Utilities ==================//
 
-//======================== PRIVATE:Internal Utilities ==================//
-
+/*
+In POSIX, most system calls (socket(), bind(), poll(), listen(), accept(), read(), etc.)
+return:
+	-1 on failure
+	>= 0 on success
+*/
 void Server::checkResult(int result, const std::string &errMsg)
 {
 	if (result == -1)
@@ -439,7 +464,7 @@ void Server::checkResult(int result, const std::string &errMsg)
 
 void Server::logErrAndThrow(const std::string &msg)
 {
-	
+
 	logError(msg);
 	throw std::runtime_error("SERVER(errno):  " + std::string(strerror(errno)));
 }
@@ -447,11 +472,11 @@ void Server::logErrAndThrow(const std::string &msg)
 /* blue + "Server🎟️🤖: " */
 void Server::logInfo(const std::string &msg)
 {
-	std::cout << SRV  << msg << RST << std::endl;
+	std::cout << SRV << msg << RST << std::endl;
 }
 
 /* red + "Server🎟️🤖🔥: " */
 void Server::logError(const std::string &msg)
 {
-	std::cerr << ESRV  << msg << RST << std::endl;
+	std::cerr << ESRV << msg << RST << std::endl;
 }

@@ -71,3 +71,6 @@ correct order:
 PASS myPassword
 NICK myNick
 USER myUser 0 * :Real Name
+
+valgrind:
+valgrind --leak-check=full ./ircserv 6667 password
