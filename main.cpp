@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:32:27 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 13:34:04 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/15 14:14:35 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,24 @@
 #include "include/Client.hpp"
 #include "include/Channel.hpp"
 #include "include/utils.hpp"
+#include <csignal> // For signal() https://en.cppreference.com/w/cpp/header/csignal.html
+#include <cstdlib> // atoi,EXIT_FAILURE EXIT_SUCCESS
 
-#include <cstdlib> // atoi
+Server *globalRunningServer = NULL; // Global pointer to allow SIGINT access
+
+void handleSigintCtrlC(int signum)
+{
+
+    if (globalRunningServer)
+    {
+        globalRunningServer->logError("Received SIGINT (Ctrl-C). Shutting down...");
+        globalRunningServer->shutdown();
+    }
+}
 
 std::pair<int, std::string> parsePortPassword(const char *portArg, const char *passwordArg)
 {
-	printWelcomeMessage();
+    printWelcomeMessage();
     char *endptr;
     long port = std::strtol(portArg, &endptr, 10);
 
@@ -36,7 +48,6 @@ std::pair<int, std::string> parsePortPassword(const char *portArg, const char *p
     return std::make_pair(static_cast<int>(port), password);
 }
 
-
 int main(int argc, char **argv)
 {
     if (argc != 3)
@@ -44,6 +55,10 @@ int main(int argc, char **argv)
         std::cerr << "USAGE: ./ircserv <port> <password>" << std::endl;
         return EXIT_FAILURE;
     }
+
+    // Signal handling setup
+    signal(SIGINT, handleSigintCtrlC); // set handler for Ctrl-C (SIGINT) using my function handleSigintCtrlC()
+    signal(SIGPIPE, SIG_IGN);          // ignore SIGPIPE to prevent crashes when writing to closed sockets
 
     try
     {

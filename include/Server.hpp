@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:22 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 21:07:35 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/15 14:21:06 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ private:
     //======================== PRIVATE: ATTRIBUTES =============================//
 
     // Server Configuration
+    bool _runningMainLoop;      
     const std::string _serverName;
     int _port;
     std::string _password;
@@ -78,13 +79,8 @@ private:
     //======================== PRIVATE: COMMAND DISPATCH & PARSING =================//
     void handleCommand(Client *client, const std::string &line);
     
-    //======================== PRIVATE: INTERNAL UTILITIES =========================//
-    void checkResult(int result, const std::string &errMsg);
-    void logInfo(const std::string &msg);
-    
-    void logError(const std::string &msg);
-    void logErrAndThrow(const std::string &msg);
-    
+       
+
     
     public:
     //======================== PUBLIC: CONSTRUCTORS & DESTRUCTOR ===================//
@@ -93,6 +89,7 @@ private:
     
     //======================== PUBLIC: MAIN SERVER METHODS =========================//
     int run();
+    void shutdown(); //called after signal SIGINT(CTRL+C)
     
     //======================== PUBLIC: CLIENT UTILITIES ============================//
     Client *getClientByNickname(const std::string &nickname);
@@ -113,5 +110,12 @@ private:
     //======================== PUBLIC: GETTERS =====================================//
     int getPort() const;
     const std::string &getServerName() const;
+    
+    //======================== PUBLIC: INTERNAL UTILITIES =========================//
+    void checkResult(int result, const std::string &errMsg);
+    void logInfo(const std::string &msg);
+    
+    void logError(const std::string &msg);
+    void logErrAndThrow(const std::string &msg);
 
 };

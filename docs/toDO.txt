@@ -49,12 +49,40 @@ TODO in Channel:
 		   // Simple getters to check channel modes — server uses these  
 //____________________________________________________________________________//
 
+
+
 TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 []Add handle signals*ctrl+c, ctrl+D
 []change logik for in handle client input(move out pollfd)
+[] DESTRUCTORS FOR ALL CLASSES MUST  cleaning!
+
+15.07
+Branch: "feature/signal-handling"
+- handle SIGINT (Ctrl-C): clean up + shut down
+- ignore SIGPIPE to prevent crash on writing to disconnected clients.
+Global shutdown flag or Server pointer 
+- handle_sigint() 
+
+-signal(SIGINT, ...)
+
+-signal(SIGPIPE, SIG_IGN)
+
+Update Server::run() to respect shutdown
+void Server::shutdown();  // Close all client sockets, set _running = false
+Server:
+add:
+	bool _runningMainLoop for main loop
+changed:
+	RUN():
+		main loop in run(0 for handling signals)
+		moved incrementng logik pollFdIndex++  from handleClientInput()
+handleClientInput():
+	pollFdIndex++ removed from function . Logic in one place = >inside run, not this functio
+	
+c
 
 
-13.07
+14.07
 Brunch: feature/quit
  add:
 	quit()
