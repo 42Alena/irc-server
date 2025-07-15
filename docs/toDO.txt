@@ -52,8 +52,6 @@ TODO in Channel:
 
 
 TODO SERVER/ CLIENT/ CHANNEL /ELSE:
-[]Add handle signals*ctrl+c, ctrl+D
-[]change logik for in handle client input(move out pollfd)
 [] DESTRUCTORS FOR ALL CLASSES MUST  cleaning!
 
 15.07
@@ -78,8 +76,10 @@ changed:
 		moved incrementng logik pollFdIndex++  from handleClientInput()
 handleClientInput():
 	pollFdIndex++ removed from function . Logic in one place = >inside run, not this functio
+[]change logik for in handle client input(move out pollfd)
+[]Add handle signals*ctrl+c, ctrl+D
 	
-c
+
 
 
 14.07

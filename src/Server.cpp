@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/15 15:51:24 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/15 17:46:23 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,15 +77,17 @@ int Server::run()
 
 	//==================== MAIN SERVER LOOP to hanndle events====================//
 
-	while (true)
+	while (_runningMainLoop) // accept() all pending  TCP connections, when no SIGINT(CTRL+C)
 	{
-		// (poll) Wait for events on all monitored file descriptors
-		int serverPollResult = poll(_pollFds.data(), _pollFds.size(), 0); // Wait for events on all fds
+		// only one (poll) Wait for events on all monitored file descriptors
+		int serverPollResult = poll(_pollFds.data(), _pollFds.size(), 0); // Wait for events on all fds. 0=nonblocking mode
 		checkResult(serverPollResult, "Failed to poll() while waiting for events");
 
 		nfds_t pollFdIndex = 0;
 		while (pollFdIndex < _pollFds.size())
 		{
+			int fd = _pollFds[pollFdIndex].fd;
+
 			//==================== NEW CLIENT CONNECTION HANDLING ====================//
 			if (_pollFds[pollFdIndex].fd == _serverFd && (_pollFds[pollFdIndex].revents & POLLIN))
 			{
@@ -97,13 +99,14 @@ int Server::run()
 			else if (_pollFds[pollFdIndex].revents & POLLIN)
 			{
 				handleClientInput(pollFdIndex);
+				pollFdIndex++;
 			}
 
 			//==================== CLIENT DISCONNECT OR ERROR ====================//
 			else if (_pollFds[pollFdIndex].revents & (POLLHUP | POLLERR))
 			{
-				int fd = _pollFds[pollFdIndex].fd;
 				removeClient(fd, pollFdIndex);
+				// not incrementing pollfd while removing client
 			}
 
 			//==================== NO EVENTS, SKIP ====================//
@@ -120,6 +123,11 @@ int Server::run()
 /* called after signal SIGINT(CTRL+C) */
 void Server::shutdown()
 {
+	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		sendToClient(it->first, "NOTICE * :💥 Server is 💥shutting down now\r\n");
+	}
+	logInfo("💥Shutdown requested by signal 💥CTRL+C (SIGINT).");
 	_runningMainLoop = false;
 	logInfo("Shutdown requested by signal CTRL+C (SIGINT).");
 }
@@ -320,7 +328,7 @@ void Server::handleClientInput(size_t pollFdIndex)
 	int fd = _pollFds[pollFdIndex].fd;
 	if (_clients.count(fd) == 0)
 		return; // fd not found — client was already removed or invalid
-		
+
 	char buf[512];
 	ssize_t readBytes = read(fd, buf, sizeof(buf)); // Read incoming data
 
@@ -436,6 +444,12 @@ void Server::removeClientFromAllChannels(Client *client)
 
 //======================== PUBLIC: Internal Utilities ==================//
 
+/*
+In POSIX, most system calls (socket(), bind(), poll(), listen(), accept(), read(), etc.)
+return:
+	-1 on failure
+	>= 0 on success
+*/
 void Server::checkResult(int result, const std::string &errMsg)
 {
 	if (result == -1)

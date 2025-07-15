@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:32:27 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/15 14:14:35 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/15 17:50:14 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ Server *globalRunningServer = NULL; // Global pointer to allow SIGINT access
 
 void handleSigintCtrlC(int signum)
 {
-
+    (void)signum; //silence. need to be for no runtime issues
     if (globalRunningServer)
     {
-        globalRunningServer->logError("Received SIGINT (Ctrl-C). Shutting down...");
+        globalRunningServer->logError("💥 Received SIGINT (Ctrl-C). Shutting down...");
         globalRunningServer->shutdown();
     }
 }
