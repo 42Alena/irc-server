@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/15 17:46:23 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/15 19:28:52 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,11 +123,17 @@ int Server::run()
 /* called after signal SIGINT(CTRL+C) */
 void Server::shutdown()
 {
+
+	if (!_runningMainLoop) // prevent double shutdown
+		return;
+
+	logInfo("💥Shutdown requested by signal 💥CTRL+C (SIGINT).");
+
+	// notifying all clients
 	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		sendToClient(it->first, "NOTICE * :💥 Server is 💥shutting down now\r\n");
 	}
-	logInfo("💥Shutdown requested by signal 💥CTRL+C (SIGINT).");
 	_runningMainLoop = false;
 	logInfo("Shutdown requested by signal CTRL+C (SIGINT).");
 }

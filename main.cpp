@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:32:27 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/15 17:50:14 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/15 18:48:15 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ int main(int argc, char **argv)
         std::pair<int, std::string> result = parsePortPassword(argv[1], argv[2]);
 
         Server server(result.first, result.second);
+        globalRunningServer = &server; // 🔥 Required for SIGINT handler to work
         server.run();
     }
     catch (const std::exception &e)
@@ -72,6 +73,9 @@ int main(int argc, char **argv)
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
+       // If server exits normally
+    globalRunningServer->shutdown();
+    globalRunningServer = NULL;
 
     return EXIT_SUCCESS;
 }
