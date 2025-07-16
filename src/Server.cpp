@@ -6,17 +6,39 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/15 19:28:52 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 07:07:51 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Server.hpp"
 
 //======================== PRIVATE: CONSTRUCTORS  (1 server only) ===================//
+
+/*
+	Default constructor is intentionally disabled.
+	A Server must be explicitly constructed with port and password.
+*/
 Server::Server() {}
-Server::Server(const Server &o) { (void)o; }
+
+/*
+	Copy constructor.
+	Copying and assignment are disabled for this class.
+	IRC Server holds global state, sockets, and file descriptors — it must remain unique.
+*/
+Server::Server(const Server &o) 
+{ 
+	logError("Copying a Server is forbidden: it owns global state, sockets, and runtime structures.");
+	(void)o; 
+}
+
+/*
+	Assignment operator.
+	Copying and assignment are disabled for this class.
+	IRC Server holds global state, sockets, and file descriptors — it must not be duplicated.
+*/
 Server &Server::operator=(const Server &o)
 {
+	logError("Assigning a Server is forbidden: it owns sockets, poll state, and all live connections.");
 	(void)o;
 	return *this;
 }

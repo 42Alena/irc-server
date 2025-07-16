@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 19:09:55 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 07:00:49 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,9 @@ class Client
 {
 private:
     //======================== PRIVATE: CONSTRUCTORS  (IRC clients are non-copyable)  ==============//
-    Client();
     Client(const Client &o);
     Client &operator=(const Client &o);
-
+    
     //======================== PRIVATE: SOCKET & IDENTIFICATION =========================//
     int _fd;                // Client socket file descriptor (-1 = no socket)
     std::string _host;      // Client's IP address (used in welcome message)
@@ -40,29 +39,30 @@ private:
     std::string _username;  // Username from USER command
     std::string _realname;  // Realname from USER command
     std::string _userModes; // Modes from USER command
-
+    
     // luis: added the attribute here since will be needed it to join channels
     std::string _password; // Password set by PASS command (if any to use in channels when want to join)
-
+    
     //======================== PRIVATE: REGISTRATION TRACKING ===========================//
     bool _hasProvidedPass; // True if PASS command provided
     bool _hasProvidedNick; // True if NICK command provided
     bool _hasProvidedUser; // True if USER command provided
-
+    
     //======================== PRIVATE: CHANNEL MEMBERSHIP ================================//
     std::vector<Channel *> _channels;      // Channels the client has joined
     std::map<Channel *, bool> _channelOps; // Channels where client is operator
-
+    
     //======================== PRIVATE: DATA BUFFERS ====================================//
     std::string _sendData;     // Buffer for outgoing data (accumulates until \r\n)
     std::string _receivedData; // Buffer for incoming data (accumulates until \r\n)
-
+    
     //======================== PRIVATE: INTERNAL UTILITIES =========================//
     void logInfo(const std::string &msg);   //cyan
     void logError(const std::string &msg); // red - error
-
-public:
+    
+    public:
     //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==============//
+    Client();
     Client(int fd, const std::string &host);
     ~Client();
 

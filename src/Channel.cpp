@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 21:08:24 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 07:02:27 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,36 +63,29 @@ Channel::Channel(const std::string &name, Client &createdBy) : _name(name), _use
 	addUser(createdBy.getFd(), &createdBy); // Add the creator to the channel members
 }
 
-// Copy constructor
+//Alena: copy and operator= must be disabled in irc project
+/*
+	Copy constructor
+	Copying and assignment are disabled for this class.
+ IRC objects must be unique and should never be copied.
+*/
 Channel::Channel(const Channel &other)
 {
-	// Copy the attributes from the other channel
-	_name = other._name;
-	_topic = other._topic;
-	_password = other._password;
-	_members = other._members;
-	_operators = other._operators;
-	_modes = other._modes;
-	_key = other._key;
-	_userLimit = other._userLimit;
+	logError(" Copying a Channel is not allowed: IRC channels must be unique and non-copyable by design.");
+	(void)other;
 }
 
-// Assignment operator
+//Alena: copy and operator= must be disabled in irc project
+/*
+	Assigments operator.
+	Copying and assignment are disabled for this class.
+ IRC objects must be unique and should never be copied.
+*/
 Channel &Channel::operator=(const Channel &other)
 {
-	if (this != &other)
-	{
-		// Check for self-assignment
-		_name = other._name;		   // Copy the name of the channel
-		_topic = other._topic;		   // Copy the topic of the channel
-		_password = other._password;   // Copy the password of the channel
-		_members = other._members;	   // Copy the members of the channel
-		_operators = other._operators; // Copy the operators of the channel
-		_modes = other._modes;		   // Copy the modes of the channel
-		_key = other._key;			   // Copy the key of the channel
-		_userLimit = other._userLimit; // Copy the user limit of the channel
-	}
-	return *this; // Return a reference to this object
+	logError(" Assignment of Channel is forbidden: IRC channels represent unique entities and cannot be duplicated.");
+	(void)other;
+	return *this;
 }
 
 // Destructor
@@ -100,8 +93,7 @@ Channel::~Channel()
 {
 	// No dynamic memory allocation, so nothing to clean up
 	// The vectors and maps will be automatically cleaned up by the destructor
-	logInfo("Channel " + _name  +  " destroyed.");
-	
+	logInfo("Channel destructor called for: " + _name);	
 }
 
 //======================== SETTERS ===================================//

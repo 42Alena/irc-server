@@ -6,29 +6,56 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 19:12:11 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 07:02:35 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Client.hpp"
 
 //======================== PRIVATE: CONSTRUCTORS  (IRC clients are non-copyable)  ===//
-Client::Client()
-{
-}
 
+/*
+	Copy constructor.
+	Copying and assignment are disabled for this class.
+	IRC clients represent unique socket connections and must not be copied.
+*/
 Client::Client(const Client &o)
 {
+    logError("Copying a Client is not allowed: IRC clients represent unique socket connections.");
     (void)o;
 }
 
+/*
+	Assignment operator.
+	Copying and assignment are disabled for this class.
+	IRC clients represent unique socket connections and must not be duplicated.
+*/
 Client &Client::operator=(const Client &o)
 {
+    logError("Assignment of Client is forbidden: IRC clients represent unique socket connections.");
     (void)o;
     return *this;
 }
 
 //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==================//
+
+Client::Client()
+    : _fd(-1),
+	  _host(""),
+	  _nickname(""),
+	  _username(""),
+	  _userModes(""),
+	  _hasProvidedPass(false),
+	  _hasProvidedNick(false),
+	  _hasProvidedUser(false),
+	  _channels(),
+	  _channelOps(),
+	  _sendData(""),
+	  _receivedData("")
+{
+   
+}
+
 
 Client::Client(int fd, const std::string &host)
     : _fd(fd),
@@ -46,7 +73,10 @@ Client::Client(int fd, const std::string &host)
 {
 }
 
-Client::~Client() {}
+Client::~Client() {
+    logInfo("Client destructor called for fd " + intToString(_fd) + ", nick: " + _nickname);
+	// No need to delete anything — all members are self-managed
+}
 
 //======================== PUBLIC: GETTERS =====================================//
 

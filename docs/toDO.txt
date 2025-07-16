@@ -52,7 +52,23 @@ TODO in Channel:
 
 
 TODO SERVER/ CLIENT/ CHANNEL /ELSE:
-[] DESTRUCTORS FOR ALL CLASSES MUST  cleaning!
+
+16.07:
+	Branch "feature/shutdown-cleanup"
+	add:
+		DESTRUCTORS update in client and chaneel.
+		add full cleaning in server destructor
+			Client* c = new Client(...)	delete c somewhere (usually in shutdown or destructor)
+			int fd = socket(...)	close(fd)
+			fcntl(fd, F_SETFL, ...)	close(fd) when done
+			std::map<int, Client*>	loop and delete all pointers
+			std::map<std::string, Channel*>	same — delete channels
+	Channel:
+	/*
+	disabled copy constructor, operator=
+		Copying and assignment are disabled for this class.
+		IRC objects must be unique and should never be copied.
+
 
 15.07
 Branch: "feature/signal-handling"
