@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/16 12:21:07 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 12:52:04 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,29 +30,60 @@
 void handleJoin(Server &server, Client &client, const std::vector<std::string> &params)
 {
 	if(params.empty())
+	{
 		replyErr461NeedMoreParams(server.getServerName(), "JOIN");
+		return; 
+	}
+	
 	std::string channelName = params[0]; // Get the channel name from the parameters
 	
 	Channel *channel = server.getChannel(channelName); // Get the channel by name from the server
 	if(!channel){
 		server.addChannel(channelName, client); 
 		logChannelInfo( "Channel " + channelName +" created by " + client.getNickname());
+		channel = server.getChannel(channelName); // get the just-created channel
+		
+		//  first user becomes operator
+		channel->addOperator(client.getFd());
+		logChannelInfo("User " + client.getNickname() + " is  operator(creates channel).");
+	}
+
+	//  check in case if smth goes wrong
+	if (!channel)
+	{
+		logChannelError("JOIN failed: could not get channel " + channelName);
+		return;
 	}
 	
 	// Check if the user is already a member of the channel
 	if (channel->hasMembers(&client))
+	{
 		logChannelError("User already in channel");
+		return;
+	}
 	//Check if the channel is invite-only and if the user is invited
 	if (channel->isInviteOnly() && !channel->isInvited(client.getFd()))
+	{
 		replyErr473InviteOnlyChan(server.getServerName(), channelName);
+		return;
+	}
 	
 	// Check if the channel has a key and if the user's password matches the channel key
 	if (channel->hasKey() && client.getPassword() != channel->getKey())
+	{
 		replyErr475BadChannelKey(server.getServerName(), channelName);
+		return;
+	}
 	// Check if the channel has a user limit and if it is reached
 	if (channel->hasUserLimit() && static_cast<int>(channel->getMembers().size()) >= channel->getLimit())
+	{
 		replyErr471ChannelIsFull(server.getServerName(), channelName);
-	channel->addUser(client.getFd(), &client); //add user to channel after all the checks														  // Add the user to the channel
+		return;
+	}
+	
+	channel->addUser(client.getFd(), &client); //add user to channel after all the checks	
+	client.joinChannel(channel); //  add channel to client's list
+														  // Add the user to the channel
 	channel->sendToChannelExcept(client.getNickname() + " has joined the channel.", client); // Notify other members
 	logChannelInfo( "User " + client.getNickname() + " joined channel: " + channelName);
 }
@@ -64,6 +95,7 @@ void handlePart(Server &server, Client &client, const std::vector<std::string> &
 		replyErr461NeedMoreParams(server.getServerName(), "PART");
 	std::string channelName = params[0]; // Get the channel name from the parameters
 	Channel *channel = server.getChannel(channelName); // Get the channel by name from the
+	
 	if(!channel)
 		replyErr403NoSuchChannel(server.getServerName(), channelName);
 	if (!channel->hasMembers(&client))
