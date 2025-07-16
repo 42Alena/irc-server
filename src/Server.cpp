@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 07:07:51 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 08:23:52 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,10 @@ Server::Server() {}
 	Copying and assignment are disabled for this class.
 	IRC Server holds global state, sockets, and file descriptors — it must remain unique.
 */
-Server::Server(const Server &o) 
-{ 
+Server::Server(const Server &o)
+{
 	logError("Copying a Server is forbidden: it owns global state, sockets, and runtime structures.");
-	(void)o; 
+	(void)o;
 }
 
 /*
@@ -51,10 +51,43 @@ Server::Server(int port, const std::string &password) : _runningMainLoop(true),
 														_password(password),
 														_serverFd(-1) {}
 
+
+
+
+
 Server::~Server()
 {
+	logInfo("\n\nServer destructor called. Start cleaning up all resources...");
 
-	logInfo("Server destructor called. All resources cleaned up.");
+	// close and delete all clients
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		logInfo("Deleting client on fd " + intToString(it->first));
+		close(it->first);
+		delete it->second;
+	}
+	_clients.clear();
+
+	// delete all channels
+	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	{
+		logInfo("Deleting channel: " + it->first);
+		delete it->second;
+	}
+	_channels.clear();
+
+	// clear poll file descriptors
+	_pollFds.clear();
+
+	// close server socket
+	if (_serverFd >= 0)
+	{
+		logInfo("Closing server socket fd " + intToString(_serverFd));
+		close(_serverFd);
+		_serverFd = -1;
+	}
+
+	logInfo("Server resources fully cleaned up.");
 }
 
 //======================== PUBLIC: MAIN SERVER METHODS ==========================//
