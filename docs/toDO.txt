@@ -112,6 +112,8 @@ Branch "fix/segfault-join"
 					return;
 				}
 		- client.joinChannel(channel); //  add channel to client's list
+		-fixef rejectin privmsg, because user was added 2 times in channel(Channel(name, creator) + channel->addUser(...);)
+		- fixed adding same client two times with: if (!channel->hasMembers(&client))
 
 
 15.07
