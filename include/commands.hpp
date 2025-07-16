@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:03 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/09 07:49:16 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 11:57:17 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,24 @@
 
 class Server;
 class Client;
+class Channel;
 
-//======================== PUBLIC: USER REGISTRATION COMMANDS =====================//
+//======================== SERVER   COMMANDS ((/commands/)=============================//
+
+void handlePing(Server &server, Client &client, const std::vector<std::string> &params);
+void sendPong(Server &server, Client &client, const std::string &originMessage);
+void handleQuit(Server &server, Client &client, const std::vector<std::string> &params);
+
+
+//========================  CLIENT COMMANDS (/commands/registration.cpp)=====================//
 
 void handlePass(Server &server, Client &client, const std::vector<std::string> &params);
 void handleNick(Server &server, Client &client, const std::vector<std::string> &params);
 void handleUser(Server &server, Client &client, const std::vector<std::string> &params);
 void sendWelcome(Server &server, Client &client);
 
-//======================== PUBLIC: CHANNEL COMMANDS ===============================//
+
+//======================== CHANNEL COMMANDS (/commands/commandsChannel.cpp) ===========================//
 
 void handleJoin(Server &server, Client &client, const std::vector<std::string> &params);
 void handlePart(Server &server, Client &client, const std::vector<std::string> &params);
@@ -39,16 +48,8 @@ void handleMode(Server &server, Client &client, const std::vector<std::string> &
 void handleInvite(Server &server, Client &client, const std::vector<std::string> &params);
 void handleKick(Server &server, Client &client, const std::vector<std::string> &params);
 
-//======================== PUBLIC: PRIVATE MESSAGING ==============================//
+//======================== PRIVATE MESSAGING ==============================//
 
 void handlePrivateMessage(Server &server, Client &client, const std::vector<std::string> &params);
 
-
-
-//======================== PUBLIC: SERVER INTERACTION =============================//
-
-void handlePing(Server &server, Client &client, const std::vector<std::string> &params);
-void sendPong(Server &server, Client &client, const std::string &originMessage);
-void handleQuit(Server &server, Client &client, const std::vector<std::string> &params);
-void sendWelcome(Server &server, Client &client); //registration.cpp
 

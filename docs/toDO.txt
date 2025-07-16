@@ -54,6 +54,9 @@ TODO in Channel:
 TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 16.07:
+	//luis: should we check if the channel name starts with '#'?
+	//Alena: yes! I am already checking in Server with function isChannelName
+
 	Branch "feature/shutdown-cleanup"
 	add:
 		DESTRUCTORS update in client and chaneel.
@@ -81,6 +84,12 @@ Branch: refactor/commands-loggs
 	Client: deleted <<operator in Server
 	- moved commands.cpp(from /src to /cmd)
 	-renamed /commands/commands.cpp to /commands/commandsChannel.cpp
+	- deleted empty files for commands
+	- added  class Channel; to  commands.hpp
+	- organized commands.hpp
+	- added loginfo to server for registering client
+	- 
+	- 
 
 
 

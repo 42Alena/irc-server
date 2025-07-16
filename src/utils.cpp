@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 18:20:37 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 10:04:49 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 12:12:21 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,10 @@ void printWelcomeMessage()
 
 //============================ LOGGER: GLOBAL LOGGING FOR ALL CLASSES ============================//
 
+void logSeparateLine(const std::string &msg)
+{
+	std::cout << YEL << "\n──────[ " << msg << " ]──────"  << RST  << std::endl;
+}
 
 /* blue + "Server🎟️🤖: " */
 void logServerInfo(const std::string &msg)
@@ -50,7 +54,7 @@ void logServerInfo(const std::string &msg)
 /* red + "Server🎟️🤖🔥: " */
 void logServerError(const std::string &msg)
 {
-	std::cerr << ESRV << msg << RST << std::endl;
+	std::cerr << " Error: " << ESRV << msg << RST << std::endl;
 }
 
 
@@ -63,7 +67,7 @@ void logServerError(const std::string &msg)
    /*  red + "Client🎭👩‍💻🔥: " */
    void logClientError(const std::string &msg)
    {
-       std::cerr << ECLT << msg << RST << std::endl;
+       std::cerr << " Error: " << ECLT << msg << RST << std::endl;
    }
    
 
@@ -77,14 +81,11 @@ void logChannelInfo(const std::string &msg)
 void logChannelError(const std::string &msg)
 {
 	//red + "Channel🎪💬🔥: "
-	std::cerr << ECHN << msg << RST << std::endl;
+	std::cerr << " Error: " << ECHN << msg << RST << std::endl;
 }
 
 
-void logSeparateLine(const std::string &msg)
-{
-	std::cout << "\n──────[ " << msg << " ]──────"  << std::endl;
-}
+
 
 /*
 https://www.rfc-editor.org/rfc/rfc1459.html#section-2.3.1
