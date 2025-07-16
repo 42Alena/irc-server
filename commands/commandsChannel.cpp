@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/16 13:14:55 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 13:31:51 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,10 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
 	// Check if the user is already a member of the channel
 	if (channel->hasMembers(&client))
 	{
-		logChannelError("User already in channel");
+		logChannelInfo("User already in channel");
 		return;
 	}
+	
 	// Check if the channel is invite-only and if the user is invited
 	if (channel->isInviteOnly() && !channel->isInvited(client.getFd()))
 	{
