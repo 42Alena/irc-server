@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 07:00:49 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 10:03:05 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,6 @@ private:
     std::string _sendData;     // Buffer for outgoing data (accumulates until \r\n)
     std::string _receivedData; // Buffer for incoming data (accumulates until \r\n)
     
-    //======================== PRIVATE: INTERNAL UTILITIES =========================//
-    void logInfo(const std::string &msg);   //cyan
-    void logError(const std::string &msg); // red - error
     
     public:
     //======================== PUBLIC: CONSTRUCTORS & DESTRUCTORS ==============//
@@ -110,5 +107,4 @@ private:
     void removeOperator(Channel *channel);   // Remove operator status from a channel
 };
 
-//======================== NON-MEMBER OPERATORS ===============================//
-const std::ostream &operator<<(std::ostream &os, const Client &o);
+

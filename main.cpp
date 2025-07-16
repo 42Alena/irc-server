@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:32:27 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 06:21:41 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 09:59:23 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void handleSigintCtrlC(int signum)
     (void)signum; //silence. need to be for no runtime issues
     if (globalRunningServer)
     {
-        globalRunningServer->logError("💥 Received SIGINT (Ctrl-C). Shutting down...");
+        logServerError("Received SIGINT (Ctrl-C). Shutting down...");
         globalRunningServer->shutdown();
     }
 }
@@ -65,8 +65,9 @@ int main(int argc, char **argv)
         std::pair<int, std::string> result = parsePortPassword(argv[1], argv[2]);
 
         Server server(result.first, result.second);
-        globalRunningServer = &server; // 🔥 Required for SIGINT handler to work
+        globalRunningServer = &server; // required for SIGINT handler to work
         server.run();
+        
         //cleanup normally, if not triggered by signal
         globalRunningServer->shutdown();
     }

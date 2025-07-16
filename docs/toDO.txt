@@ -75,6 +75,15 @@ SERVER:
 		add NULL check
 		used copy instead original
 
+Branch: refactor/commands-loggs
+	-movved logs from classes to utils.cpp to use it in functions outside classes
+
+	Client: deleted <<operator
+
+
+
+
+
 15.07
 Branch: "feature/signal-handling"
 - handle SIGINT (Ctrl-C): clean up + shut down

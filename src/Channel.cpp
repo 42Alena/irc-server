@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 07:02:27 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 09:44:01 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,7 @@
 #include "../include/Channel.hpp"
 #include "../include/colors.hpp"
 
-// Alena: added for consistent logs across Channel/Client/Server + color
-//======================== PRIVATE: INTERNAL UTILITIES =========================//
-void Channel::logInfo(const std::string &msg)
-{
-	//magenta + "Channel🎪💬🔥: "
-	std::cout << CHN << msg << RST << std::endl;
-}
 
-void Channel::logError(const std::string &msg)
-{
-	//red + "Channel🎪💬🔥: "
-	std::cerr << ECHN << msg << RST << std::endl;
-}
 
 
 //======================== CONSTRUCTORS ===========================//
@@ -71,7 +59,7 @@ Channel::Channel(const std::string &name, Client &createdBy) : _name(name), _use
 */
 Channel::Channel(const Channel &other)
 {
-	logError(" Copying a Channel is not allowed: IRC channels must be unique and non-copyable by design.");
+	logChannelError(" Copying a Channel is not allowed: IRC channels must be unique and non-copyable by design.");
 	(void)other;
 }
 
@@ -83,7 +71,7 @@ Channel::Channel(const Channel &other)
 */
 Channel &Channel::operator=(const Channel &other)
 {
-	logError(" Assignment of Channel is forbidden: IRC channels represent unique entities and cannot be duplicated.");
+	logChannelError(" Assignment of Channel is forbidden: IRC channels represent unique entities and cannot be duplicated.");
 	(void)other;
 	return *this;
 }
@@ -93,7 +81,7 @@ Channel::~Channel()
 {
 	// No dynamic memory allocation, so nothing to clean up
 	// The vectors and maps will be automatically cleaned up by the destructor
-	logInfo("Channel destructor called for: " + _name);	
+	logChannelInfo("Channel destructor called for: " + _name);	
 }
 
 //======================== SETTERS ===================================//
@@ -168,7 +156,7 @@ std::set<int> Channel::getOperators() const
 void Channel::addUser(int fd, Client *client)
 {
 	_members[fd] = client; // Add the client to the _members map using their file descriptor (fd) as the key
-	logInfo("Client added to channel: "  +  client->getNickname());
+	logChannelInfo("Client added to channel: "  +  client->getNickname());
 
 }
 
@@ -177,7 +165,7 @@ void Channel::addUser(int fd, Client *client)
 void Channel::addOperator(int fd)
 {
 	_operators.insert(fd); // Add the client's file descriptor (fd) to the _operators set
-	logInfo("Client added as operator: " + intToString(fd) );
+	logChannelInfo("Client added as operator: " + intToString(fd) );
 }
 
 /*
@@ -189,17 +177,17 @@ void Channel::removeUser(int fd, Client *client)
 {
 	if (isOperator(client))
 	{
-		logError("Error: Cannot remove operator from channel.");
+		logChannelError("Error: Cannot remove operator from channel.");
 	}
 	std::map<int, Client *>::iterator it = _members.find(fd);
 	if (it != _members.end() && it->second == client)
 	{
 		_members.erase(it); // Erase the client from the _members map if found
-		logError("Client removed from channel: " + client->getNickname());
+		logChannelError("Client removed from channel: " + client->getNickname());
 	}
 	else
 	{
-		logInfo("Client not found in this channel, are you sure is here?");
+		logChannelInfo("Client not found in this channel, are you sure is here?");
 	}
 }
 
@@ -282,5 +270,5 @@ bool Channel::hasUserLimit() const
 void Channel::inviteUser(int fd)
 {
 	_invited.insert(fd); // Add the user's file descriptor (fd) to the _invited set
-	logInfo("User with fd " + intToString(fd) + " invited to channel: " +  _name );
+	logChannelInfo("User with fd " + intToString(fd) + " invited to channel: " +  _name );
 }
