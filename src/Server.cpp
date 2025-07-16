@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 09:05:47 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 09:56:47 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ Server::Server() {}
 */
 Server::Server(const Server &o)
 {
-	logError("Copying a Server is forbidden: it owns global state, sockets, and runtime structures.");
+	logServerError("Copying a Server is forbidden: it owns global state, sockets, and runtime structures.");
 	(void)o;
 }
 
@@ -38,7 +38,7 @@ Server::Server(const Server &o)
 */
 Server &Server::operator=(const Server &o)
 {
-	logError("Assigning a Server is forbidden: it owns sockets, poll state, and all live connections.");
+	logServerError("Assigning a Server is forbidden: it owns sockets, poll state, and all live connections.");
 	(void)o;
 	return *this;
 }
@@ -56,9 +56,9 @@ Server::Server(int port, const std::string &password) : _runningMainLoop(true),
 
 Server::~Server()
 {
-	logInfo("🎟️ Server destructor called.");
+	logServerInfo("Server destructor called.");
 
-	// Call shutdown if it wasnont already triggered manually by ctrl+c
+	// call shutdown if it wasnont already triggered manually by ctrl+c
 	shutdown();
 }
 
@@ -96,7 +96,7 @@ int Server::run()
 
 	//==================== POLL SETUP ====================//
 
-	logInfo("Registering server socket with poll() to monitor for new TCP connections...");
+	logServerInfo("Registering server socket with poll() to monitor for new TCP connections...");
 	struct pollfd serverPollFd;
 	serverPollFd.fd = _serverFd;
 	serverPollFd.events = POLLIN; // Interested in incoming connections
@@ -155,23 +155,23 @@ void Server::shutdown()
 	if (!_runningMainLoop) // prevent double shutdown
 		return;
 
-	logInfo("\n\n_______________________________________________________________");
-	logInfo("💥Shutdown requested. Cleaning all server resources...");
+
+	logSeparateLine("💥Shutdown requested");
+	logServerInfo(" Cleaning all server resources...");
 	
 	_runningMainLoop = false;
 
 	// notifying all clients
 	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		sendToClient(it->first, "NOTICE * :💥 Server is 💥shutting down now\r\n");
+		sendToClient(it->first, "NOTICE * : Server is shutting down now\r\n");
 	}
-	logInfo("Shutdown requested by signal CTRL+C (SIGINT).");
-
+	
 
 	// delete and close all clients
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		logInfo(" Deleting client on fd " + intToString(it->first));
+		logServerInfo(" Deleting client on fd " + intToString(it->first));
 		close(it->first);
 		delete it->second;
 	}
@@ -180,7 +180,7 @@ void Server::shutdown()
 	// delete all channels
 	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 	{
-		logInfo("Deleting channel: " + it->first);
+		logServerInfo("Deleting channel: " + it->first);
 		delete it->second;
 	}
 	_channels.clear();
@@ -191,13 +191,13 @@ void Server::shutdown()
 	// close server socket
 	if (_serverFd >= 0)
 	{
-		logInfo("Closing server socket fd " + intToString(_serverFd));
+		logServerInfo("Closing server socket fd " + intToString(_serverFd));
 		close(_serverFd);
 		_serverFd = -1;
 	}
 
-	logInfo("Server shutdown complete.");
-	logInfo("\n\n_______________________________________________________________");
+	
+	logSeparateLine("Server shutdown complete");
 }
 
 //======================== PUBLIC: GETTERS ====================================//
@@ -218,7 +218,7 @@ const std::string &Server::getServerName() const
 void Server::handleCommand(Client *client, const std::string &line)
 {
 
-	logInfo("Received command from client fd " + intToString(client->getFd()) + ": " + line);
+	logServerInfo("Received command from client fd " + intToString(client->getFd()) + ": " + line);
 
 	// Create a stream from the input line to parse it
 	std::istringstream iss(line);
@@ -228,6 +228,7 @@ void Server::handleCommand(Client *client, const std::string &line)
 	// Ignore empty lines
 	if (command.empty())
 		return;
+		
 	// Convert command to uppercase (IRC commands are case-insensitive)
 	std::transform(command.begin(), command.end(), command.begin(), ::toupper);
 
@@ -351,7 +352,7 @@ void Server::acceptNewClient()
 		else
 		{
 			_clients[clientFd] = new Client(clientFd, clientIP);
-			logInfo("New client connected on fd " + intToString(clientFd) + " (" + clientIP + ")");
+			logServerInfo("New client connected on fd " + intToString(clientFd) + " (" + clientIP + ")");
 		}
 
 		// (pollfd) Add new client to poll() monitoring
@@ -387,7 +388,7 @@ void Server::removeClient(int fd, size_t pollFdIndex)
 	int fdCloseResult = close(fd);
 	checkResult(fdCloseResult, "Failed to close client TCP connection on fd " + intToString(fd));
 
-	logInfo("Closed client TCP connection on fd " + intToString(fd));
+	logServerInfo("Closed client TCP connection on fd " + intToString(fd));
 }
 
 void Server::handleClientInput(size_t pollFdIndex)
@@ -402,7 +403,7 @@ void Server::handleClientInput(size_t pollFdIndex)
 
 	if (readBytes == 0)
 	{
-		logInfo("Client on fd " + intToString(fd) + " disconnected");
+		logServerInfo("Client on fd " + intToString(fd) + " disconnected");
 		removeClient(fd, pollFdIndex);
 	}
 	else if (readBytes > 0)
@@ -480,7 +481,7 @@ void Server::addChannel(const std::string &channelName, Client &creator)
 	Channel *newChannel = new Channel(channelName, creator);
 	_channels[channelName] = newChannel;
 
-	logInfo("Created channel " + channelName + " by user " + creator.getNickname());
+	logServerInfo("Created channel " + channelName + " by user " + creator.getNickname());
 }
 
 void Server::removeChannel(const std::string &channelName)
@@ -491,7 +492,7 @@ void Server::removeChannel(const std::string &channelName)
 	{
 		delete it->second;	 // deallocate the Channel object with its destructor
 		_channels.erase(it); // remove pointer from the map
-		logInfo("Channel " + channelName + " removed from server.");
+		logServerInfo("Channel " + channelName + " removed from server.");
 	}
 }
 
@@ -512,7 +513,7 @@ void Server::removeClientFromAllChannels(Client *client)
 		if (!ch)
 			continue; // extra safety
 
-		logInfo("Removing client from channel: " + ch->getName());
+		logServerInfo("Removing client from channel: " + ch->getName());
 		
 		// remove client from channel
 		ch->removeUser(fd, client);
@@ -540,18 +541,8 @@ void Server::checkResult(int result, const std::string &errMsg)
 void Server::logErrAndThrow(const std::string &msg)
 {
 
-	logError(msg);
+	logServerError(msg);
 	throw std::runtime_error("SERVER(errno):  " + std::string(strerror(errno)));
 }
 
-/* blue + "Server🎟️🤖: " */
-void Server::logInfo(const std::string &msg)
-{
-	std::cout << SRV << msg << RST << std::endl;
-}
 
-/* red + "Server🎟️🤖🔥: " */
-void Server::logError(const std::string &msg)
-{
-	std::cerr << ESRV << msg << RST << std::endl;
-}

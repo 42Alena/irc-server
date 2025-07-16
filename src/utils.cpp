@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 18:20:37 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 09:23:37 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 12:12:21 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,51 @@ void printWelcomeMessage()
 	std::cout << std::endl;
 }
 
-//============================LOG MESSAGES======================
+//============================ LOGGER: GLOBAL LOGGING FOR ALL CLASSES ============================//
 
+void logSeparateLine(const std::string &msg)
+{
+	std::cout << YEL << "\n──────[ " << msg << " ]──────"  << RST  << std::endl;
+}
+
+/* blue + "Server🎟️🤖: " */
+void logServerInfo(const std::string &msg)
+{
+	std::cout << SRV << msg << RST << std::endl;
+}
+
+/* red + "Server🎟️🤖🔥: " */
+void logServerError(const std::string &msg)
+{
+	std::cerr << " Error: " << ESRV << msg << RST << std::endl;
+}
+
+
+   /*magenta + "Client🎭👩‍💻🔥:   */
+   void logClientInfo(const std::string &msg)
+   {
+       std::cout << CLT << msg << RST << std::endl;
+   }
+   
+   /*  red + "Client🎭👩‍💻🔥: " */
+   void logClientError(const std::string &msg)
+   {
+       std::cerr << " Error: " << ECLT << msg << RST << std::endl;
+   }
+   
+
+
+void logChannelInfo(const std::string &msg)
+{
+	//magenta + "Channel🎪💬🔥: "
+	std::cout << CHN << msg << RST << std::endl;
+}
+
+void logChannelError(const std::string &msg)
+{
+	//red + "Channel🎪💬🔥: "
+	std::cerr << " Error: " << ECHN << msg << RST << std::endl;
+}
 
 
 

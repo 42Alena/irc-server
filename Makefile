@@ -12,18 +12,12 @@ SOURCES = \
 	./src/Client.cpp\
 	./src/Channel.cpp\
 	./src/replies.cpp\
-	./src/commands.cpp\
 	./src/utils.cpp\
-	./commands/invite.cpp\
-	./commands/join.cpp\
-	./commands/kick.cpp\
-	./commands/mode.cpp\
-	./commands/part.cpp\
 	./commands/pingPong.cpp\
 	./commands/privmsg.cpp\
 	./commands/quit.cpp\
 	./commands/registration.cpp\
-	./commands/topic.cpp\
+	./commands/commandsChannel.cpp\
 	
 	
 

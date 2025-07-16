@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 21:07:53 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 09:44:35 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,8 @@ private:
 	Channel(const Channel &other);			  // Copy constructor
 	Channel &operator=(const Channel &other); // Assignment operator
 
-	//======================== PRIVATE: INTERNAL UTILITIES =========================//
-	// Alena: formatted logger for Channel messages and changed in channel.hpp
-	void logInfo(const std::string &msg); // magenta - info
-	void logError(const std::string &msg); // red - error
-
+	//Alena: moved logs to utils.cpp
+	
 public:
 	// Adding the Channel constructors and destructor
 	Channel();											 // Default constructor

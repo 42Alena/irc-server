@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 18:20:44 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 13:33:19 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 10:03:26 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,20 @@
 
 //======================== PUBLIC: welcome to cIRCus             ==================//
 void printWelcomeMessage();
+
+//============================ LOGGER: GLOBAL LOGGING FOR ALL CLASSES ============================//
+	
+    void logServerInfo(const std::string &msg);
+    void logServerError(const std::string &msg);
+
+        
+    void logClientInfo(const std::string &msg);   //cyan
+    void logClientError(const std::string &msg); // red - error
+
+    void logChannelInfo(const std::string &msg); // magenta - info
+	void logChannelError(const std::string &msg); // red - error
+
+    void logSeparateLine(const std::string &msg);
 
 //======================== PUBLIC: NICKNAME & USERNAME VALIDATION ==================//
 bool isValidNickname(const std::string &nickname);

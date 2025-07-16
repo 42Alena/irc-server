@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 07:02:35 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 10:04:03 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 */
 Client::Client(const Client &o)
 {
-    logError("Copying a Client is not allowed: IRC clients represent unique socket connections.");
+    logClientError("Copying a Client is not allowed: IRC clients represent unique socket connections.");
     (void)o;
 }
 
@@ -32,7 +32,7 @@ Client::Client(const Client &o)
 */
 Client &Client::operator=(const Client &o)
 {
-    logError("Assignment of Client is forbidden: IRC clients represent unique socket connections.");
+    logClientError("Assignment of Client is forbidden: IRC clients represent unique socket connections.");
     (void)o;
     return *this;
 }
@@ -74,7 +74,7 @@ Client::Client(int fd, const std::string &host)
 }
 
 Client::~Client() {
-    logInfo("Client destructor called for fd " + intToString(_fd) + ", nick: " + _nickname);
+    logClientInfo("Client destructor called for fd " + intToString(_fd) + ", nick: " + _nickname);
 	// No need to delete anything — all members are self-managed
 }
 
@@ -193,19 +193,7 @@ void Client::clearReceivedData()
     _receivedData.clear();
 }
 
-   //======================== PRIVATE: INTERNAL UTILITIES =========================//
-   /*magenta + "Client🎭👩‍💻🔥:   */
-   void Client::logInfo(const std::string &msg)
-   {
-       std::cout << CLT << msg << RST << std::endl;
-   }
-   
-   /*  red + "Client🎭👩‍💻🔥: " */
-   void Client::logError(const std::string &msg)
-   {
-       std::cerr << ECLT << msg << RST << std::endl;
-   }
-   
+
 
 //======================== PUBLIC: COMMAND PARSING =============================//
 
