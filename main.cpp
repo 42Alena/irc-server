@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:32:27 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/15 18:48:15 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 06:21:41 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,15 +67,17 @@ int main(int argc, char **argv)
         Server server(result.first, result.second);
         globalRunningServer = &server; // 🔥 Required for SIGINT handler to work
         server.run();
+        //cleanup normally, if not triggered by signal
+        globalRunningServer->shutdown();
     }
     catch (const std::exception &e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
-       // If server exits normally
-    globalRunningServer->shutdown();
+    
     globalRunningServer = NULL;
 
     return EXIT_SUCCESS;
 }
+
