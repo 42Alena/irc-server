@@ -1,3 +1,16 @@
+test memory leaks: 
+        valgrind --leak-check=full ./ircserv 6667 pass
+        2.terminal:
+          nc -C 127.0.0.1 6667
+              PASS pass
+              NICK testuser
+              USER testuser 0 * :Real Name
+              JOIN #42
+              PRIVMSG #42 :Hello world!
+              QUIT
+
+
+
 28.06
 STEps to test:
 0. Check if your previous server is still running

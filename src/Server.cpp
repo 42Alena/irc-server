@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 08:23:52 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 08:52:26 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,41 +54,14 @@ Server::Server(int port, const std::string &password) : _runningMainLoop(true),
 
 
 
-
 Server::~Server()
 {
-	logInfo("\n\nServer destructor called. Start cleaning up all resources...");
+	logInfo("🎟️ Server destructor called.");
 
-	// close and delete all clients
-	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-	{
-		logInfo("Deleting client on fd " + intToString(it->first));
-		close(it->first);
-		delete it->second;
-	}
-	_clients.clear();
-
-	// delete all channels
-	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
-	{
-		logInfo("Deleting channel: " + it->first);
-		delete it->second;
-	}
-	_channels.clear();
-
-	// clear poll file descriptors
-	_pollFds.clear();
-
-	// close server socket
-	if (_serverFd >= 0)
-	{
-		logInfo("Closing server socket fd " + intToString(_serverFd));
-		close(_serverFd);
-		_serverFd = -1;
-	}
-
-	logInfo("Server resources fully cleaned up.");
+	// Call shutdown if it wasnont already triggered manually by ctrl+c
+	shutdown();
 }
+
 
 //======================== PUBLIC: MAIN SERVER METHODS ==========================//
 int Server::run()
@@ -175,22 +148,56 @@ int Server::run()
 	return EXIT_SUCCESS;
 }
 
-/* called after signal SIGINT(CTRL+C) */
+/* called for normal exit or after after signal SIGINT(CTRL+C) */
 void Server::shutdown()
 {
 
 	if (!_runningMainLoop) // prevent double shutdown
 		return;
 
-	logInfo("💥Shutdown requested by signal 💥CTRL+C (SIGINT).");
+	logInfo("\n\n_______________________________________________________________");
+	logInfo("💥Shutdown requested. Cleaning all server resources...");
+	
+	_runningMainLoop = false;
 
 	// notifying all clients
 	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		sendToClient(it->first, "NOTICE * :💥 Server is 💥shutting down now\r\n");
 	}
-	_runningMainLoop = false;
 	logInfo("Shutdown requested by signal CTRL+C (SIGINT).");
+
+
+	// delete and close all clients
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		logInfo(" Deleting client on fd " + intToString(it->first));
+		close(it->first);
+		delete it->second;
+	}
+	_clients.clear();
+
+	// delete all channels
+	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	{
+		logInfo("Deleting channel: " + it->first);
+		delete it->second;
+	}
+	_channels.clear();
+
+	// clear pollfd
+	_pollFds.clear();
+
+	// close server socket
+	if (_serverFd >= 0)
+	{
+		logInfo("Closing server socket fd " + intToString(_serverFd));
+		close(_serverFd);
+		_serverFd = -1;
+	}
+
+	logInfo("Server shutdown complete.");
+	logInfo("\n\n_______________________________________________________________");
 }
 
 //======================== PUBLIC: GETTERS ====================================//
