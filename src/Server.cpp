@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 07:07:51 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 09:05:47 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,10 @@ Server::Server() {}
 	Copying and assignment are disabled for this class.
 	IRC Server holds global state, sockets, and file descriptors — it must remain unique.
 */
-Server::Server(const Server &o) 
-{ 
+Server::Server(const Server &o)
+{
 	logError("Copying a Server is forbidden: it owns global state, sockets, and runtime structures.");
-	(void)o; 
+	(void)o;
 }
 
 /*
@@ -51,11 +51,17 @@ Server::Server(int port, const std::string &password) : _runningMainLoop(true),
 														_password(password),
 														_serverFd(-1) {}
 
+
+
+
 Server::~Server()
 {
+	logInfo("🎟️ Server destructor called.");
 
-	logInfo("Server destructor called. All resources cleaned up.");
+	// Call shutdown if it wasnont already triggered manually by ctrl+c
+	shutdown();
 }
+
 
 //======================== PUBLIC: MAIN SERVER METHODS ==========================//
 int Server::run()
@@ -142,22 +148,56 @@ int Server::run()
 	return EXIT_SUCCESS;
 }
 
-/* called after signal SIGINT(CTRL+C) */
+/* called for normal exit or after after signal SIGINT(CTRL+C) */
 void Server::shutdown()
 {
 
 	if (!_runningMainLoop) // prevent double shutdown
 		return;
 
-	logInfo("💥Shutdown requested by signal 💥CTRL+C (SIGINT).");
+	logInfo("\n\n_______________________________________________________________");
+	logInfo("💥Shutdown requested. Cleaning all server resources...");
+	
+	_runningMainLoop = false;
 
 	// notifying all clients
 	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		sendToClient(it->first, "NOTICE * :💥 Server is 💥shutting down now\r\n");
 	}
-	_runningMainLoop = false;
 	logInfo("Shutdown requested by signal CTRL+C (SIGINT).");
+
+
+	// delete and close all clients
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		logInfo(" Deleting client on fd " + intToString(it->first));
+		close(it->first);
+		delete it->second;
+	}
+	_clients.clear();
+
+	// delete all channels
+	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	{
+		logInfo("Deleting channel: " + it->first);
+		delete it->second;
+	}
+	_channels.clear();
+
+	// clear pollfd
+	_pollFds.clear();
+
+	// close server socket
+	if (_serverFd >= 0)
+	{
+		logInfo("Closing server socket fd " + intToString(_serverFd));
+		close(_serverFd);
+		_serverFd = -1;
+	}
+
+	logInfo("Server shutdown complete.");
+	logInfo("\n\n_______________________________________________________________");
 }
 
 //======================== PUBLIC: GETTERS ====================================//
@@ -457,14 +497,27 @@ void Server::removeChannel(const std::string &channelName)
 
 void Server::removeClientFromAllChannels(Client *client)
 {
-	const std::vector<Channel *> &channels = client->getChannels();
+	if (!client)
+		return;
+		
+	// copy to avoid using internal vector while modifying it
+	const std::vector<Channel *> channelsCopy = client->getChannels(); 
+
 	int fd = client->getFd();
 
-	for (size_t i = 0; i < channels.size(); ++i)
+	for (size_t i = 0; i < channelsCopy.size(); ++i)
 	{
-		Channel *ch = channels[i];
+		Channel *ch = channelsCopy[i];
+		
+		if (!ch)
+			continue; // extra safety
+
+		logInfo("Removing client from channel: " + ch->getName());
+		
+		// remove client from channel
 		ch->removeUser(fd, client);
 
+		// if channel is empty after removal, delete it from server
 		if (ch->getMembers().empty())
 			removeChannel(ch->getName());
 	}
