@@ -7,9 +7,9 @@ test memory leaks:
               USER testuser 0 * :Real Name
               
               JOIN #42
-              PRIVMSG #42 :Hello world!
+              PRIVMSG #git che42 :Hello world!
               QUIT
-Branch: "fix/segfault join"
+
 
 
 28.06
