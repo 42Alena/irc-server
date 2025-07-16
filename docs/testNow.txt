@@ -9,7 +9,7 @@ test memory leaks:
               JOIN #42
               PRIVMSG #42 :Hello world!
               QUIT
-
+Branch: "fix/segfault join"
 
 
 28.06

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 18:20:37 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 12:12:21 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 13:21:10 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void logServerInfo(const std::string &msg)
 /* red + "Server🎟️🤖🔥: " */
 void logServerError(const std::string &msg)
 {
-	std::cerr << " Error: " << ESRV << msg << RST << std::endl;
+	std::cerr  << ESRV << " Error: " << msg << RST << std::endl;
 }
 
 
@@ -67,7 +67,7 @@ void logServerError(const std::string &msg)
    /*  red + "Client🎭👩‍💻🔥: " */
    void logClientError(const std::string &msg)
    {
-       std::cerr << " Error: " << ECLT << msg << RST << std::endl;
+       std::cerr  << ECLT << " Error: " << msg << RST << std::endl;
    }
    
 
