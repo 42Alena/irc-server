@@ -158,6 +158,9 @@ commandsChannel.cpp
 registration.cpp:
 	updated loServerinfo for welcome message
 
+Client:
+add: function for get prefix + _nickname + "!" + _username + "@" + _host;
+
 
 
 15.07

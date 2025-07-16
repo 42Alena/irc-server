@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/16 19:28:25 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 22:05:32 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,12 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
 	if (!channel)
 	{
 		server.addChannel(channelName, client);
-		logChannelInfo("Channel " + channelName + " created by " + client.getNickname());
+		
 		channel = server.getChannel(channelName); // get the just-created channel
 
 		//  first user becomes operator
 		channel->addOperator(client.getFd());
-		logChannelInfo("User " + client.getNickname() + " is  operator(creates channel).");
+	
 	}
 
 	//  check in case if smth goes wrong
@@ -96,6 +96,10 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
 
 	// Add the user to the channel
 	channel->sendToChannelExcept(client.getNickname() + " has joined the channel.", client); // Notify other members
+	channel->sendToChannelExcept(
+		":" + client.getPrefix() + " JOIN " + channelName,
+		client
+	); //  More accurate IRC JOIN message format
 	logChannelInfo("User " + client.getNickname() + " joined channel: " + channelName);
 }
 
