@@ -78,8 +78,9 @@ SERVER:
 Branch: refactor/commands-loggs
 	-movved logs from classes to utils.cpp to use it in functions outside classes
 
-	Client: deleted <<operator
-
+	Client: deleted <<operator in Server
+	- moved commands.cpp(from /src to /cmd)
+	-renamed /commands/commands.cpp to /commands/commandsChannel.cpp
 
 
 
