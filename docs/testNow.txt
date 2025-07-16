@@ -5,6 +5,7 @@ test memory leaks:
               PASS pass
               NICK testuser
               USER testuser 0 * :Real Name
+              
               JOIN #42
               PRIVMSG #42 :Hello world!
               QUIT

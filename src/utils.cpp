@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 18:20:37 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/13 14:44:24 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 09:23:37 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,12 @@ void printWelcomeMessage()
 	std::cout << std::endl;
 	std::cout << std::endl;
 }
+
+//============================LOG MESSAGES======================
+
+
+
+
 
 /*
 https://www.rfc-editor.org/rfc/rfc1459.html#section-2.3.1
