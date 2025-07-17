@@ -54,11 +54,32 @@ TODO in Channel:
 TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 17.07
-BRUNC: /  fix/channel-commands
+
+BRUNCh: fix/channel-name-validation 
+server.cpp
+	 changed logic to check is channel name
+
+join.cpp:
+	separated join  to join.cpp form commandsChannel.cpp for easier work with test/refactoring
+	Fixed is channel name + added new numeric reply
+			 join a
+			:ircserv 476 n a :Bad Channel Mask
+
+			Server🎟️🤖: Received command from client fd 4: join a
+
+
+replies.cpp:
+	add: replyErr476BadChanMask for an invalid channel name
+
+utils.cpp
+	updated welcome message
+
+
 TESTCASES:
 	[]JOIN 1 
 		must: JOIN 1
 				:ircserv 476 testuser 1 :Invalid channel name
+
 
 16.07:
 

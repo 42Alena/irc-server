@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:13:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/14 21:20:41 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 08:41:12 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,14 @@ std::string replyErr475BadChannelKey(const std::string &server, const std::strin
 {
     return ":" + server + " " + ERR_BADCHANNELKEY + " " + channel + " :Cannot join channel (+k)\r\n";
 }
+
+
+
+std::string replyErr476BadChanMask(const std::string &serverName, const std::string &nickname, const std::string &channel)
+{
+	return ":" + serverName + " 476 " + nickname + " " + channel + " :Bad Channel Mask\r\n";
+}
+
 
 std::string replyErr482ChanOpPrivsNeeded(const std::string &server, const std::string &channel)
 {

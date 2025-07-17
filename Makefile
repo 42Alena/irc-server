@@ -17,6 +17,7 @@ SOURCES = \
 	./commands/privmsg.cpp\
 	./commands/quit.cpp\
 	./commands/registration.cpp\
+	./commands/join.cpp\
 	./commands/commandsChannel.cpp\
 	
 	

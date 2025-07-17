@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/14 21:21:42 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 08:41:38 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,6 +213,13 @@ std::string replyErr473InviteOnlyChan(const std::string &server, const std::stri
    - Used when an incorrect channel key (password) is provided.
 */
 std::string replyErr475BadChannelKey(const std::string &server, const std::string &channel);
+
+/* 
+ 476 ERR_BADCHANMASK
+ "<channel name> :Bad Channel Mask"
+for invalid channel names
+*/
+std::string replyErr476BadChanMask(const std::string &serverName, const std::string &nickname, const std::string &channel);
 
 /* 482 ERR_CHANOPRIVSNEEDED
    "<channel> :You're not channel operator"

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:03 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 11:57:17 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 08:44:02 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include "../include/Server.hpp"
 #include "../include/Client.hpp"
 #include "../include/Channel.hpp"
+
+#include "../include/commands.hpp"
 
 class Server;
 class Client;
