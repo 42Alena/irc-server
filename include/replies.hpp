@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/17 15:49:27 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 22:32:50 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,12 @@ std::string replyRpl003Created(const std::string &server, const std::string &dat
    - Provides server information, including version and supported modes.
 */
 std::string replyRpl004MyInfo(const std::string &server);
+
+/* 331 RPL_NOTOPIC
+   "<channel> :No topic is set"
+   - Indicates that no topic has been set for the channel.
+*/
+std::string replyRpl331NoTopic(const std::string &server, const std::string &channel, const std::string &topic);
 
 /* 332 RPL_TOPIC
    "<channel> :<topic>"
