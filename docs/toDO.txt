@@ -53,9 +53,15 @@ TODO in Channel:
 
 TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
+17.07
+BRUNC: /  fix/channel-commands
+TESTCASES:
+	[]JOIN 1 
+		must: JOIN 1
+				:ircserv 476 testuser 1 :Invalid channel name
+
 16.07:
-	//luis: should we check if the channel name starts with '#'?
-	//Alena: yes! I am already checking in Server with function isChannelName
+
 
 	Branch "feature/shutdown-cleanup"
 	add:

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 20:11:06 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 07:50:29 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -455,6 +455,16 @@ Channel *Server::getChannelByName(const std::string &channelName)
 }
 
 //======================== PUBLIC: CHANNEL UTILITIES ============================//
+/* 
+Channels names are strings (beginning with a '&', '#', '+' or '!'
+   character) of length up to fifty (50) characters.  Apart from the
+   requirement that the first character is either '&', '#', '+' or '!',
+   the only restriction on a channel name is that it SHALL NOT contain
+   any spaces (' '), a control G (^G or ASCII 7), a comma (',').  Space
+   is used as parameter separator and command is used as a list item
+   separator by the protocol).  A colon (':') can also be used as a
+   delimiter for the channel mask.  Channel names are case insensitive.
+*/
 bool Server::isChannelName(const std::string &name)
 {
 	return !name.empty() && name[0] == '#';
