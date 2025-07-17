@@ -18,6 +18,8 @@ BRANCH: refactor/separate-topic
 	separated topic from commandsChannel
 
 
+Branch:
+refactor/separate-topic-from-commands-channel
 
 BRANCH: fix/handle-part
 	[x]moved handlePart from commandsChannel  to  part.cpp
