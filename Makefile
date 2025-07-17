@@ -20,6 +20,7 @@ SOURCES = \
 	./commands/join.cpp\
 	./commands/part.cpp\
 	./commands/topic.cpp\
+	./commands/mode.cpp\
 	./commands/commandsChannel.cpp\
 	
 	
