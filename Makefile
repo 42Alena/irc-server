@@ -18,6 +18,7 @@ SOURCES = \
 	./commands/quit.cpp\
 	./commands/registration.cpp\
 	./commands/join.cpp\
+	./commands/part.cpp\
 	./commands/commandsChannel.cpp\
 	
 	
