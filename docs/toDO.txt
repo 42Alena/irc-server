@@ -1,61 +1,29 @@
-
-
-
-TODO in Channel:
-
-	[] move some orthodox stuff (copy constructor and operator=) to private  
-	   // Real-world IRC channel objects are usually non-copyable — prevents accidental copies  
-
-	REPLACE:  
-		[] std::vector<Client*> _members;  
-		   => std::map<int, Client*> _members;  
-		   // Faster lookup by fd, avoids duplicates, standard for server-side user tracking  
-
-		[] std::vector<Client*> _operators;  
-		   => std::set<int> _operators;  
-		   // Store only fds of operators, no need to store full Client* here  
-
-		[] removeUser(Client* client)  
-		   => void removeUser(int fd);  
-		   // Server works with fd — avoid searching by pointer  
-
-		[] void sendToChannelExcept(const std::string &message, Client *sender) const;  
-		   => void broadcast(const std::string &message, int excludeFd) const;  
-		   // Simpler to exclude sender by fd, members stored by fd  
-
-	CHANGE:  
-		[] Remove either _key or _password — only one field for channel key should exist (suggest: keep _key)  
-		   // Subject requires "key" for +k mode — no need for both  
-
-	ADD:  
-		[] std::set<int> _invited;  
-		   // Store fds of invited clients for invite-only channels (+i)  
-
-		[] void inviteUser(int fd);  
-		   // Add client to invited list  
-
-		[] bool isInvited(int fd) const;  
-		   // Check if client is invited  
-
-		[] bool _inviteOnly;      // +i — invite-only channel  
-		[] bool _topicLocked;     // +t — only operators can change topic  
-		[] bool _hasKey;          // +k — key/password is set  
-		[] bool _hasUserLimit;    // +l — user limit active  
-
-		[] bool isInviteOnly() const;  
-		[] bool isTopicLocked() const;  
-		[] bool hasKey() const;  
-		[] bool hasUserLimit() const;  
-		   // Simple getters to check channel modes — server uses these  
-//____________________________________________________________________________//
-
+TO TEST:
+test:
+irssi (original client)
+test with nc
 
 
 TODO SERVER/ CLIENT/ CHANNEL /ELSE:
+[] Second PASS after registration 2 tiems pass from same person
+		must:
+			According to RFC and common practice, you cannot send PASS after registration. This must be rejected with:
+
+			:ircserv 462 n :You may not reregister
+
+
 
 17.07
 
 BRUNCH: test/join
+
+
+BRUNCH: git branch -m fix-user-realname-channel-pass
+	- rejected the USER command if the realname is missing or empty after :.
+	- prevented a user from joining the same channel twice.
+	- blocked the PASS command if the client is already registered.
+
+
 
 BRUNCH: fix/handleUSer
 	[x] fix accept without realname, but welcome
@@ -536,3 +504,56 @@ src/Channel.cpp:67:15: note: previous definition is here
 added  git actions. 
 made compiling version
 changed to_string to own function
+
+
+
+
+
+
+TODO in Channel:
+
+	[] move some orthodox stuff (copy constructor and operator=) to private  
+	   // Real-world IRC channel objects are usually non-copyable — prevents accidental copies  
+
+	REPLACE:  
+		[] std::vector<Client*> _members;  
+		   => std::map<int, Client*> _members;  
+		   // Faster lookup by fd, avoids duplicates, standard for server-side user tracking  
+
+		[] std::vector<Client*> _operators;  
+		   => std::set<int> _operators;  
+		   // Store only fds of operators, no need to store full Client* here  
+
+		[] removeUser(Client* client)  
+		   => void removeUser(int fd);  
+		   // Server works with fd — avoid searching by pointer  
+
+		[] void sendToChannelExcept(const std::string &message, Client *sender) const;  
+		   => void broadcast(const std::string &message, int excludeFd) const;  
+		   // Simpler to exclude sender by fd, members stored by fd  
+
+	CHANGE:  
+		[] Remove either _key or _password — only one field for channel key should exist (suggest: keep _key)  
+		   // Subject requires "key" for +k mode — no need for both  
+
+	ADD:  
+		[] std::set<int> _invited;  
+		   // Store fds of invited clients for invite-only channels (+i)  
+
+		[] void inviteUser(int fd);  
+		   // Add client to invited list  
+
+		[] bool isInvited(int fd) const;  
+		   // Check if client is invited  
+
+		[] bool _inviteOnly;      // +i — invite-only channel  
+		[] bool _topicLocked;     // +t — only operators can change topic  
+		[] bool _hasKey;          // +k — key/password is set  
+		[] bool _hasUserLimit;    // +l — user limit active  
+
+		[] bool isInviteOnly() const;  
+		[] bool isTopicLocked() const;  
+		[] bool hasKey() const;  
+		[] bool hasUserLimit() const;  
+		   // Simple getters to check channel modes — server uses these  
+//____________________________________________________________________________//

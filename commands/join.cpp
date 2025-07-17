@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/17 08:52:51 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 11:48:56 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,18 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
     // Reject unregistered clients
     if (!client.isRegistered())
     {
-        replyErr451NotRegistered(server.getServerName(), "JOIN");
+        server.sendToClient(
+            client.getFd(),
+            replyErr451NotRegistered(server.getServerName(), "JOIN"));
         return;
     }
 
     // Missing channel name
     if (params.empty())
     {
-        replyErr461NeedMoreParams(server.getServerName(), "JOIN");
+        server.sendToClient(
+            client.getFd(),
+            replyErr461NeedMoreParams(server.getServerName(), "JOIN"));
         return;
     }
 
@@ -42,13 +46,27 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
     if (!server.isChannelName(channelName)) // Check for valid prefix, no spaces, length, etc.
     {
         server.sendToClient(
-        client.getFd(),
-        replyErr476BadChanMask(server.getServerName(), client.getNickname(), channelName));
+            client.getFd(),
+            replyErr476BadChanMask(server.getServerName(), client.getNickname(), channelName));
         return;
     }
 
     Channel *channel = server.getChannel(channelName); // Get the channel by name from the server
-    if (!channel)
+    
+     if (channel && channel->hasMembers(&client)) // Already in the channel
+        return;
+
+    if(channel)
+    {
+        
+        // Check if the user is already a member of the channel
+        if (channel && channel->hasMembers(&client))
+        {
+            logChannelInfo("User already in channel");
+            return;
+        }
+    }
+    else 
     {
         server.addChannel(channelName, client);
 
@@ -62,13 +80,6 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
     if (!channel)
     {
         logChannelError("JOIN failed: could not get channel " + channelName);
-        return;
-    }
-
-    // Check if the user is already a member of the channel
-    if (channel->hasMembers(&client))
-    {
-        logChannelInfo("User already in channel");
         return;
     }
 
