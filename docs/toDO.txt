@@ -16,8 +16,22 @@ So sendToChannel() is useful for all of these.
 TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 
+Pull remote main once	git pull origin main
+Set tracking branch	git branch --set-upstream-to=origin/main
 
 17.07
+
+BRANCH: * fix/handle-key-send-all
+	changed the key-setting logic to broadcast the MODE +k message to all channel members (including the operator), making it IRC-compliant.
+	Check if the params vector has at least 2 elements (channel name and key).
+	Validate that the channel name is correctly formatted using isChannelName().
+	Retrieve the channel using server.getChannel().
+	Verify that the channel exists; otherwise, sent 403 ERR_NOSUCHCHANNEL.
+	Checke if the client is an operator in the channel; otherwise, sent 482 ERR_CHANOPRIVSNEEDED.
+	Set the channel key using channel->setKey(key), storing it internally.
+	Sent an IRC-formatted MODE +k :key message to all channel members using sendToChannelAll(...) instead of sendToChannelExcept(...).
+	Logg the change using logChannelInfo(...), clearly showing the key mode was set by the user.``
+
 BRANCH: "fix/handle-topic
 	- add to numeric reply send() from server to client
 
