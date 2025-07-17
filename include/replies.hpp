@@ -6,10 +6,10 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
+/*   Updated: 2025/07/18 01:38:51 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
 #include <string>
 
 // =============================================================
@@ -89,24 +89,31 @@ std::string replyRpl004MyInfo(const std::string &server);
 std::string replyRpl324ChannelMode(const std::string &serverName, const std::string &nickname, const std::string &channel, const std::string &modes);
 
 /* 331 RPL_NOTOPIC
-   "<channel> :No topic is set"
-   - Indicates that no topic has been set for the channel.
+"<channel> :No topic is set"
+- Indicates that no topic has been set for the channel.
 */
 std::string replyRpl331NoTopic(const std::string &server, const std::string &channel, const std::string &topic);
 
 
 /* 332 RPL_TOPIC
-   "<channel> :<topic>"
-   - Displays the topic for a channel.
+"<channel> :<topic>"
+- Displays the topic for a channel.
 */
 std::string replyRpl332Topic(const std::string &server, const std::string &channel, const std::string &topic);
 
 /* 353 RPL_NAMREPLY
-   "= <channel> :[[@|+]<nick> [[@|+]<nick> [...]]]"
-   - Lists users visible on the channel.
+"= <channel> :[[@|+]<nick> [[@|+]<nick> [...]]]"
+- Lists users visible on the channel.
 */
 std::string replyRpl353NamReply(const std::string &server, const std::string &nick, const std::string &symbol, const std::string &channel, const std::string &names);
 
+/* 
+341    RPL_INVITING
+        "<nick> <channel>"
+        - Returned by the server to indicate that the attempt to invite
+          a user to a channel was successful.
+*/
+std::string replyRpl341Inviting(const std::string &server, const std::string &targetNick, const std::string &channel);
 
 /* 366 RPL_ENDOFNAMES
 "<channel> :End of /NAMES list"
