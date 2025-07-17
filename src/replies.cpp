@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:13:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 00:49:05 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 01:39:11 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,11 @@ std::string replyRpl331NoTopic(const std::string &server, const std::string &cha
 std::string replyRpl332Topic(const std::string &server, const std::string &channel, const std::string &topic)
 {
     return ":" + server + " " + RPL_TOPIC + " " + channel + " :" + topic + "\r\n";
+}
+
+std::string replyRpl341Inviting(const std::string &server, const std::string &nick, const std::string &channel)
+{
+    return ":" + server + " 341 " + nick + " " + channel + "\r\n";
 }
 
 std::string replyRpl353NamReply(const std::string &server,

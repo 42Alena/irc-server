@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/17 12:52:48 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 01:45:06 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,7 +299,7 @@ void Server::handleCommand(Client *client, const std::string &line)
 		sendToClient(client->getFd(), "Unknown command: " + command + "\r\n"); // TODO
 }
 
-//======================== PRIVATE: Connection & Client Management ==================//
+//======================== PUBLIC: Connection & Client Management ==================//
 
 Client *Server::getClientByNickname(const std::string &nickname)
 {

@@ -21,6 +21,24 @@ Set tracking branch	git branch --set-upstream-to=origin/main
 
 17.07
 
+BRANCH: fix/handle-invite
+	 replyErr...() calls are not sent via server.sendToClient(...)
+
+	- Invitation should be based on nickname, not file descriptor
+	- You don’t check whether the target client actually exists
+	- Message to the inviter and invitee is missing (RFC requires it)
+	- The broadcast message "has invited a user" is not in IRC format
+	- IRC INVITE command format
+		INVITE <nickname> <channel>
+		wrongly using a file descriptor (fd) instead of the nickname.
+		done:
+			std::string targetNick = params[0];        //  <nickname> first
+    	std::string channelName = params[1];       // <channel> is second
+
+	-add replyRpl341Inviting()
+	- add Client* getClientByNick(const std::string &nickname) const;
+
+
 BRANCH: * fix/handle-key-send-all
 	changed the key-setting logic to broadcast the MODE +k message to all channel members (including the operator), making it IRC-compliant.
 	Check if the params vector has at least 2 elements (channel name and key).
