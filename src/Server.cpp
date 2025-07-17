@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/17 07:50:29 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 08:10:25 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -456,18 +456,40 @@ Channel *Server::getChannelByName(const std::string &channelName)
 
 //======================== PUBLIC: CHANNEL UTILITIES ============================//
 /* 
+https://www.rfc-editor.org/rfc/rfc2812.txt
 Channels names are strings (beginning with a '&', '#', '+' or '!'
    character) of length up to fifty (50) characters.  Apart from the
    requirement that the first character is either '&', '#', '+' or '!',
    the only restriction on a channel name is that it SHALL NOT contain
-   any spaces (' '), a control G (^G or ASCII 7), a comma (',').  Space
+   any spaces (' '), 
+   a control G (^G or ASCII 7), a comma (',').  Space
    is used as parameter separator and command is used as a list item
    separator by the protocol).  A colon (':') can also be used as a
    delimiter for the channel mask.  Channel names are case insensitive.
+    '\a'= Control-G (^G). //caused a terminal to make a sound (a "ding").
 */
 bool Server::isChannelName(const std::string &name)
 {
-	return !name.empty() && name[0] == '#';
+	if (name.empty())                     // Reject empty string
+		return false;
+
+	char prefix = name[0];               // Get the first character
+	if (prefix != '#' &&                 // Channel must start with
+		prefix != '&' &&                // one of these: #, &, +, !
+		prefix != '+' &&
+		prefix != '!')
+		return false;
+
+	if (name.length() > 50)              // Reject names longer than 50 characters
+		return false;
+
+	for (size_t i = 1; i < name.length(); ++i)
+	{
+		char c = name[i];
+		if (c == ' ' || c == ',' || c == '\a') // '\a' == ASCII 7 == ^G
+			return false;
+	}
+	return true;                         // Valid channel name
 }
 
 bool Server::channelExists(const std::string &name)

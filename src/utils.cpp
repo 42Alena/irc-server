@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 18:20:37 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 13:21:10 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 09:07:32 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,41 @@ void printWelcomeMessage()
 	std::cout << std::endl;
 
 	std::cout << RED << "🌟✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨🌟" << RST << std::endl;
-	std::cout << ORG << "✨      W E L C O M E      T O   T H E          c I R C u s !               ✨" << RST << std::endl;
-	std::cout << YEL << "✨                     Launch the  🎆magic below!                           ✨" << RST << std::endl;
+	std::cout << ORG << "✨      W E L C O M E      T O   T H E          c I R C u s !                 ✨" << RST << std::endl;
+	std::cout << YEL << "✨               Launch the 🎆 magic by following these steps!                ✨" << RST << std::endl;
 	std::cout << RED << "🌟✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨🌟" << RST << std::endl;
 
 	std::cout << std::endl;
 
-	std::cout << CYN << "💫     🎟️   NICK  juggler               " << AQU << "// NICK <nickname>                 " << RST << std::endl;
-	std::cout << BLU << "💫     🤡   USER  clown 0 * :BigTop      " << PNK << "// USER <username> <hostname>...   " << RST << std::endl;
-	std::cout << MAG << "💫     🎪   JOIN  #tent                  " << RED << "// JOIN <#channel>                 " << RST << std::endl;
+std::cout << BLU << "💫     🎟️   NICK  juggler                      "
+          << PNK << "  // NICK <nickname>" << RST << std::endl;
 
+std::cout << BLU << "💫     🤡   USER  clown 0 * :BigTop            "
+          << PNK << "// USER <username> <hostname> <servername> :<real name>" << RST << std::endl;
+
+std::cout << BLU << "💫     🎪   JOIN  #tent                        "
+          << PNK << "// JOIN <#channel>" << RST << std::endl;
+
+std::cout << BLU << "💫     💬   PRIVMSG  #tent :Hello world!       "
+          << PNK << "// Send message to a channel or user" << RST << std::endl;
+
+std::cout << BLU << "💫     🧑‍⚖️   MODE  #tent +i                   "
+          << PNK << " // MODE <channel> <+/-i|t|k|l> (invite-only|topic lock| key|user limit)" << std::endl;
+
+std::cout << BLU << "💫     🎯   INVITE  friend #tent               "
+          << PNK << "// Invite a user to a channel" << RST << std::endl;
+
+std::cout << BLU << "💫     🥾   KICK  #tent baduser :no clowns!    "
+          << PNK << "// Kick a user from a channel with a reason" << RST << std::endl;
+
+std::cout << BLU << "💫     🎤   TOPIC  #tent :Let’s party!         "
+          << PNK << "// Set or view channel topic" << RST << std::endl;
+
+std::cout << BLU << "💫     👋   PART  #tent                        "
+          << PNK << "// Leave a channel" << RST << std::endl;
+
+std::cout << BLU << "💫     ❌   QUIT  :Goodbye!                    "
+          << PNK << "// Quit IRC server with optional message" << RST << std::endl;
 	std::cout << std::endl;
 	std::cout << std::endl;
 
@@ -37,6 +62,7 @@ void printWelcomeMessage()
 	std::cout << std::endl;
 	std::cout << std::endl;
 }
+
 
 //============================ LOGGER: GLOBAL LOGGING FOR ALL CLASSES ============================//
 
