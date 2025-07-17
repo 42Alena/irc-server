@@ -19,6 +19,7 @@ SOURCES = \
 	./commands/registration.cpp\
 	./commands/join.cpp\
 	./commands/part.cpp\
+	./commands/topic.cpp\
 	./commands/commandsChannel.cpp\
 	
 	
