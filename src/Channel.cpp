@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 09:44:01 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 22:03:41 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,8 @@ void Channel::addUser(int fd, Client *client)
 void Channel::addOperator(int fd)
 {
 	_operators.insert(fd); // Add the client's file descriptor (fd) to the _operators set
-	logChannelInfo("Client added as operator: " + intToString(fd) );
+	logChannelInfo("Client with fd " + intToString(fd) + " was granted operator status");
+
 }
 
 /*

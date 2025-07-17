@@ -53,9 +53,15 @@ TODO in Channel:
 
 TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
+17.07
+BRUNC: /  fix/channel-commands
+TESTCASES:
+	[]JOIN 1 
+		must: JOIN 1
+				:ircserv 476 testuser 1 :Invalid channel name
+
 16.07:
-	//luis: should we check if the channel name starts with '#'?
-	//Alena: yes! I am already checking in Server with function isChannelName
+
 
 	Branch "feature/shutdown-cleanup"
 	add:
@@ -114,6 +120,53 @@ Branch "fix/segfault-join"
 		- client.joinChannel(channel); //  add channel to client's list
 		-fixef rejectin privmsg, because user was added 2 times in channel(Channel(name, creator) + channel->addUser(...);)
 		- fixed adding same client two times with: if (!channel->hasMembers(&client))
+
+BRANCH:		fix/channel-commands
+
+		1. PROBLEM:
+			
+		  	[] nc -C 127.0.0.1 6667
+			PASS p
+			JOIN a
+
+			
+			BUT server accept not registered client!
+				Server🎟️🤖: New client connected on fd 4 (127.0.0.1)
+				Server🎟️🤖: Received command from client fd 4: PASS p
+				Server🎟️🤖: Received command from client fd 4: JOIN a
+				Channel🎪💬: Client added to channel: 
+				Server🎟️🤖: Created channel a by user 
+				Channel🎪💬: Channel a created by 
+				Channel🎪💬: Client added as operator: 4
+				Channel🎪💬: User  is  operator(creates channel).
+				Channel🎪💬: User already in channel
+		2.PROBLEM : user addd 2 times => problem in Channel:handleJoin()
+				User already in channel
+
+		3.Problem. In server teminal: ctrlC, but Client terminal is wrking!
+
+		[X]4.problem:
+		server closed, but client not:(
+			 nc -C 127.0.0.1 6667
+			NOTICE * : Server is shutting down now			//The fd was closed successfully by your server. 
+			clear
+			nc: write failed (0/2): Broken pipe
+		FIX: not a problem: =>
+			nc: write failed (0/2): Broken pipe
+			=> that confirms the socket is fully closed on the server side
+			nc is a simple line-based client — it doesn’t auto-quit on EOF unless it receives nothing.
+			You cannot force nc to quit remotely (only close the connection).
+
+commandsChannel.cpp
+	add:
+		-check if not registered user=> dont allow join channel
+
+registration.cpp:
+	updated loServerinfo for welcome message
+
+Client:
+add: function for get prefix + _nickname + "!" + _username + "@" + _host;
+
 
 
 15.07

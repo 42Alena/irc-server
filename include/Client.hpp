@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 10:03:05 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 22:07:43 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ private:
     std::string getHost() const;     // Get client IP address(used in welcome message)
     std::string getUserModes() const;
     std::string getPassword() const; // Get password set by PASS command
+    std::string getPrefix() const;  //get :nickname!username@host
 
     const std::string &getReceivedData() const;        // Get accumulated received data
     const std::vector<Channel *> &getChannels() const; // Get list of channels, where this client is a member

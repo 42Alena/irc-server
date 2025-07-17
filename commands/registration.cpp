@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 11:15:08 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 12:03:49 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/16 21:28:46 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,7 +275,8 @@ https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.5
 */
 void sendWelcome(Server &server, Client &client)
 {
-	logServerInfo("Welcome message sent to client: " + client.getNickname() + " (" + intToString(client.getFd()) + ")");
+	logServerInfo("Welcome message sent to client '" + client.getNickname() + "' (fd=" + intToString(client.getFd()) + ", ip=" + client.getHost() + ")" );
+
 
 	server.sendToClient(client.getFd(),
 						replyRpl001Welcome(server.getServerName(), client.getNickname(), client.getUsername(), client.getHost()));

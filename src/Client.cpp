@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 10:04:03 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 07:35:51 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,12 @@ std::string Client::getUserModes() const
 std::string Client::getPassword() const {
     return _password;
 }
+
+std::string Client::getPrefix() const
+{
+	return ":" + _nickname + "!" + _username + "@" + _host;
+}
+
 
 /*
 Get list of channels, where this client is a member
@@ -265,14 +271,3 @@ void Client::removeOperator(Channel *channel)
     _channelOps[channel] = false;
 }
 
-//======================== NON-MEMBER OPERATORS ================================//
-
-const std::ostream &operator<<(std::ostream &os, const Client &o)
-{
-    os << "Client(fd: " << o.getFd();
-    os << ", nickname: " << o.getNickname();
-    os << ", username: " << o.getUsername();
-    os << ", receivedData: " << o.getReceivedData();
-    os << ");" << std::endl;
-    return os;
-}

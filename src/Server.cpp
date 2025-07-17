@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 09:56:47 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 07:50:29 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,6 @@ Server::Server(int port, const std::string &password) : _runningMainLoop(true),
 														_password(password),
 														_serverFd(-1) {}
 
-
-
-
 Server::~Server()
 {
 	logServerInfo("Server destructor called.");
@@ -61,7 +58,6 @@ Server::~Server()
 	// call shutdown if it wasnont already triggered manually by ctrl+c
 	shutdown();
 }
-
 
 //======================== PUBLIC: MAIN SERVER METHODS ==========================//
 int Server::run()
@@ -155,10 +151,9 @@ void Server::shutdown()
 	if (!_runningMainLoop) // prevent double shutdown
 		return;
 
-
 	logSeparateLine("💥Shutdown requested");
 	logServerInfo(" Cleaning all server resources...");
-	
+
 	_runningMainLoop = false;
 
 	// notifying all clients
@@ -166,19 +161,28 @@ void Server::shutdown()
 	{
 		sendToClient(it->first, "NOTICE * : Server is shutting down now\r\n");
 	}
-	
+
+
+	// giving time for clients to receive message
+	usleep(200000); // 200 ms
 
 	// delete and close all clients
-	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	while (!_clients.empty())
 	{
-		logServerInfo(" Deleting client on fd " + intToString(it->first));
-		close(it->first);
-		delete it->second;
+		int fd = _clients.begin()->first;
+
+		for (size_t i = 0; i < _pollFds.size(); ++i)
+		{
+			if (_pollFds[i].fd == fd)
+			{
+				removeClient(fd, i); //  handles close(), delete, erase from pollFds
+				break;
+			}
+		}
 	}
-	_clients.clear();
 
 	// delete all channels
-	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	for (std::map<std::string, Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 	{
 		logServerInfo("Deleting channel: " + it->first);
 		delete it->second;
@@ -196,7 +200,6 @@ void Server::shutdown()
 		_serverFd = -1;
 	}
 
-	
 	logSeparateLine("Server shutdown complete");
 }
 
@@ -228,7 +231,7 @@ void Server::handleCommand(Client *client, const std::string &line)
 	// Ignore empty lines
 	if (command.empty())
 		return;
-		
+
 	// Convert command to uppercase (IRC commands are case-insensitive)
 	std::transform(command.begin(), command.end(), command.begin(), ::toupper);
 
@@ -452,6 +455,16 @@ Channel *Server::getChannelByName(const std::string &channelName)
 }
 
 //======================== PUBLIC: CHANNEL UTILITIES ============================//
+/* 
+Channels names are strings (beginning with a '&', '#', '+' or '!'
+   character) of length up to fifty (50) characters.  Apart from the
+   requirement that the first character is either '&', '#', '+' or '!',
+   the only restriction on a channel name is that it SHALL NOT contain
+   any spaces (' '), a control G (^G or ASCII 7), a comma (',').  Space
+   is used as parameter separator and command is used as a list item
+   separator by the protocol).  A colon (':') can also be used as a
+   delimiter for the channel mask.  Channel names are case insensitive.
+*/
 bool Server::isChannelName(const std::string &name)
 {
 	return !name.empty() && name[0] == '#';
@@ -500,21 +513,21 @@ void Server::removeClientFromAllChannels(Client *client)
 {
 	if (!client)
 		return;
-		
+
 	// copy to avoid using internal vector while modifying it
-	const std::vector<Channel *> channelsCopy = client->getChannels(); 
+	const std::vector<Channel *> channelsCopy = client->getChannels();
 
 	int fd = client->getFd();
 
 	for (size_t i = 0; i < channelsCopy.size(); ++i)
 	{
 		Channel *ch = channelsCopy[i];
-		
+
 		if (!ch)
 			continue; // extra safety
 
 		logServerInfo("Removing client from channel: " + ch->getName());
-		
+
 		// remove client from channel
 		ch->removeUser(fd, client);
 
@@ -544,5 +557,3 @@ void Server::logErrAndThrow(const std::string &msg)
 	logServerError(msg);
 	throw std::runtime_error("SERVER(errno):  " + std::string(strerror(errno)));
 }
-
-
