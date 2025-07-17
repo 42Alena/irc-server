@@ -6,13 +6,30 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/17 20:47:15 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 01:11:59 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/commands.hpp"
 
-// Function to handle setting a key for the channel
+/*
+ Function: handleKey
+
+ Description:
+ Handles the setting of a channel key (MODE +k). This key acts as a password
+ required to join the channel.
+
+ Behavior:
+ - Only operators are allowed to set the key.
+ - Validates channel existence and that the client is in the channel.
+ - If valid, sets the channel key using setKey().
+ - Broadcasts a standard IRC MODE +k message to all users in the channel.
+ - Logs the action for debug or audit purposes.
+
+ Usage:
+    KEY #channel secret
+    → translates to: MODE #channel +k :secret
+*/
 void handleKey(Server &server, Client &client, const std::vector<std::string> &params)
 {
 	if (params.size() < 2)
@@ -55,10 +72,11 @@ void handleKey(Server &server, Client &client, const std::vector<std::string> &p
 
 	channel->setKey(key); // Use the setter to change the key
 
-	// send standard MODE message to other members
-	channel->sendToChannelExcept(
+	// send standard MODE message to ALL other members
+	channel->sendToChannelAll(
 		":" + client.getPrefix() + " MODE " + channelName + " +k :" + key,
-		client);
+		server);
 
-	logChannelInfo("Channel key for " + channelName + " has been set by " + client.getNickname());
+	//KEY #channel secret → MODE #channel +k :secret irc format
+	logChannelInfo("Mode '+k' (key) set for " + channelName + " by " + client.getNickname());
 }
