@@ -1,22 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   commandsChannel.cpp                                :+:      :+:    :+:   */
+/*   key.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/17 19:17:07 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 19:23:02 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/commands.hpp"
-#include "../include/Server.hpp"
-#include "../include/Client.hpp"
-#include "../include/Channel.hpp"
-#include "../include/colors.hpp"
-#include "../include/utils.hpp"
-#include "../include/replies.hpp"
+
 
 // Function to handle setting a key for the channel
 void handleKey(Server &server, Client &client, const std::vector<std::string> &params)
