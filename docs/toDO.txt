@@ -15,6 +15,12 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 17.07
 
+BRANCH: "fix/handle-key" 
+	- add to numeric reply send() from server to client
+	- add validation channel name
+	- changed send standard MODE message to irc format
+
+
 BRANCH: "refactor/separate-key-commands" 
 	separated key from commandsChannel
 
