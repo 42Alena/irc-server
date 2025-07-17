@@ -15,6 +15,8 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 17.07
 
+Branch:
+refactor/separate-topic-from-commands-channel
 
 BRANCH: fix/handle-part
 	[x]moved handlePart from commandsChannel  to  part.cpp
