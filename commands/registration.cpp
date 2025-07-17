@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 11:15:08 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 21:28:46 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 11:21:28 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,10 +155,12 @@ void handleUser(Server &server, Client &client, const std::vector<std::string> &
 		client.addUserMode('i');
 
 	// <realname> starts after : and can contain spaces
-	if (!realname.empty() && realname[0] == ':')
-		client.setRealname(realname.substr(1)); // after leading ':'
-	else
-		client.setRealname(realname);
+	if (realname.empty() || realname[0] != ':' || realname.substr(1).empty())
+	{
+		server.sendToClient(client.getFd(), replyErr461NeedMoreParams(server.getServerName(), "USER"));
+		return;
+	}
+	client.setRealname(realname.substr(1));
 
 	client.setHasProvidedUser(true);
 
@@ -203,7 +205,7 @@ void handleNick(Server &server, Client &client, const std::vector<std::string> &
 	const std::string newNickname = params[0];
 
 	// block if PASS not sent
-	if (!client.getHasProvidedPass()) 
+	if (!client.getHasProvidedPass())
 	{
 		server.sendToClient(client.getFd(), replyErr451NotRegistered(server.getServerName(), "NICK"));
 		return;
@@ -275,8 +277,7 @@ https://www.rfc-editor.org/rfc/rfc2812.html#section-3.1.5
 */
 void sendWelcome(Server &server, Client &client)
 {
-	logServerInfo("Welcome message sent to client '" + client.getNickname() + "' (fd=" + intToString(client.getFd()) + ", ip=" + client.getHost() + ")" );
-
+	logServerInfo("Welcome message sent to client '" + client.getNickname() + "' (fd=" + intToString(client.getFd()) + ", ip=" + client.getHost() + ")");
 
 	server.sendToClient(client.getFd(),
 						replyRpl001Welcome(server.getServerName(), client.getNickname(), client.getUsername(), client.getHost()));

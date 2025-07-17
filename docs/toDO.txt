@@ -55,6 +55,14 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 17.07
 
+BRUNCH: test/join
+
+BRUNCH: fix/handleUSer
+	[x] fix accept without realname, but welcome
+		user n 0 * : 
+		:ircserv 001 n :Welcome to the Internet Relay Network n!n@127.0.0.1
+
+
 BRUNCh: fix/channel-name-validation 
 server.cpp
 	 changed logic to check is channel name
