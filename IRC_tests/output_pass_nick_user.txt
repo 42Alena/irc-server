@@ -1,0 +1,1 @@
+:ircserv 001 user1 :Welcome to the Internet Relay Network user1!u1@127.0.0.1
