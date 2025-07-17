@@ -22,6 +22,7 @@ SOURCES = \
 	./commands/topic.cpp\
 	./commands/mode.cpp\
 	./commands/invite.cpp\
+	./commands/kick.cpp\
 	./commands/commandsChannel.cpp\
 	
 	
