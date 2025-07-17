@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commandsChannel.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/17 08:15:56 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 11:39:04 by lperez-h         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,21 @@
 // Function to handle a user leaving the channel
 void handlePart(Server &server, Client &client, const std::vector<std::string> &params)
 {
-	if (params.empty())
+	if (params.empty()){
 		replyErr461NeedMoreParams(server.getServerName(), "PART");
+		return;
+	}
 	std::string channelName = params[0];			   // Get the channel name from the parameters
 	Channel *channel = server.getChannel(channelName); // Get the channel by name from the
 
-	if (!channel)
+	if (!channel){
 		replyErr403NoSuchChannel(server.getServerName(), channelName);
-	if (!channel->hasMembers(&client))
+		return;
+	}
+	if (!channel->hasMembers(&client)){
 		replyErr441UserNotInChannel(server.getServerName(), client.getNickname(), channelName);
+		return;
+	}
 	channel->removeUser(client.getFd(), &client);										   // Remove the user from the channel
 	channel->sendToChannelExcept(client.getNickname() + " has left the channel.", client); // Notify other members
 	logChannelInfo("User " + client.getNickname() + " left channel: " + channelName);
@@ -43,15 +49,21 @@ void handlePart(Server &server, Client &client, const std::vector<std::string> &
 void handleTopic(Server &server, Client &client, const std::vector<std::string> &params)
 {
 
-	if (params.size() < 2)
+	if (params.size() < 2){
 		replyErr461NeedMoreParams(server.getServerName(), "TOPIC");
+		return;
+	}
 	std::string channelName = params[0];			   // Get the channel name from the parameters
 	std::string newTopic = params[1];				   // Get the new topic from the parameters
 	Channel *channel = server.getChannel(channelName); // Get the channel by name from the server
-	if (!channel)
+	if (!channel){
 		replyErr403NoSuchChannel(server.getServerName(), channelName);
-	if (!channel->isOperator(&client))
+		return;
+	}
+	if (!channel->isOperator(&client)){
 		replyErr482ChanOpPrivsNeeded(server.getServerName(), channelName);
+		return;
+	}
 	channel->setTopic(newTopic);										   // Use the setter to change the topic of the channel
 	channel->sendToChannelExcept("Topic changed to: " + newTopic, client); // Notify other members
 	logChannelInfo("Topic changed to: " + newTopic + " by " + client.getNickname());
@@ -65,16 +77,22 @@ void handleTopic(Server &server, Client &client, const std::vector<std::string> 
 */
 void handleMode(Server &server, Client &client, const std::vector<std::string> &params)
 {
-	if (params.size() < 3)
+	if (params.size() < 3){
 		replyErr461NeedMoreParams(server.getServerName(), "MODE");
+		return;
+	}
 	std::string channelName = params[0];			   // Get the channel name from the parameters
 	char mode = params[1][0];						   // Get the mode character from the parameters
 	bool enable = (params[2] == "true");			   // check if the mode is being enabled or disabled
 	Channel *channel = server.getChannel(channelName); // Get the channel by name from the server
-	if (!channel)
+	if (!channel){
 		replyErr403NoSuchChannel(server.getServerName(), channelName); // If the channel does not exist, return with an error message
-	if (!channel->isOperator(&client))
+		return;
+	}
+	if (!channel->isOperator(&client)){
 		replyErr482ChanOpPrivsNeeded(server.getServerName(), channelName);
+		return;
+	}
 	channel->setMode(mode, enable); // Use the setter to change the mode
 	std::string modeStatus = enable ? "enabled" : "disabled";
 	channel->sendToChannelExcept("Mode '" + std::string(1, mode) + "' has been " + modeStatus + ".", client); // Notify other members
@@ -89,8 +107,10 @@ void handleMode(Server &server, Client &client, const std::vector<std::string> &
 */
 void handleInvite(Server &server, Client &client, const std::vector<std::string> &params)
 {
-	if (params.size() < 2)
+	if (params.size() < 2){
 		replyErr461NeedMoreParams(server.getServerName(), "INVITE");
+		return;
+	}
 	std::string channelName = params[0]; // Get the channel name from the parameters
 	std::stringstream ss(params[1]);
 	int targetFd;
@@ -100,10 +120,14 @@ void handleInvite(Server &server, Client &client, const std::vector<std::string>
 		return; // Handle invalid input
 	}
 	Channel *channel = server.getChannel(channelName); // Get the channel by name from the server
-	if (!channel->isOperator(&client))
+	if (!channel->isOperator(&client)){
 		replyErr482ChanOpPrivsNeeded(server.getServerName(), channelName);
-	if (channel->isInvited(targetFd))
+		return;
+	}
+	if (channel->isInvited(targetFd)){
 		replyErr443UserOnChannel(server.getServerName(), client.getNickname(), channelName);			// If the user is already invited, return with an error message
+		return;
+	}
 	channel->inviteUser(targetFd);																		// Add the user to the invited list
 	channel->sendToChannelExcept(client.getNickname() + " has invited a user to the channel.", client); // Notify other members
 	logChannelInfo("User with fd " + intToString(targetFd) + " invited to channel: " + channelName);
@@ -112,8 +136,10 @@ void handleInvite(Server &server, Client &client, const std::vector<std::string>
 // Function to handle kicking a user from the channel
 void handleKick(Server &server, Client &client, const std::vector<std::string> &params)
 {
-	if (params.size() < 2)
+	if (params.size() < 2){
 		replyErr461NeedMoreParams(server.getServerName(), "KICK");
+		return;
+	}
 	std::string channelName = params[0]; // Get the channel name from the parameters
 	std::stringstream ss(params[1]);
 	int targetFd;
@@ -124,12 +150,18 @@ void handleKick(Server &server, Client &client, const std::vector<std::string> &
 	}
 	std::string reason = (params.size() > 2) ? params[2] : "No reason provided"; // Get the reason for the kick, if provided
 	Channel *channel = server.getChannel(channelName);							 // Get the channel by name from the server
-	if (!channel)
+	if (!channel){
 		replyErr403NoSuchChannel(server.getServerName(), channelName); // If the channel does not exist, return with an error message
-	if (!channel->isOperator(&client))
+		return;
+	}
+	if (!channel->isOperator(&client)){
 		replyErr482ChanOpPrivsNeeded(server.getServerName(), channelName);
-	if (!channel->hasMembers(&client))
+		return;
+	}
+	if (!channel->hasMembers(&client)){
 		replyErr441UserNotInChannel(server.getServerName(), client.getNickname(), channelName);							   // If the user is not a member, return with an error message
+		return;
+	}
 	channel->removeUser(targetFd, &client);																				   // Remove the user from the channel
 	channel->sendToChannelExcept(client.getNickname() + " has kicked a user from the channel. Reason: " + reason, client); // Notify other members
 	logChannelInfo("User with fd " + intToString(targetFd) + " kicked from channel: " + channelName);
@@ -138,15 +170,21 @@ void handleKick(Server &server, Client &client, const std::vector<std::string> &
 // Function to handle setting a key for the channel
 void handleKey(Server &server, Client &client, const std::vector<std::string> &params)
 {
-	if (params.size() < 2)
+	if (params.size() < 2){
 		replyErr461NeedMoreParams(server.getServerName(), "KEY");
+		return;
+	}
 	std::string channelName = params[0];			   // Get the channel name from the parameters
 	std::string key = params[1];					   // Get the key from the parameters
 	Channel *channel = server.getChannel(channelName); // Get the channel by name from the server
-	if (!channel)
+	if (!channel){
 		replyErr403NoSuchChannel(server.getServerName(), channelName);
-	if (!channel->isOperator(&client))
+		return;
+	}
+	if (!channel->isOperator(&client)){
 		replyErr482ChanOpPrivsNeeded(server.getServerName(), channelName);
+		return;
+	}
 	channel->setKey(key);												  // Use the setter to change the key
 	channel->sendToChannelExcept("Channel key has been changed", client); // Notify other members
 	logChannelInfo("Channel key has been set by " + client.getNickname());
