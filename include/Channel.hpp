@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 16:33:09 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/07/17 15:38:56 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,14 +51,14 @@ public:
 	Channel(const std::string &name, Client &createdBy); // Constructor with channel name and channel creator
 	~Channel();											 // Destructor
 
-	void addUser(int fd, Client *client);	 // done
-	void addOperator(int fd);				 // done
-	void removeUser(int fd, Client *client); // done
+	void addUser(int fd, Client *client);	 
+	void addOperator(int fd);				 
+	void removeUser(int fd, Client *client); 
 
-	bool hasMembers(Client *client) const; // done
-	bool isOperator(Client *client) const; // done
+	bool hasMembers(Client *client) const; 
+	bool isOperator(Client *client) const; 
 
-	void sendToChannelExcept(const std::string &message, const Client &clientExcluded) const; // done
+	void sendToChannelExcept(const std::string &message, const Client &clientExcluded) const; 
 
 	void inviteUser(int fd);	  // Add user to invited list -> done
 	bool isInvited(int fd) const; // Check if user is invited -> done
@@ -68,20 +68,21 @@ public:
 	bool hasUserLimit() const;	  // Check if channel has a user limit set -> done
 
 	// Setters
-	void setTopic(const std::string &topic); // done
-	void setMode(char mode, bool enable);	 // done
-	void setName(std::string name);			 // done
-	void setKey(const std::string &key);	 // done
-	void setLimit(int _userLimit);			 // done
+	void setTopic(const std::string &topic); 
+	void setMode(char mode, bool enable);	 
+	void setName(std::string name);			 
+	void setKey(const std::string &key);	 
+	void setLimit(int _userLimit);			 
 
 	// Getters
-	std::string getName() const;				// done
-	std::string getTopic() const;				// -> done
-	std::string getPassword() const;			// -> done
-	std::map<int, Client *> getMembers() const; //-> done
-	std::set<int> getOperators() const;			// -> done
-	std::string getKey() const;					// -> done
-	int getLimit() const;						// -> done
+	std::string getName() const;				
+	std::string getNickList() const;
+	std::string getTopic() const;				
+	std::string getPassword() const;			
+	std::map<int, Client *> getMembers() const;
+	std::set<int> getOperators() const;			
+	std::string getKey() const;					
+	int getLimit() const;						
 };
 
 #endif
