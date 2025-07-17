@@ -19,6 +19,22 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 17.07
 
+BRANCH:
+	Fix
+	params.size() < 3	 Invalid for standard IRC MODE command. The command can be just MODE #chan (to view) or MODE #chan +i (to set). The third parameter (true) is not standard.
+	params[2] == "true"	 Not valid in IRC. You should use +i, -t, +k, etc. inside params[1]
+	sendToChannelExcept(...)	 Kicks, mode changes, etc. should go to all, including the one making the change.
+	"Mode 'x' has been enabled"	 This is not proper IRC format. The correct message is:
+	:<prefix> MODE <channel> <+mode> [value]
+	add getModes()
+	moved from top if (params.size() < 2) => if the client does MODE #channel (to query), which is valid with 1 param, it gets wrongly rejected.
+	replyRpl324ChannelMode(server.getServerName(), client.getNickname(), channelName, currentModes));
+	add  if (params.empty()) instead if (params.size() < 2)
+
+
+
+
+
 BRANCH: "fix/handle-ick" //kick :) 
 	- add to numeric reply send() from server to client
 	- add validation channel name

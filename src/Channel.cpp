@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/17 21:25:48 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 00:43:42 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,6 +172,25 @@ std::map<int, Client *> Channel::getMembers() const
 std::set<int> Channel::getOperators() const
 {
 	return _operators; // Return the vector of operators in the channel
+}
+
+std::string Channel::getModes() const
+{
+	std::string modes = "+";
+
+	if (_modes.find('i') != _modes.end() && _modes.at('i'))
+		modes += 'i';
+	if (_modes.find('t') != _modes.end() && _modes.at('t'))
+		modes += 't';
+	if (!_key.empty())
+		modes += 'k';
+	if (_userLimit > 0)
+		modes += 'l';
+
+	if (modes == "+")
+		return ""; // No active modes
+
+	return modes;
 }
 
 //======================== MEMBER FUNCTIONS ===========================//

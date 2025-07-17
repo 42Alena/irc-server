@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/17 21:26:58 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 00:44:09 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ public:
 	std::set<int> getOperators() const;
 	std::string getKey() const;
 	int getLimit() const;
+	std::string getModes() const;
 };
 
 #endif
