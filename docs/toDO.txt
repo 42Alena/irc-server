@@ -15,6 +15,16 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 17.07
 
+
+BRANCH: fix/handle-part
+	[x]moved handlePart from commandsChannel  to  part.cpp
+	[x] updated handlePart: sends proper IRC-format PART message to client and channel,
+	[x]add error replies using sendToClient(), and removes redundant or invalid output format.
+
+changed:
+		[] rnumeric replies are not send 
+________________________________________
+
 BRUNCH: fix/handlejoin-replies-modes
 	-deleted 46! git branches
 			% git branch -r | wc -l                                              
