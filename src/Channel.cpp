@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/17 15:39:37 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 21:25:48 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,6 +240,15 @@ bool Channel::isOperator(Client *client) const
 		return true; // If the client is found in the operators set, return true)
 	else
 		return false; // If the client is not found in the operators set, return false
+}
+
+void Channel::sendToChannelAll(const std::string &message, Server &server)
+{
+	std::map<int, Client *>::iterator it;
+	for (it = _members.begin(); it != _members.end(); ++it)
+	{
+		server.sendToClient(it->first, message);
+	}
 }
 
 void Channel::sendToChannelExcept(const std::string &message, const Client &clientExcluded) const
