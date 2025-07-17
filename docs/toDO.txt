@@ -15,7 +15,7 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 17.07
 
-BRUNCH: test/join
+BRUNCH: fix/handlejoin-replies-modes
 	-deleted 46! git branches
 			% git branch -r | wc -l                                              
 			46
