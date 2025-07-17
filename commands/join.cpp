@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/17 15:36:23 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 15:56:26 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,14 +58,14 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
         logChannelInfo("User already in channel");
         return;
     }
-    else
+
+    if (!channel)
     {
         server.addChannel(channelName, client);
-
-        channel = server.getChannel(channelName); // get the just-created channel
-
-        //  first user becomes operator
+        channel = server.getChannel(channelName);
         channel->addOperator(client.getFd());
+       
+
     }
 
     //  check in case if smth goes wrong
@@ -98,7 +98,7 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
     {
         server.sendToClient(
             client.getFd(),
-            replyErr471ChannelIsFull(server.getServerName(), channelName));
+            replyErr471ChannelIsFull(server.getServerName(), client.getNickname(), channelName));
         return;
     }
 
@@ -124,5 +124,5 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
         client.getFd(),
         replyRpl366EndOfNames(server.getServerName(), client.getNickname(), channelName));
 
-    logChannelInfo("[joinChannel] User " + client.getNickname() + " joined channel: " + channelName);
+    logChannelInfo("[JOIN]  User " + client.getNickname() + " joined channel: " + channelName);
 }

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:13:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/17 15:44:15 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 15:49:43 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,10 +138,11 @@ std::string replyErr464PasswordMismatch(const std::string &server)
     return ":" + server + " " + ERR_PASSWDMISMATCH + " :Password incorrect\r\n";
 }
 
-std::string replyErr471ChannelIsFull(const std::string &server, const std::string &channel)
+std::string replyErr471ChannelIsFull(const std::string &server, const std::string &nick, const std::string &channel)
 {
-    return ":" + server + " " + ERR_CHANNELISFULL + " " + channel + " :Cannot join channel (+l)\r\n";
+    return ":" + server + " 471 " + nick + " " + channel + " :Cannot join channel (+l)\r\n";
 }
+
 
 std::string replyErr473InviteOnlyChan(const std::string &server, const std::string &nick, const std::string &channel)
 {

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/17 15:44:43 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 15:49:27 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,10 +200,11 @@ std::string replyErr462AlreadyRegistered(const std::string &server);
 std::string replyErr464PasswordMismatch(const std::string &server);
 
 /* 471 ERR_CHANNELISFULL
-   "<channel> :Cannot join channel (+l)"
    - Sent when a channel has reached its user limit.
+   :ircserv 471 <nick> <channel> :Cannot join channel (+l)
 */
-std::string replyErr471ChannelIsFull(const std::string &server, const std::string &channel);
+std::string replyErr471ChannelIsFull(const std::string &server, const std::string &nick, const std::string &channel);
+
 
 /* 473 ERR_INVITEONLYCHAN
    "<channel> :Cannot join channel (+i)"
