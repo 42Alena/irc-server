@@ -6,11 +6,14 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/17 15:56:26 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 18:40:16 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/commands.hpp"
+
+
+
 /*
  Function to handle a user joining the channel
 - it check if the channel is not created and created it if needed

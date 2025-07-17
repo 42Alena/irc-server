@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commandsChannel.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lperez-h <lperez-h@student.42.fr>          +#+  +:+       +#+        */
+/*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/17 11:39:04 by lperez-h         ###   ########.fr       */
+/*   Updated: 2025/07/17 18:31:25 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,28 +19,7 @@
 #include "../include/replies.hpp"
 
 
-// Function to handle a user leaving the channel
-void handlePart(Server &server, Client &client, const std::vector<std::string> &params)
-{
-	if (params.empty()){
-		replyErr461NeedMoreParams(server.getServerName(), "PART");
-		return;
-	}
-	std::string channelName = params[0];			   // Get the channel name from the parameters
-	Channel *channel = server.getChannel(channelName); // Get the channel by name from the
 
-	if (!channel){
-		replyErr403NoSuchChannel(server.getServerName(), channelName);
-		return;
-	}
-	if (!channel->hasMembers(&client)){
-		replyErr441UserNotInChannel(server.getServerName(), client.getNickname(), channelName);
-		return;
-	}
-	channel->removeUser(client.getFd(), &client);										   // Remove the user from the channel
-	channel->sendToChannelExcept(client.getNickname() + " has left the channel.", client); // Notify other members
-	logChannelInfo("User " + client.getNickname() + " left channel: " + channelName);
-}
 /*
   Function to handle the change of the topic in the channel
 - it checks if the user is an operator before allowing them to change the topic
