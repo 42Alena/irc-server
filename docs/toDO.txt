@@ -18,6 +18,32 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 
 17.07
+BRANCH: "fix/handle-topic
+	- add to numeric reply send() from server to client
+
+
+    [x]Topic change is not limited to operators in all cases
+    According to the IRC spec and MODE +t, only when the +t mode is set, operators can change the topic. Otherwise, any member can.
+
+    [x]You're not checking if the client is in the channel
+    Even regular users should be in the channel to view or change topic.
+
+    [x]You're not sending the proper IRC TOPIC message to the channel
+    Format: :<nick> TOPIC <channel> :<new_topic>
+
+    []No support for topic queries
+    TOPIC <channel> (without a second param) is used to view the topic.
+
+ADD:
+	[x] if (!channel->hasMembers(&client))
+	[x]  if (params.size() == 1)
+	[x] replyRpl331NoTopic(
+	[x] 
+	[x] channel->isTopicLocked() &&
+	[x]   notify all, not except 
+		channel->sendToChannelAll(msg, server);								   // requires sendToChannelAll(msg, server) to be implemented
+	 wrong: channel->sendToChannelExcept("Topic changed to: " + newTopic, client); // Notify other members
+
 
 BRANCH:
 	Fix
