@@ -15,7 +15,36 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 17.07
 
-BRUNCH: test/join
+BRUNCH: fix/handlejoin-replies-modes
+	-deleted 46! git branches
+			% git branch -r | wc -l                                              
+			46
+			% for branch in $(git branch -r | grep -v "origin/main" | sed 's/origin\///'); do
+			git push origin --delete "$branch"
+			done
+
+join.cpp:
+	[x] send() to client, no just  replie with numeric isValidUsername
+		    function:void Server::sendToClient(int fd, const std::string &message)
+	    	
+			server.sendToClient(
+        client.getFd(),
+           replyErr473InviteOnlyChan(server.getServerName(), client.getNickname(), channelName));
+
+			from:	
+        	replyErr473InviteOnlyChan(server.getServerName(), channelName);
+
+	[x] added irc-format notify: :n!user@host JOIN #channel
+	// send irc formt  JOIN message to other channel members
+    channel->sendToChannelExcept(
+        ":" + client.getPrefix() + " JOIN " + channelName,
+        client);
+	[x] changed 473 for irc standart: <server> 473 <nick> <channel> :Cannot join channel (+i)
+
+	[x] added required: replyRplNamReply (353)
+	[x] added required: replyRplEndOfNames (366)
+
+
 
 
 BRUNCH: git branch -m fix-user-realname-channel-pass

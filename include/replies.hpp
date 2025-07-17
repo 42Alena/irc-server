@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/17 08:41:38 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 15:49:27 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,13 +95,14 @@ std::string replyRpl332Topic(const std::string &server, const std::string &chann
    "= <channel> :[[@|+]<nick> [[@|+]<nick> [...]]]"
    - Lists users visible on the channel.
 */
-std::string replyRpl353NamReply(const std::string &server, const std::string &channel, const std::string &names);
+std::string replyRpl353NamReply(const std::string &server, const std::string &nick, const std::string &symbol, const std::string &channel, const std::string &names);
+
 
 /* 366 RPL_ENDOFNAMES
-   "<channel> :End of /NAMES list"
-   - Indicates the end of the NAMES list for a channel.
+"<channel> :End of /NAMES list"
+- Indicates the end of the NAMES list for a channel.
 */
-std::string replyRpl366EndOfNames(const std::string &server, const std::string &channel);
+std::string replyRpl366EndOfNames(const std::string &server, const std::string &nick, const std::string &channel);
 
 /* 401 ERR_NOSUCHNICK
    "<nickname> :No such nick/channel"
@@ -176,6 +177,8 @@ std::string replyErr443UserOnChannel(const std::string &server, const std::strin
 */
 std::string replyErr451NotRegistered(const std::string &server, const std::string &command);
 
+
+
 /* 461 ERR_NEEDMOREPARAMS
    "<command> :Not enough parameters"
    - Returned when a command lacks required parameters.
@@ -197,22 +200,26 @@ std::string replyErr462AlreadyRegistered(const std::string &server);
 std::string replyErr464PasswordMismatch(const std::string &server);
 
 /* 471 ERR_CHANNELISFULL
-   "<channel> :Cannot join channel (+l)"
    - Sent when a channel has reached its user limit.
+   :ircserv 471 <nick> <channel> :Cannot join channel (+l)
 */
-std::string replyErr471ChannelIsFull(const std::string &server, const std::string &channel);
+std::string replyErr471ChannelIsFull(const std::string &server, const std::string &nick, const std::string &channel);
+
 
 /* 473 ERR_INVITEONLYCHAN
    "<channel> :Cannot join channel (+i)"
    - Returned when trying to join an invite-only channel without an invitation.
 */
-std::string replyErr473InviteOnlyChan(const std::string &server, const std::string &channel);
+std::string replyErr473InviteOnlyChan(const std::string &server, const std::string &nick, const std::string &channel);
 
 /* 475 ERR_BADCHANNELKEY
    "<channel> :Cannot join channel (+k)"
    - Used when an incorrect channel key (password) is provided.
 */
-std::string replyErr475BadChannelKey(const std::string &server, const std::string &channel);
+std::string replyErr475BadChannelKey(const std::string &server, const std::string &nick, const std::string &channel);
+
+
+
 
 /* 
  476 ERR_BADCHANMASK

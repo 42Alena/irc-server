@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:13:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/17 08:41:12 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 15:49:43 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,15 +45,23 @@ std::string replyRpl332Topic(const std::string &server, const std::string &chann
     return ":" + server + " " + RPL_TOPIC + " " + channel + " :" + topic + "\r\n";
 }
 
-std::string replyRpl353NamReply(const std::string &server, const std::string &channel, const std::string &names)
+std::string replyRpl353NamReply(const std::string &server,
+                                 const std::string &nick,
+                                 const std::string &symbol,
+                                 const std::string &channel,
+                                 const std::string &names)
 {
-    return ":" + server + " " + RPL_NAMREPLY + " = " + channel + " :" + names + "\r\n";
+    return ":" + server + " 353 " + nick + " " + symbol + " " + channel + " :" + names + "\r\n";
 }
 
-std::string replyRpl366EndOfNames(const std::string &server, const std::string &channel)
+
+std::string replyRpl366EndOfNames(const std::string &server,
+                                   const std::string &nick,
+                                   const std::string &channel)
 {
-    return ":" + server + " " + RPL_ENDOFNAMES + " " + channel + " :End of /NAMES list\r\n";
+    return ":" + server + " 366 " + nick + " " + channel + " :End of /NAMES list\r\n";
 }
+
 
 std::string replyErr401NoSuchNick(const std::string &server, const std::string &nick)
 {
@@ -130,19 +138,21 @@ std::string replyErr464PasswordMismatch(const std::string &server)
     return ":" + server + " " + ERR_PASSWDMISMATCH + " :Password incorrect\r\n";
 }
 
-std::string replyErr471ChannelIsFull(const std::string &server, const std::string &channel)
+std::string replyErr471ChannelIsFull(const std::string &server, const std::string &nick, const std::string &channel)
 {
-    return ":" + server + " " + ERR_CHANNELISFULL + " " + channel + " :Cannot join channel (+l)\r\n";
+    return ":" + server + " 471 " + nick + " " + channel + " :Cannot join channel (+l)\r\n";
 }
 
-std::string replyErr473InviteOnlyChan(const std::string &server, const std::string &channel)
+
+std::string replyErr473InviteOnlyChan(const std::string &server, const std::string &nick, const std::string &channel)
 {
-    return ":" + server + " " + ERR_INVITEONLYCHAN + " " + channel + " :Cannot join channel (+i)\r\n";
+    return ":" + server + " 473 " + nick + " " + channel + " :Cannot join channel (+i)\r\n";
 }
 
-std::string replyErr475BadChannelKey(const std::string &server, const std::string &channel)
+
+std::string replyErr475BadChannelKey(const std::string &server, const std::string &nick, const std::string &channel)
 {
-    return ":" + server + " " + ERR_BADCHANNELKEY + " " + channel + " :Cannot join channel (+k)\r\n";
+    return ":" + server + " " + ERR_BADCHANNELKEY + " " + nick + " " + channel + " :Cannot join channel (+k)\r\n";
 }
 
 

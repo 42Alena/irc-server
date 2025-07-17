@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/16 22:03:41 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/17 15:39:37 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,30 @@ void Channel::setLimit(int limit)
 }
 
 //======================== GETTERS ===================================//
+
+std::string Channel::getNickList() const
+{
+    std::string list;
+
+    for (std::map<int, Client*>::const_iterator it = _members.begin(); it != _members.end(); ++it)
+    {
+        int fd = it->first;
+        Client* client = it->second;
+
+        if (_operators.find(fd) != _operators.end())
+            list += "@" + client->getNickname();
+        else
+            list += client->getNickname();
+
+        list += " ";
+    }
+
+    if (!list.empty())
+        list.erase(list.end() - 1); // Remove trailing space
+
+    return list;
+}
+
 
 // get the limit of users in the channel
 int Channel::getLimit() const
