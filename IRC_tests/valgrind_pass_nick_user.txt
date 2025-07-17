@@ -1,0 +1,15 @@
+==1194400== Memcheck, a memory error detector
+==1194400== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==1194400== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==1194400== Command: ../ircserv 6667 pass123
+==1194400== Parent PID: 1194399
+==1194400== 
+==1194400== 
+==1194400== HEAP SUMMARY:
+==1194400==     in use at exit: 0 bytes in 0 blocks
+==1194400==   total heap usage: 28,180,848 allocs, 28,180,848 frees, 1,183,672,183 bytes allocated
+==1194400== 
+==1194400== All heap blocks were freed -- no leaks are possible
+==1194400== 
+==1194400== For lists of detected and suppressed errors, rerun with: -s
+==1194400== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

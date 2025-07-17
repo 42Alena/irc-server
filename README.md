@@ -12,7 +12,7 @@ The goal of this project is to build our own IRC (Internet Relay Chat) Server. U
 
 - The server must handle multiple clients simultaneously without hanging. 
 - Forking is forbidden, so all the I/O ops must be non-blocking
-- Only 1 `poll()` can be used for handling all these operations (read, write, listen and so forth)
+- Only 1 `()` can be used for handling all these operations (read, write, listen and so forth)
 - Communication between client and server has to be done via TCP/IP (v4 or v6)
 - You must be able to authenticate, set a nickname, a username, join a channel, send and receive private messages using your reference client
 - All the messages sent from one client to a channel have to be forwarded to every other client that joined the channel
