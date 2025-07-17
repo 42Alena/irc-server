@@ -23,7 +23,7 @@ SOURCES = \
 	./commands/mode.cpp\
 	./commands/invite.cpp\
 	./commands/kick.cpp\
-	./commands/commandsChannel.cpp\
+	./commands/key.cpp\
 	
 	
 

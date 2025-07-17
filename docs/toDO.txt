@@ -15,6 +15,9 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 
 17.07
 
+BRANCH: "refactor/separate-key-commands" 
+	separated key from commandsChannel
+
 BRANCH: "refactor/separate-kick-commands" 
 	separated kick from commandsChannel
 
