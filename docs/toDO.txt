@@ -21,6 +21,7 @@ Set tracking branch	git branch --set-upstream-to=origin/main
 
 18.07
 
+
 BRANCH test/channel
 	in removeUser():
 		- changed loInfo from Error for user quit from channel
