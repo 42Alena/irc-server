@@ -10,6 +10,8 @@ SERVER_LOG="server.log"  # Log file for the server
 
 set -ex
 
+tmux kill-session -t "irc_test" 2>/dev/null || true
+
 # Start the IRC server in a tmux session
 tmux new-session -d -s $TMUX_SESSION -n server
 tmux send-keys -t $TMUX_SESSION:server "$SERVER_EXEC $PORT $PASSWORD > $SERVER_LOG 2>&1" C-m
