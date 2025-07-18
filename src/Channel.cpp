@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 00:43:42 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 05:56:53 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,6 +299,13 @@ bool Channel::isInviteOnly() const
 {
 	return _modes.at('i'); // Return true if the 'i' mode is enabled, false otherwise
 }
+
+void Channel::removeInvited(int fd)
+{
+	_invited.erase(fd);
+	logChannelInfo("Removed invitation for fd " + intToString(fd) + " in channel: " + _name);
+}
+
 
 // Function to check if the topic is locked for changes
 bool Channel::isTopicLocked() const

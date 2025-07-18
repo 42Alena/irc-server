@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 01:43:28 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 05:56:13 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ public:
 
 	void inviteUser(int fd);	  // Add user to invited list -> done
 	bool isInvited(int fd) const; // Check if user is invited -> done
+	void removeInvited(int fd);		//Remove after invited uses
 	bool isInviteOnly() const;	  // Check if channel is invite-only -> done
 	bool isTopicLocked() const;	  // Check if topic is locked for changes -> done
 	bool hasKey() const;		  // Check if channel has a key/password set -> done
