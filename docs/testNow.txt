@@ -28,6 +28,7 @@ JOIN #test
 => Expect: JOIN, 353 (names), 366 (end of names)
 => Server log: channel created, operator granted
 
+//Only channel operators can change modes.
 MODE #test +i           // Make invite-only
 MODE #test +k secret    // Add key
 MODE #test +l 2         // Limit to 2 users
