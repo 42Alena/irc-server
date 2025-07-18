@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 12:02:10 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 16:14:36 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,8 +122,7 @@ std::string Client::getPassword() const {
 
 std::string Client::getPrefix() const
 {
-    
-	return  _nickname + "!" + _username + "@" + _host;
+    return _nickname + "!" + _username + "@" + _host;
 }
 
 
@@ -269,6 +268,6 @@ void Client::addOperator(Channel *channel)
 
 void Client::removeOperator(Channel *channel)
 {
-    _channelOps[channel] = false;
+    _channelOps.erase(channel);
 }
 

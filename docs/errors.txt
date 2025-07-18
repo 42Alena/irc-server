@@ -1,3 +1,45 @@
+
+ const&) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40B479: Server::handleClientInput(unsigned long) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40A9C4: Server::run() (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40923C: main (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884== 
+==1302884== 
+==1302884== 1 errors in context 4 of 4:
+==1302884== Invalid read of size 8
+==1302884==    at 0x49C1148: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+==1302884==    by 0x418722: Channel::getName[abi:cxx11]() const (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40CC67: Server::removeClientFromAllChannels(Client*) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40B684: Server::removeClient(int, unsigned long) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x409F38: Server::shutdown() (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x408C9F: handleSigintCtrlC(int) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x4BE751F: ??? (in /usr/lib/x86_64-linux-gnu/libc.so.6)
+==1302884==    by 0x4CBDB94: poll (poll.c:29)
+==1302884==    by 0x40A65C: Server::run() (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40923C: main (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==  Address 0x701b1b8 is 8 bytes inside a block of size 328 free'd
+==1302884==    at 0x484B8AF: operator delete(void*) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==1302884==    by 0x40D5A7: Server::removeChannel(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40CE86: Server::removeClientFromAllChannels(Client*) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40B684: Server::removeClient(int, unsigned long) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x409F38: Server::shutdown() (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x408C9F: handleSigintCtrlC(int) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x4BE751F: ??? (in /usr/lib/x86_64-linux-gnu/libc.so.6)
+==1302884==    by 0x4CBDB94: poll (poll.c:29)
+==1302884==    by 0x40A65C: Server::run() (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40923C: main (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==  Block was alloc'd at
+==1302884==    at 0x4849013: operator new(unsigned long) (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==1302884==    by 0x40D319: Server::addChannel(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, Client&) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x425A0E: handleJoin(Server&, Client&, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40C3E8: Server::handleCommand(Client*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40B479: Server::handleClientInput(unsigned long) (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40A9C4: Server::run() (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884==    by 0x40923C: main (in /home/akurmyza/42_MY_WORK_GITS/IRC/ircserv)
+==1302884== 
+==1302884== ERROR SUMMARY: 4 errors from 4 contexts (suppressed: 0 from 0)
+
+___________________________________________________________________________________________________________________________
 ==1221798== 
 ==1221798== HEAP SUMMARY:
 ==1221798==     in use at exit: 0 bytes in 0 blocks

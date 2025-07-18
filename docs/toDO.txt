@@ -22,6 +22,11 @@ Set tracking branch	git branch --set-upstream-to=origin/main
 TODO: 20 mistakes ctrl+c server when  channel is opened
 
 18.07
+branch:
+	test/channel-topic-secret
+	- 	test topic
+	added checking modes
+	nt allow mode wit one - or +
 
 BRANCH: 'fix/channel-operator-quit-part'
 	channel:
