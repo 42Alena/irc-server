@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:13:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 09:02:30 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 09:26:27 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,23 +37,23 @@ std::string replyRpl004MyInfo(const std::string &server)
 
 std::string replyRpl324ChannelMode(const std::string &serverName, const std::string &nickname, const std::string &channel, const std::string &modes)
 {
-	return ":" + serverName + " 324 " + nickname + " " + channel + " " + modes ";
+	return ":" + serverName + " 324 " + nickname + " " + channel + " " + modes ;
 }
 
 
 std::string replyRpl331NoTopic(const std::string &server, const std::string &channel, const std::string &topic)
 {
-    return ":" + server + " " + RPL_NOTOPIC + " " + channel + " :" + topic ";
+    return ":" + server + " " + RPL_NOTOPIC + " " + channel + " :" + topic;
 }
 
 std::string replyRpl332Topic(const std::string &server, const std::string &channel, const std::string &topic)
 {
-    return ":" + server + " " + RPL_TOPIC + " " + channel + " :" + topic ";
+    return ":" + server + " " + RPL_TOPIC + " " + channel + " :" + topic ;
 }
 
 std::string replyRpl341Inviting(const std::string &server, const std::string &nick, const std::string &channel)
 {
-    return ":" + server + " 341 " + nick + " " + channel ";
+    return ":" + server + " 341 " + nick + " " + channel;
 }
 
 std::string replyRpl353NamReply(const std::string &server,
@@ -62,7 +62,7 @@ std::string replyRpl353NamReply(const std::string &server,
                                  const std::string &channel,
                                  const std::string &names)
 {
-    return ":" + server + " 353 " + nick + " " + symbol + " " + channel + " :" + names ";
+    return ":" + server + " 353 " + nick + " " + symbol + " " + channel + " :" + names ;
 }
 
 
