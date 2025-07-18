@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 11:17:52 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 08:43:45 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 11:42:12 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,12 @@ https://www.rfc-editor.org/rfc/rfc2812.html#page-14
 */
 void handleQuit(Server &server, Client &client, const std::vector<std::string> &params)
 {
+
 	std::string message = (params.empty()) ? "Client Quit" : params[0];
 
+	if (!message.empty() && message[0] == ':')
+		message = message.substr(1);
+	
 	// build correct QUIT message format for IRC
 	std::string quitMsg = ":" + client.getPrefix() + " QUIT :" + message + "\r\n";
 	
