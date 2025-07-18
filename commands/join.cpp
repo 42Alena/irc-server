@@ -6,13 +6,11 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/17 18:40:16 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 05:55:24 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/commands.hpp"
-
-
 
 /*
  Function to handle a user joining the channel
@@ -67,8 +65,6 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
         server.addChannel(channelName, client);
         channel = server.getChannel(channelName);
         channel->addOperator(client.getFd());
-       
-
     }
 
     //  check in case if smth goes wrong
@@ -79,13 +75,17 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
     }
 
     // Check if the channel is invite-only and if the user is invited
-    if (channel->isInviteOnly() && !channel->isInvited(client.getFd()))
+    if (channel->isInviteOnly())
     {
-        server.sendToClient(
-            client.getFd(),
-            replyErr473InviteOnlyChan(server.getServerName(), client.getNickname(), channelName));
-
-        return;
+        if (!channel->isInvited(client.getFd()))
+        {
+            server.sendToClient(
+                client.getFd(),
+                replyErr473InviteOnlyChan(server.getServerName(), client.getNickname(), channelName));
+            return;
+        }
+        //  Remove the invite once after used
+        channel->removeInvited(client.getFd());
     }
 
     // Check if the channel has a key and if the user's password matches the channel key

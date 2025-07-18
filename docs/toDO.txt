@@ -19,7 +19,12 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 Pull remote main once	git pull origin main
 Set tracking branch	git branch --set-upstream-to=origin/main
 
-17.07
+18.07
+
+BRANCH: fix/handle-join
+	add;
+		removeInvited(int fd)
+		delete after invite is used
 
 BRANCH: fix/handle-invite
 	 replyErr...() calls are not sent via server.sendToClient(...)
@@ -49,6 +54,10 @@ BRANCH: * fix/handle-key-send-all
 	Set the channel key using channel->setKey(key), storing it internally.
 	Sent an IRC-formatted MODE +k :key message to all channel members using sendToChannelAll(...) instead of sendToChannelExcept(...).
 	Logg the change using logChannelInfo(...), clearly showing the key mode was set by the user.``
+
+17.07
+
+
 
 BRANCH: "fix/handle-topic
 	- add to numeric reply send() from server to client
