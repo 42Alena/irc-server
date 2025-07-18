@@ -52,7 +52,7 @@ EOF
 done
 
 #wait for connections to establish
-sleep 15
+sleep 200
 
 # Debug check: list all tmux sessions
 tmux list-sessions
@@ -65,7 +65,7 @@ for i in {1..3}; do
 done
 
 #wait for messages to be processed
-sleep 10
+sleep 30
 
 # verify messages were received by all clients
 for i in {1..3}; do
