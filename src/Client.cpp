@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:20 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/17 07:35:51 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 12:02:10 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,8 @@ std::string Client::getPassword() const {
 
 std::string Client::getPrefix() const
 {
-	return ":" + _nickname + "!" + _username + "@" + _host;
+    
+	return  _nickname + "!" + _username + "@" + _host;
 }
 
 

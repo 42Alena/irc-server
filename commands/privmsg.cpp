@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 08:47:53 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 11:57:32 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,11 +79,13 @@ void handlePrivateMessage(Server &server, Client &client, const std::vector<std:
                 server.sendToClient(client.getFd(), replyErr451NotRegistered(server.getServerName(), "PRIVMSG"));
                 return;
         }
-        if (params.size() == 0) // no recipient
+
+        if (params.empty())
         {
                 server.sendToClient(client.getFd(), replyErr411NoRecipient(server.getServerName(), "PRIVMSG"));
                 return;
         }
+
         if (params.size() == 1) // recipient is present, but no message
         {
                 server.sendToClient(client.getFd(), replyErr412NoTextToSend(server.getServerName()));
@@ -91,14 +93,10 @@ void handlePrivateMessage(Server &server, Client &client, const std::vector<std:
         }
 
         const std::string receiver = params[0];
-        bool isChannel = (receiver[0] == '#');
+        bool isChannel = server.isChannelName(receiver);
+
         if (isChannel)
         {
-                if (!server.isChannelName(receiver))
-                {
-                        server.sendToClient(client.getFd(), replyErr403NoSuchChannel(server.getServerName(), receiver));
-                        return;
-                }
                 if (!client.isInChannel(receiver))
                 {
                         server.sendToClient(client.getFd(), replyErr404CannotSendToChan(server.getServerName(), receiver));
@@ -114,51 +112,45 @@ void handlePrivateMessage(Server &server, Client &client, const std::vector<std:
                 }
         }
 
-        // extract message
+        // Build the full message body from all tokens after receiver
         std::string message;
+        bool foundMessage = false;
 
-        // PRIVMSG must have exactly one recipient before ':'
-        size_t colonIndex = 1;
-        for (; colonIndex < params.size(); ++colonIndex)
+        for (size_t i = 1; i < params.size(); ++i)
         {
-                if (!params[colonIndex].empty() && params[colonIndex][0] == ':')
+                if (!foundMessage && !params[i].empty() && params[i][0] == ':')
                 {
-                        message = params[colonIndex].substr(1); // Remove ':'
-                        ++colonIndex;
-                        break;
+                        message += params[i].substr(1);
+                        foundMessage = true;
+                }
+                else if (foundMessage)
+                {
+                        message += " " + params[i];
                 }
         }
 
-        // if no ':' was found or more than one parameter before message
-        if (colonIndex == params.size() || colonIndex > 2)
+        if (!foundMessage || message.empty())
         {
-                server.sendToClient(client.getFd(), replyErr461NeedMoreParams(server.getServerName(), "PRIVMSG"));
+                server.sendToClient(client.getFd(), replyErr412NoTextToSend(server.getServerName()));
                 return;
         }
-
-        // join all remaining parts into one clean message string
-        for (; colonIndex < params.size(); ++colonIndex)
-        {
-                message += " " + params[colonIndex];
-        }
-
-        // Format for message ":<sender_nick>!<username>@<hostname> PRIVMSG <target> :<message>\r\n"
-        std::string messageFormated =
-            ":" + client.getNickname() + "!" + client.getUsername() +
-            "@" + client.getHost() + " PRIVMSG " + receiver +
-            " :" + message + "\r\n";
+        
+        if (!message.empty() && message[0] == ':')
+                message = message.substr(1);
+                
+        // Format and send the message
+        std::string formattedMsg = ":" + client.getPrefix() + " PRIVMSG " + receiver + " :" + message + "\r\n";
 
         if (isChannel)
         {
                 Channel *channel = server.getChannel(receiver);
                 if (channel)
-                        channel->sendToChannelExcept(messageFormated, client, server); // or *client if pointer
+                        channel->sendToChannelExcept(formattedMsg, client, server);
         }
-
         else
         {
-                Client *clientReceiver = server.getClientByNickname(receiver);
-                if (clientReceiver)
-                        server.sendToClient(clientReceiver->getFd(), messageFormated);
+                Client *targetClient = server.getClientByNickname(receiver);
+                if (targetClient)
+                        server.sendToClient(targetClient->getFd(), formattedMsg);
         }
 }

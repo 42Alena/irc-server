@@ -20,6 +20,11 @@ Pull remote main once	git pull origin main
 Set tracking branch	git branch --set-upstream-to=origin/main
 
 18.07
+BRANCH: * test/channel-invite
+	- fix send priv mesage
+	- fix with sending msg bye msg by quit
+	- fix :: in invite msg"
+	- :: in priv msg was from getPrefix(0)
 
 BRANCH test/channel
 	in removeUser():
