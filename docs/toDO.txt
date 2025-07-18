@@ -26,6 +26,7 @@ TODO: 20 mistakes ctrl+c server when  channel is opened
 BRANCH: 'fix/channel-operator-quit-part'
 	channel:
 		add void makeOperator(Client *client);
+		add delete channel after part quit last user
 
 
 BRANCH: * test/channel-invite

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 11:17:52 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 13:19:19 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 13:34:28 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void handleQuit(Server &server, Client &client, const std::vector<std::string> &
 	if (!message.empty() && message[0] == ':')
 		message = message.substr(1);
 
-	std::string quitMsg = ":" + client.getPrefix() + " QUIT :" + message;
+	std::string quitMsg = ":" + client.getPrefix() + " QUIT :" + message + "\r\n";
 
 	// Copy list of channels before removal
 	std::vector<Channel *> channels = client.getChannels();
@@ -46,14 +46,21 @@ void handleQuit(Server &server, Client &client, const std::vector<std::string> &
 		if (!channel)
 			continue;
 
-		// Notify others in the channel about the QUIT
+		// Notify others
 		channel->sendToChannelExcept(quitMsg, client, server);
 
 		// Remove the client from the channel
 		channel->removeUser(client.getFd(), &client);
 
-		// If there are members but no operators, promote the first available one
-		if (!channel->getMembers().empty() && channel->getOperators().empty())
+		// If the channel is now empty, destroy it
+		if (channel->getMembers().empty())
+		{
+			server.removeChannel(channel->getName());
+			continue;
+		}
+
+		// Promote a new operator if none left
+		if (channel->getOperators().empty())
 		{
 			std::map<int, Client *> members = channel->getMembers();
 			Client *newOp = NULL;
@@ -70,15 +77,14 @@ void handleQuit(Server &server, Client &client, const std::vector<std::string> &
 			if (newOp)
 			{
 				channel->makeOperator(newOp);
-				std::string modeMsg = ":ircserv MODE " + channel->getName() + " +o " + newOp->getNickname();
+				std::string modeMsg = ":ircserv MODE " + channel->getName() + " +o " + newOp->getNickname() + "\r\n";
 				channel->sendToChannelAll(modeMsg, server);
 			}
 		}
 	}
 
-	// Send QUIT message to the client itself
+	// Send QUIT message to the client
 	server.sendToClient(client.getFd(), quitMsg);
 
-	// Don't call removeClientFromAllChannels — already handled above
 	logServerInfo("[QUIT] " + client.getNickname() + " has quit: " + message);
 }

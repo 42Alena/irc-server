@@ -6,10 +6,9 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/18 13:19:25 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 13:34:22 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "../include/commands.hpp"
 
@@ -19,65 +18,62 @@
   sends appropriate error replies if the channel doesn't exist
   or the user is not in the channel.
 */
-void handlePart(Server &server, Client &client, const std::vector<std::string> &params)
+void handleQuit(Server &server, Client &client, const std::vector<std::string> &params)
 {
-	if (params.empty())
+	std::string message = (params.empty()) ? "Client Quit" : params[0];
+	if (!message.empty() && message[0] == ':')
+		message = message.substr(1);
+
+	std::string quitMsg = ":" + client.getPrefix() + " QUIT :" + message + "\r\n";
+
+	// Copy list of channels before removal
+	std::vector<Channel *> channels = client.getChannels();
+
+	for (std::vector<Channel *>::iterator it = channels.begin(); it != channels.end(); ++it)
 	{
-		server.sendToClient(
-			client.getFd(),
-			replyErr461NeedMoreParams(server.getServerName(), "PART"));
-		return;
-	}
+		Channel *channel = *it;
+		if (!channel)
+			continue;
 
-	std::string channelName = params[0];
-	Channel *channel = server.getChannel(channelName);
+		// Notify others
+		channel->sendToChannelExcept(quitMsg, client, server);
 
-	if (!channel)
-	{
-		server.sendToClient(
-			client.getFd(),
-			replyErr403NoSuchChannel(server.getServerName(), channelName));
-		return;
-	}
+		// Remove the client from the channel
+		channel->removeUser(client.getFd(), &client);
 
-	if (!channel->hasMembers(&client))
-	{
-		server.sendToClient(
-			client.getFd(),
-			replyErr441UserNotInChannel(server.getServerName(), client.getNickname(), channelName));
-		return;
-	}
-
-	// Build and send PART message
-	std::string partMsg = ":" + client.getPrefix() + " PART " + channelName + "\r\n";
-	channel->sendToChannelExcept(partMsg, client, server);
-	server.sendToClient(client.getFd(), partMsg);
-
-	// Remove user from channel
-	channel->removeUser(client.getFd(), &client);
-
-	// Promote a new operator if no ops left
-	if (!channel->getMembers().empty() && channel->getOperators().empty())
-	{
-		std::map<int, Client *> members = channel->getMembers();
-		Client *newOp = NULL;
-
-		for (std::map<int, Client *>::iterator it = members.begin(); it != members.end(); ++it)
+		// If the channel is now empty, destroy it
+		if (channel->getMembers().empty())
 		{
-			if (it->second)
+			server.removeChannel(channel->getName());
+			continue;
+		}
+
+		// Promote a new operator if none left
+		if (channel->getOperators().empty())
+		{
+			std::map<int, Client *> members = channel->getMembers();
+			Client *newOp = NULL;
+
+			for (std::map<int, Client *>::iterator mIt = members.begin(); mIt != members.end(); ++mIt)
 			{
-				newOp = it->second;
-				break;
+				if (mIt->second)
+				{
+					newOp = mIt->second;
+					break;
+				}
+			}
+
+			if (newOp)
+			{
+				channel->makeOperator(newOp);
+				std::string modeMsg = ":ircserv MODE " + channel->getName() + " +o " + newOp->getNickname() + "\r\n";
+				channel->sendToChannelAll(modeMsg, server);
 			}
 		}
-
-		if (newOp)
-		{
-			channel->makeOperator(newOp);
-			std::string modeMsg = ":ircserv MODE " + channelName + " +o " + newOp->getNickname() + "\r\n";
-			channel->sendToChannelAll(modeMsg, server);
-		}
 	}
 
-	logChannelInfo("[PART] User " + client.getNickname() + " left channel: " + channelName);
+	// Send QUIT message to the client
+	server.sendToClient(client.getFd(), quitMsg);
+
+	logServerInfo("[QUIT] " + client.getNickname() + " has quit: " + message);
 }

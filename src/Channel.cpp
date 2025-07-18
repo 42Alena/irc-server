@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 13:22:12 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 13:32:33 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,6 +188,8 @@ std::string Channel::getModes() const
 
 	return modes;
 }
+
+
 
 //======================== MEMBER FUNCTIONS ===========================//
 

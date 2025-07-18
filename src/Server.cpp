@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 09:00:09 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 13:36:53 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -547,28 +547,33 @@ void Server::removeClientFromAllChannels(Client *client)
 	if (!client)
 		return;
 
-	// copy to avoid using internal vector while modifying it
-	const std::vector<Channel *> channelsCopy = client->getChannels();
+	std::vector<std::string> channelNames;
+	const std::vector<Channel *> &channels = client->getChannels();
+
+	// Store names before we risk modifying/deleting any channels
+	for (size_t i = 0; i < channels.size(); ++i)
+	{
+		if (channels[i])
+			channelNames.push_back(channels[i]->getName());
+	}
 
 	int fd = client->getFd();
 
-	for (size_t i = 0; i < channelsCopy.size(); ++i)
+	for (size_t i = 0; i < channelNames.size(); ++i)
 	{
-		Channel *ch = channelsCopy[i];
-
+		Channel *ch = getChannel(channelNames[i]);
 		if (!ch)
-			continue; // extra safety
+			continue;
 
 		logServerInfo("Removing client from channel: " + ch->getName());
 
-		// remove client from channel
 		ch->removeUser(fd, client);
 
-		// if channel is empty after removal, delete it from server
 		if (ch->getMembers().empty())
 			removeChannel(ch->getName());
 	}
 }
+
 
 //======================== PUBLIC: Internal Utilities ==================//
 
