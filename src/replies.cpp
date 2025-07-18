@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:13:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 09:26:27 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 15:24:29 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,6 +164,12 @@ std::string replyErr471ChannelIsFull(const std::string &server, const std::strin
     return ":" + server + " 471 " + nick + " " + channel + " :Cannot join channel (+l)";
 }
 
+std::string replyErr472UnknownMode(const std::string &serverName,
+                                   const std::string &nickname,
+                                   const std::string &modeChar)
+{
+    return ":" + serverName + " 472 " + nickname + " " + modeChar + " :is unknown mode char to me\r\n";
+}
 
 std::string replyErr473InviteOnlyChan(const std::string &server, const std::string &nick, const std::string &channel)
 {

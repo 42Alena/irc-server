@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/18 08:44:30 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 16:31:56 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
     {
         server.addChannel(channelName, client);
         channel = server.getChannel(channelName);
-        channel->addOperator(client.getFd());
+       channel->addOperator(&client); 
     }
 
     //  check in case if smth goes wrong

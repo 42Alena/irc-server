@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 13:32:33 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 16:27:33 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,23 +98,21 @@ void Channel::setKey(const std::string &key) { _key = key; }
 
 // Function to set a limit for the channel
 // need to define a getter for the userlimit since is private attribute
-void Channel::setLimit(int limit)
+void Channel::setUserLimit(int limit)
 {
 	_userLimit = limit;
 }
 
 //======================== GETTERS ===================================//
-
 std::string Channel::getNickList() const
 {
 	std::string list;
 
 	for (std::map<int, Client *>::const_iterator it = _members.begin(); it != _members.end(); ++it)
 	{
-		int fd = it->first;
 		Client *client = it->second;
 
-		if (_operators.find(fd) != _operators.end())
+		if (_operators.find(client) != _operators.end())
 			list += "@" + client->getNickname();
 		else
 			list += client->getNickname();
@@ -165,10 +163,12 @@ std::map<int, Client *> Channel::getMembers() const
 }
 
 // Function to get the operators of the channel
-std::set<int> Channel::getOperators() const
+const std::set<Client*>& Channel::getOperators() const
 {
-	return _operators; // Return the vector of operators in the channel
+    return _operators;
 }
+
+
 
 std::string Channel::getModes() const
 {
@@ -200,12 +200,18 @@ void Channel::addUser(int fd, Client *client)
 	logChannelInfo("Client added to channel: " + client->getNickname());
 }
 
-// Function to add a client to the _operators vector inside the channel
-void Channel::addOperator(int fd)
+void Channel::addOperator(Client *client)
 {
-	_operators.insert(fd); // Add the client's file descriptor (fd) to the _operators set
-	logChannelInfo("Client with fd " + intToString(fd) + " was granted operator status");
+    _operators.insert(client);
+    logChannelInfo("Client " + client->getNickname() + " was granted operator status");
 }
+
+void Channel::removeOperator(Client *client)
+{
+    _operators.erase(client);
+    logChannelInfo("Client " + client->getNickname() + " lost operator status");
+}
+
 
 /*
 This function checks if the user is an operator before removing them
@@ -221,7 +227,7 @@ void Channel::removeUser(int fd, Client *client)
 	{
 		_members.erase(it); // Erase the client from the _members map if found
 
-		_operators.erase(fd);
+		_operators.erase(client);
 		_invited.erase(fd);
 
 		logChannelInfo("[QUIT] Client left channel: " + client->getNickname());
@@ -246,22 +252,23 @@ bool Channel::hasMembers(Client *client) const
 	}
 }
 
-// Function to check if a client is an operator of the channel
 bool Channel::isOperator(Client *client) const
 {
-	std::map<int, Client *>::const_iterator it = _members.find(client->getFd());
-	if (it == _members.end())
-		return false; // If the client is not found in the members map, return false
-	else if (_operators.find(client->getFd()) != _operators.end())
-		return true; // If the client is found in the operators set, return true)
-	else
-		return false; // If the client is not found in the operators set, return false
+    if (!client)
+        return false;
+
+    std::map<int, Client *>::const_iterator it = _members.find(client->getFd());
+    if (it == _members.end())
+        return false; // Not a member
+
+    return _operators.find(client) != _operators.end(); // Correct type
 }
+
 
 void Channel::makeOperator(Client *client)
 {
 	if (client && _members.find(client->getFd()) != _members.end())
-		_operators.insert(client->getFd());
+		_operators.insert(client); //   correct: insert Client*
 }
 
 void Channel::sendToChannelAll(const std::string &message, Server &server)
@@ -315,10 +322,10 @@ bool Channel::hasKey() const
 	return !_key.empty(); // Return true if the key is not empty, false otherwise
 }
 
-// Function to check if the channel has a user limit set
 bool Channel::hasUserLimit() const
 {
-	return _modes.at('l'); // Return true if the 'l' mode is enabled, false otherwise
+    std::map<char, bool>::const_iterator it = _modes.find('l');
+    return it != _modes.end() && it->second;
 }
 
 //----------------------- COMMANDS HANDLERS -----------------------//

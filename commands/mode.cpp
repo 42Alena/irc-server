@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/18 00:55:53 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 15:39:19 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 */
 void handleMode(Server &server, Client &client, const std::vector<std::string> &params)
 {
-
     if (params.empty())
     {
         server.sendToClient(
@@ -32,10 +31,9 @@ void handleMode(Server &server, Client &client, const std::vector<std::string> &
         return;
     }
 
-    std::string channelName = params[0]; // Get the channel name from the parameters
+    const std::string &channelName = params[0];
 
-    // check channel name
-    if (!server.isChannelName(channelName)) // Check for valid prefix, no spaces, length, etc.
+    if (!server.isChannelName(channelName))
     {
         server.sendToClient(
             client.getFd(),
@@ -43,13 +41,12 @@ void handleMode(Server &server, Client &client, const std::vector<std::string> &
         return;
     }
 
-    Channel *channel = server.getChannel(channelName); // Get the channel by name from the server
-
+    Channel *channel = server.getChannel(channelName);
     if (!channel)
     {
         server.sendToClient(
             client.getFd(),
-            replyErr403NoSuchChannel(server.getServerName(), channelName)); // If the channel does not exist, return with an error message
+            replyErr403NoSuchChannel(server.getServerName(), channelName));
         return;
     }
 
@@ -61,20 +58,26 @@ void handleMode(Server &server, Client &client, const std::vector<std::string> &
         return;
     }
 
-    // Handle mode query: MODE #chan => means "show modes"
+    // MODE #chan (no change, just show current modes)
     if (params.size() == 1)
     {
-        std::string currentModes = channel->getModes(); // example: "+it"
+        std::string currentModes = channel->getModes();
         server.sendToClient(
             client.getFd(),
             replyRpl324ChannelMode(server.getServerName(), client.getNickname(), channelName, currentModes));
         return;
     }
 
+    const std::string &modeString = params[1];
+    if (modeString.empty() || (modeString[0] != '+' && modeString[0] != '-'))
+    {
+        server.sendToClient(
+            client.getFd(),
+            replyErr472UnknownMode(server.getServerName(), client.getNickname(), modeString));
+        return;
+    }
 
-    std::string modeString = params[1]; // e.g. "+i", "-t"
-
-    if ((modeString[0] == '+' || modeString[0] == '-') && !channel->isOperator(&client))
+    if (!channel->isOperator(&client))
     {
         server.sendToClient(
             client.getFd(),
@@ -82,13 +85,117 @@ void handleMode(Server &server, Client &client, const std::vector<std::string> &
         return;
     }
 
-    char modeChar = modeString[1];
     bool enable = (modeString[0] == '+');
+    size_t argIndex = 2;
+    std::string appliedModes;
+    std::vector<std::string> modeArgs;
 
-    channel->setMode(modeChar, enable); // Use the setter to change the mode
+    for (size_t i = 1; i < modeString.size(); ++i)
+    {
+        char modeChar = modeString[i];
 
-    std::string msg = ":" + client.getPrefix() + " MODE " + channelName + " " + modeString;
-    channel->sendToChannelAll(msg, server); // Notify all members
+        if (std::string("itkol").find(modeChar) == std::string::npos)
+        {
+            server.sendToClient(
+                client.getFd(),
+                replyErr472UnknownMode(server.getServerName(), client.getNickname(), std::string(1, modeChar)));
+            continue;
+        }
 
-    logChannelInfo("Mode '" + modeString + "' applied on " + channelName + " by " + client.getNickname());
+        switch (modeChar)
+        {
+            case 'i':
+            case 't':
+                channel->setMode(modeChar, enable);
+                break;
+
+            case 'k':
+                if (enable)
+                {
+                    if (argIndex >= params.size())
+                    {
+                        server.sendToClient(
+                            client.getFd(),
+                            replyErr461NeedMoreParams(server.getServerName(), "MODE"));
+                        continue;
+                    }
+                    channel->setKey(params[argIndex]);
+                    channel->setMode('k', true);
+                    modeArgs.push_back(params[argIndex]);
+                    ++argIndex;
+                }
+                else
+                {
+                    channel->setKey("");
+                    channel->setMode('k', false);
+                }
+                break;
+
+            case 'l':
+                if (enable)
+                {
+                    if (argIndex >= params.size())
+                    {
+                        server.sendToClient(
+                            client.getFd(),
+                            replyErr461NeedMoreParams(server.getServerName(), "MODE"));
+                        continue;
+                    }
+                    int limit = std::atoi(params[argIndex].c_str());
+                    channel->setUserLimit(limit);
+                    channel->setMode('l', true);
+                    modeArgs.push_back(params[argIndex]);
+                    ++argIndex;
+                }
+                else
+                {
+                    channel->setUserLimit(-1);
+                    channel->setMode('l', false);
+                }
+                break;
+
+            case 'o':
+                if (argIndex >= params.size())
+                {
+                    server.sendToClient(
+                        client.getFd(),
+                        replyErr461NeedMoreParams(server.getServerName(), "MODE"));
+                    continue;
+                }
+                {
+                    Client *target = server.getClientByNickname(params[argIndex]);
+                    if (!target || !channel->hasMembers(target))
+                    {
+                        server.sendToClient(
+                            client.getFd(),
+                            replyErr441UserNotInChannel(server.getServerName(), params[argIndex], channelName));
+                        ++argIndex;
+                        continue;
+                    }
+
+                    if (enable)
+                        channel->addOperator(target);
+                    else
+                        channel->removeOperator(target);
+
+                    modeArgs.push_back(params[argIndex]);
+                    ++argIndex;
+                }
+                break;
+        }
+
+        if (appliedModes.empty())
+            appliedModes += (enable ? "+" : "-");
+        appliedModes += modeChar;
+    }
+
+    if (!appliedModes.empty())
+    {
+        std::string msg = ":" + client.getPrefix() + " MODE " + channelName + " " + appliedModes;
+        for (size_t i = 0; i < modeArgs.size(); ++i)
+            msg += " " + modeArgs[i];
+        channel->sendToChannelAll(msg, server);
+
+        logChannelInfo("Mode '" + appliedModes + "' applied on " + channelName + " by " + client.getNickname());
+    }
 }

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 10:12:36 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 01:38:51 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 15:24:48 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,6 +222,9 @@ std::string replyErr464PasswordMismatch(const std::string &server);
 */
 std::string replyErr471ChannelIsFull(const std::string &server, const std::string &nick, const std::string &channel);
 
+std::string replyErr472UnknownMode(const std::string &serverName,
+                                   const std::string &nickname,
+                                   const std::string &modeChar);
 
 /* 473 ERR_INVITEONLYCHAN
    "<channel> :Cannot join channel (+i)"
