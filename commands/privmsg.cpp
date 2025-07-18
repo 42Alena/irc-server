@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 11:32:23 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 11:57:32 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,13 +79,13 @@ void handlePrivateMessage(Server &server, Client &client, const std::vector<std:
                 server.sendToClient(client.getFd(), replyErr451NotRegistered(server.getServerName(), "PRIVMSG"));
                 return;
         }
-        
-        if (params.empty()) 
+
+        if (params.empty())
         {
                 server.sendToClient(client.getFd(), replyErr411NoRecipient(server.getServerName(), "PRIVMSG"));
                 return;
         }
-        
+
         if (params.size() == 1) // recipient is present, but no message
         {
                 server.sendToClient(client.getFd(), replyErr412NoTextToSend(server.getServerName()));
@@ -95,7 +95,6 @@ void handlePrivateMessage(Server &server, Client &client, const std::vector<std:
         const std::string receiver = params[0];
         bool isChannel = server.isChannelName(receiver);
 
-        
         if (isChannel)
         {
                 if (!client.isInChannel(receiver))
@@ -113,42 +112,45 @@ void handlePrivateMessage(Server &server, Client &client, const std::vector<std:
                 }
         }
 
-	// Build the full message body from all tokens after receiver
-	std::string message;
-	bool foundMessage = false;
+        // Build the full message body from all tokens after receiver
+        std::string message;
+        bool foundMessage = false;
 
-	for (size_t i = 1; i < params.size(); ++i)
-	{
-		if (!foundMessage && !params[i].empty() && params[i][0] == ':')
-		{
-			message += params[i].substr(1);
-			foundMessage = true;
-		}
-		else if (foundMessage)
-		{
-			message += " " + params[i];
-		}
-	}
+        for (size_t i = 1; i < params.size(); ++i)
+        {
+                if (!foundMessage && !params[i].empty() && params[i][0] == ':')
+                {
+                        message += params[i].substr(1);
+                        foundMessage = true;
+                }
+                else if (foundMessage)
+                {
+                        message += " " + params[i];
+                }
+        }
 
-	if (!foundMessage || message.empty())
-	{
-		server.sendToClient(client.getFd(), replyErr412NoTextToSend(server.getServerName()));
-		return;
-	}
+        if (!foundMessage || message.empty())
+        {
+                server.sendToClient(client.getFd(), replyErr412NoTextToSend(server.getServerName()));
+                return;
+        }
+        
+        if (!message.empty() && message[0] == ':')
+                message = message.substr(1);
+                
+        // Format and send the message
+        std::string formattedMsg = ":" + client.getPrefix() + " PRIVMSG " + receiver + " :" + message + "\r\n";
 
-	// Format and send the message
-	std::string formattedMsg = ":" + client.getPrefix() + " PRIVMSG " + receiver + " :" + message + "\r\n";
-
-	if (isChannel)
-	{
-		Channel *channel = server.getChannel(receiver);
-		if (channel)
-			channel->sendToChannelExcept(formattedMsg, client, server);
-	}
-	else
-	{
-		Client *targetClient = server.getClientByNickname(receiver);
-		if (targetClient)
-			server.sendToClient(targetClient->getFd(), formattedMsg);
-	}
+        if (isChannel)
+        {
+                Channel *channel = server.getChannel(receiver);
+                if (channel)
+                        channel->sendToChannelExcept(formattedMsg, client, server);
+        }
+        else
+        {
+                Client *targetClient = server.getClientByNickname(receiver);
+                if (targetClient)
+                        server.sendToClient(targetClient->getFd(), formattedMsg);
+        }
 }
