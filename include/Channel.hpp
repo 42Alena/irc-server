@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 08:42:41 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 13:32:40 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ private:
 	Channel(const Channel &other);			  // Copy constructor
 	Channel &operator=(const Channel &other); // Assignment operator
 
-	// Alena: moved logs to utils.cpp
+	
 
 public:
 	// Adding the Channel constructors and destructor
@@ -57,6 +57,8 @@ public:
 
 	bool hasMembers(Client *client) const;
 	bool isOperator(Client *client) const;
+	void makeOperator(Client *client);
+
 
 	void sendToChannelAll(const std::string &message, Server &server);
 	void sendToChannelExcept(const std::string &message, const Client &clientExcluded, Server &server) const;

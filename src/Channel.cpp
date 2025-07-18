@@ -6,16 +6,13 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 08:43:20 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 13:32:33 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Client.hpp"
 #include "../include/Channel.hpp"
 #include "../include/colors.hpp"
-
-
-
 
 //======================== CONSTRUCTORS ===========================//
 // Default constructor
@@ -51,7 +48,7 @@ Channel::Channel(const std::string &name, Client &createdBy) : _name(name), _use
 	addUser(createdBy.getFd(), &createdBy); // Add the creator to the channel members
 }
 
-//Alena: copy and operator= must be disabled in irc project
+// Alena: copy and operator= must be disabled in irc project
 /*
 	Copy constructor
 	Copying and assignment are disabled for this class.
@@ -63,7 +60,7 @@ Channel::Channel(const Channel &other)
 	(void)other;
 }
 
-//Alena: copy and operator= must be disabled in irc project
+// Alena: copy and operator= must be disabled in irc project
 /*
 	Assigments operator.
 	Copying and assignment are disabled for this class.
@@ -81,7 +78,7 @@ Channel::~Channel()
 {
 	// No dynamic memory allocation, so nothing to clean up
 	// The vectors and maps will be automatically cleaned up by the destructor
-	logChannelInfo("Channel destructor called for: " + _name);	
+	logChannelInfo("Channel destructor called for: " + _name);
 }
 
 //======================== SETTERS ===================================//
@@ -110,27 +107,26 @@ void Channel::setLimit(int limit)
 
 std::string Channel::getNickList() const
 {
-    std::string list;
+	std::string list;
 
-    for (std::map<int, Client*>::const_iterator it = _members.begin(); it != _members.end(); ++it)
-    {
-        int fd = it->first;
-        Client* client = it->second;
+	for (std::map<int, Client *>::const_iterator it = _members.begin(); it != _members.end(); ++it)
+	{
+		int fd = it->first;
+		Client *client = it->second;
 
-        if (_operators.find(fd) != _operators.end())
-            list += "@" + client->getNickname();
-        else
-            list += client->getNickname();
+		if (_operators.find(fd) != _operators.end())
+			list += "@" + client->getNickname();
+		else
+			list += client->getNickname();
 
-        list += " ";
-    }
+		list += " ";
+	}
 
-    if (!list.empty())
-        list.erase(list.end() - 1); // Remove trailing space
+	if (!list.empty())
+		list.erase(list.end() - 1); // Remove trailing space
 
-    return list;
+	return list;
 }
-
 
 // get the limit of users in the channel
 int Channel::getLimit() const
@@ -193,23 +189,22 @@ std::string Channel::getModes() const
 	return modes;
 }
 
+
+
 //======================== MEMBER FUNCTIONS ===========================//
 
 // Function to add a clients to the _members vector inside the channel
 void Channel::addUser(int fd, Client *client)
 {
 	_members[fd] = client; // Add the client to the _members map using their file descriptor (fd) as the key
-	logChannelInfo("Client added to channel: "  +  client->getNickname());
-
+	logChannelInfo("Client added to channel: " + client->getNickname());
 }
-
 
 // Function to add a client to the _operators vector inside the channel
 void Channel::addOperator(int fd)
 {
 	_operators.insert(fd); // Add the client's file descriptor (fd) to the _operators set
 	logChannelInfo("Client with fd " + intToString(fd) + " was granted operator status");
-
 }
 
 /*
@@ -219,9 +214,9 @@ This function checks if the user is an operator before removing them
  */
 void Channel::removeUser(int fd, Client *client)
 {
-	
+
 	std::map<int, Client *>::iterator it = _members.find(fd);
-	
+
 	if (it != _members.end() && it->second == client)
 	{
 		_members.erase(it); // Erase the client from the _members map if found
@@ -233,7 +228,7 @@ void Channel::removeUser(int fd, Client *client)
 	}
 	else
 	{
-		logChannelInfo("Client not found in this channel:"  + client->getNickname());
+		logChannelInfo("Client not found in this channel:" + client->getNickname());
 	}
 }
 
@@ -263,6 +258,12 @@ bool Channel::isOperator(Client *client) const
 		return false; // If the client is not found in the operators set, return false
 }
 
+void Channel::makeOperator(Client *client)
+{
+	if (client && _members.find(client->getFd()) != _members.end())
+		_operators.insert(client->getFd());
+}
+
 void Channel::sendToChannelAll(const std::string &message, Server &server)
 {
 	std::map<int, Client *>::iterator it;
@@ -284,7 +285,6 @@ void Channel::sendToChannelExcept(const std::string &message, const Client &clie
 	}
 }
 
-
 // Function to check if the user's file descriptor (fd) is in the _invited set
 bool Channel::isInvited(int fd) const
 {
@@ -302,7 +302,6 @@ void Channel::removeInvited(int fd)
 	_invited.erase(fd);
 	logChannelInfo("Removed invitation for fd " + intToString(fd) + " in channel: " + _name);
 }
-
 
 // Function to check if the topic is locked for changes
 bool Channel::isTopicLocked() const
@@ -327,5 +326,5 @@ bool Channel::hasUserLimit() const
 void Channel::inviteUser(int fd)
 {
 	_invited.insert(fd); // Add the user's file descriptor (fd) to the _invited set
-	logChannelInfo("User with fd " + intToString(fd) + " invited to channel: " +  _name );
+	logChannelInfo("User with fd " + intToString(fd) + " invited to channel: " + _name);
 }
