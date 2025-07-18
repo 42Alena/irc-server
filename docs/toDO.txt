@@ -21,6 +21,12 @@ Set tracking branch	git branch --set-upstream-to=origin/main
 
 18.07
 
+BRANCH: fix/handle-quit-inform-all-in-channel
+	[x] bag: user B quit : bye! (quit with message, but in channel nobody receive message bye!)
+	[x] bag: sever send logError and not logInfo
+	[x] if (*it)
+
+
 BRANCH: fix/channel-remove-user
 	return after log-> prevent delete user
 
