@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 11:17:52 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 08:09:39 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 08:43:45 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,11 @@ void handleQuit(Server &server, Client &client, const std::vector<std::string> &
 		if (*it)
 		{
 			
-			(*it)->sendToChannelExcept(quitMsg, client);
+			(*it)->sendToChannelExcept(quitMsg, client, server);
 		}
 	}
 	
+	server.sendToClient(client.getFd(), quitMsg); // send back to quitting client
 	// remove the client from all those channels:
 	server.removeClientFromAllChannels(&client);
 	

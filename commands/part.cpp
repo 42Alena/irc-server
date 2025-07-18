@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/17 18:30:40 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 08:44:39 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void handlePart(Server &server, Client &client, const std::vector<std::string> &
 
     std::string partMsg = ":" + client.getPrefix() + " PART " + channelName;
 
-    channel->sendToChannelExcept(partMsg, client);
+    channel->sendToChannelExcept(partMsg, client,server);
     server.sendToClient(client.getFd(), partMsg);
 
     channel->removeUser(client.getFd(), &client);

@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/18 05:55:24 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 08:44:30 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ void handleJoin(Server &server, Client &client, const std::vector<std::string> &
     // Send JOIN message to others
     channel->sendToChannelExcept(
         ":" + client.getPrefix() + " JOIN " + channelName,
-        client);
+        client, server);
 
     // Echo JOIN to the joining client
     server.sendToClient(

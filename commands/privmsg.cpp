@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 10:36:16 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/14 21:22:30 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 08:47:53 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,7 @@ void handlePrivateMessage(Server &server, Client &client, const std::vector<std:
         {
                 Channel *channel = server.getChannel(receiver);
                 if (channel)
-                        channel->sendToChannelExcept(messageFormated, client); // or *client if pointer
+                        channel->sendToChannelExcept(messageFormated, client, server); // or *client if pointer
         }
 
         else

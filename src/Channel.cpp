@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 08:27:28 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 08:43:20 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -272,23 +272,18 @@ void Channel::sendToChannelAll(const std::string &message, Server &server)
 	}
 }
 
-void Channel::sendToChannelExcept(const std::string &message, const Client &clientExcluded) const
+void Channel::sendToChannelExcept(const std::string &message, const Client &clientExcluded, Server &server) const
 {
-	// Iterate through the _members map
 	for (std::map<int, Client *>::const_iterator it = _members.begin(); it != _members.end(); ++it)
 	{
-		int fd = it->first;			 // Get the file descriptor
-		Client *client = it->second; // Get the client pointer
-
-		// Skip the sender (excludeFd)
+		int fd = it->first;
 		if (fd == clientExcluded.getFd())
-		{
 			continue;
-		}
-		// Send the message to the client
-		client->appendToReceivedData(message);
+
+		server.sendToClient(fd, message); // actually sends to socket
 	}
 }
+
 
 // Function to check if the user's file descriptor (fd) is in the _invited set
 bool Channel::isInvited(int fd) const
