@@ -19,7 +19,15 @@ TODO SERVER/ CLIENT/ CHANNEL /ELSE:
 Pull remote main once	git pull origin main
 Set tracking branch	git branch --set-upstream-to=origin/main
 
+TODO: 20 mistakes ctrl+c server when  channel is opened
+
 18.07
+
+BRANCH: 'fix/channel-operator-quit-part'
+	channel:
+		add void makeOperator(Client *client);
+
+
 BRANCH: * test/channel-invite
 	- fix send priv mesage
 	- fix with sending msg bye msg by quit
