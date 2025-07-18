@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 05:56:53 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 06:06:41 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,6 +222,7 @@ void Channel::removeUser(int fd, Client *client)
 	if (isOperator(client))
 	{
 		logChannelError("Error: Cannot remove operator from channel.");
+		return;	// return for not execution rest ant prevent delete user
 	}
 	std::map<int, Client *>::iterator it = _members.find(fd);
 	if (it != _members.end() && it->second == client)

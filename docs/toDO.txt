@@ -21,6 +21,9 @@ Set tracking branch	git branch --set-upstream-to=origin/main
 
 18.07
 
+BRANCH: fix/channel-remove-user
+	return after log-> prevent delete user
+
 BRANCH: fix/handle-join
 	add;
 		removeInvited(int fd)
