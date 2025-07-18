@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:47 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 06:06:41 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 08:43:20 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,20 +219,21 @@ This function checks if the user is an operator before removing them
  */
 void Channel::removeUser(int fd, Client *client)
 {
-	if (isOperator(client))
-	{
-		logChannelError("Error: Cannot remove operator from channel.");
-		return;	// return for not execution rest ant prevent delete user
-	}
+	
 	std::map<int, Client *>::iterator it = _members.find(fd);
+	
 	if (it != _members.end() && it->second == client)
 	{
 		_members.erase(it); // Erase the client from the _members map if found
-		logChannelError("Client removed from channel: " + client->getNickname());
+
+		_operators.erase(fd);
+		_invited.erase(fd);
+
+		logChannelInfo("[QUIT] Client left channel: " + client->getNickname());
 	}
 	else
 	{
-		logChannelInfo("Client not found in this channel, are you sure is here?");
+		logChannelInfo("Client not found in this channel:"  + client->getNickname());
 	}
 }
 
@@ -271,23 +272,18 @@ void Channel::sendToChannelAll(const std::string &message, Server &server)
 	}
 }
 
-void Channel::sendToChannelExcept(const std::string &message, const Client &clientExcluded) const
+void Channel::sendToChannelExcept(const std::string &message, const Client &clientExcluded, Server &server) const
 {
-	// Iterate through the _members map
 	for (std::map<int, Client *>::const_iterator it = _members.begin(); it != _members.end(); ++it)
 	{
-		int fd = it->first;			 // Get the file descriptor
-		Client *client = it->second; // Get the client pointer
-
-		// Skip the sender (excludeFd)
+		int fd = it->first;
 		if (fd == clientExcluded.getFd())
-		{
 			continue;
-		}
-		// Send the message to the client
-		client->appendToReceivedData(message);
+
+		server.sendToClient(fd, message); // actually sends to socket
 	}
 }
+
 
 // Function to check if the user's file descriptor (fd) is in the _invited set
 bool Channel::isInvited(int fd) const

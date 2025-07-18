@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:42:32 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 05:56:13 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 08:42:41 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,8 @@ public:
 	bool isOperator(Client *client) const;
 
 	void sendToChannelAll(const std::string &message, Server &server);
-	void sendToChannelExcept(const std::string &message, const Client &clientExcluded) const;
+	void sendToChannelExcept(const std::string &message, const Client &clientExcluded, Server &server) const;
+
 
 	void inviteUser(int fd);	  // Add user to invited list -> done
 	bool isInvited(int fd) const; // Check if user is invited -> done

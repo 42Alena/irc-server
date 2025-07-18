@@ -21,6 +21,22 @@ Set tracking branch	git branch --set-upstream-to=origin/main
 
 18.07
 
+BRANCH test/channel
+	in removeUser():
+		- changed loInfo from Error for user quit from channel
+		- add remove from _operators
+		- add remove from _invited
+	changed function(A was not receivin quit bye from B)
+	void sendToChannelExcept(const std::string &message, const Client &clientExcluded, Server &server) const;
+
+	[] a invites B, B received invitation with cursor on same line (musr \r\n)
+		=> updated sendToClient() to add "/r/n" for each message
+		=>deleted /r/n/ from all numeric replies (while added to sendToClient centralized") 
+
+	[] 10 ERROR WHILE TESTIN QUIT WITH MESSAGE. BUT only one time (strange)
+		==1116195== ERROR SUMMARY: 10 errors from 10 contexts (suppressed: 0 from 0)
+
+
 BRANCH: fix/handle-quit-inform-all-in-channel
 	[x] bag: user B quit : bye! (quit with message, but in channel nobody receive message bye!)
 	[x] bag: sever send logError and not logInfo

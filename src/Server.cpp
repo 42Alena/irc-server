@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 17:31:25 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/18 01:45:06 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 09:00:09 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -443,9 +443,15 @@ void Server::handleClientInput(size_t pollFdIndex)
 	   https://man7.org/linux/man-pages/man2/send.2.html
 		data()- return a const char * (pointer to the beginning of the message)
 	   */
+
 void Server::sendToClient(int fd, const std::string &message)
 {
-	int sendMsgResult = send(fd, message.data(), message.size(), 0);
+	std::string fullMessage = message;
+
+	if (fullMessage.size() < 2 || fullMessage.substr(fullMessage.size() - 2) != "\r\n")
+		fullMessage += "\r\n"; // append \r\n only if missing
+
+	int sendMsgResult = send(fd, fullMessage.data(), fullMessage.size(), 0);
 	checkResult(sendMsgResult, "Failed to send a message on socket");
 }
 
