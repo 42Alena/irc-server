@@ -1,3 +1,134 @@
+18.07
+/*
+======================== FULL MANUAL TEST PLAN (3 TERMINALS) ========================
+
+./ircserv <port> <password>
+
+    port: The port number on which your IRC server will be listening
+    password: The connection password. It will be needed by any IRC client that tries to connect to your server
+
+127.0.0.1 is the local loopback IP =   “this same computer”
+
+____________________
+do:
+- Server running: ./ircserv  6667 password
+  test memory leaks: 
+        valgrind --leak-check=full ./ircserv 6667 pass
+- All clients use: nc -C 127.0.0.1 6667
+
+------------------------------------------------------------------------------------
+🖥️ Terminal A — Client "A"
+------------------------------------------------------------------------------------
+PASS password
+NICK A
+USER A 0 * :A K
+
+JOIN #test
+=> Expect: JOIN, 353 (names), 366 (end of names)
+=> Server log: channel created, operator granted
+
+MODE #test +i           // Make invite-only
+MODE #test +k secret    // Add key
+MODE #test +l 2         // Limit to 2 users
+
+INVITE bob #test
+=> Expect: 341 (RPL_INVITING)
+=> Log: invitation added
+
+------------------------------------------------------------------------------------
+🖥️ Terminal B — Client "B"
+------------------------------------------------------------------------------------
+PASS password
+NICK B
+USER B 0 * : B 
+
+JOIN #test
+=> Expect: JOIN, 353, 366
+=> JOIN allowed (was invited)
+=> Invitation auto-removed
+=> Log: B added
+
+PRIVMSG A :hello
+=> A receives message
+
+PRIVMSG #test :hi everyone
+=> Sent to A
+
+PART #test
+=> Expect PART on A
+=> Log: B removed
+
+------------------------------------------------------------------------------------
+🖥️ Terminal C — Client "charlie"
+------------------------------------------------------------------------------------
+PASS password
+NICK charlie
+USER charlie 0 * :Charlie
+
+JOIN #test
+=> Expect: 473 ERR_INVITEONLYCHAN
+
+INVITE charlie #wrongchan
+=> Expect: 403 ERR_NOSUCHCHANNEL
+
+------------------------------------------------------------------------------------
+🧪 Additional Checks
+------------------------------------------------------------------------------------
+JOIN ch
+=> Expect: 476 ERR_BADCHANMASK
+
+JOIN
+=> Expect: 461 ERR_NEEDMOREPARAMS
+
+INVITE notconnected #test
+=> Expect: 401 ERR_NOSUCHNICK
+
+JOIN #test wrongkey
+=> Expect: 475 ERR_BADCHANNELKEY
+
+JOIN #test secret
+=> Expect: 471 ERR_CHANNELISFULL (if 2 members already in)
+
+PART #notexist
+=> Expect: 403 ERR_NOSUCHCHANNEL
+
+PRIVMSG nouser :hi
+=> Expect: 401 ERR_NOSUCHNICK
+
+------------------------------------------------------------------------------------
+🔁 Signal / Cleanup Test
+------------------------------------------------------------------------------------
+Press Ctrl+C in server terminal
+=> Expect: clean shutdown message
+=> All clients disconnected gracefully
+=> No crash or memory leak (check with valgrind)
+
+------------------------------------------------------------------------------------
+✅ Expected Server Logging (examples)
+------------------------------------------------------------------------------------
+Created channel #test by user A
+Client with fd 4 was granted operator status
+User B joined channel: #test
+User charlie attempted to join invite-only channel
+Client removed from channel: B
+Invitation removed for fd 5 in channel: #test
+Client disconnected (Ctrl+C or QUIT)
+
+------------------------------------------------------------------------------------
+💡 Use this plan for final manual testing before push or defense
+- Covers all valid/invalid commands
+- Confirms all reply codes
+- Checks cleanup, join/part, invite-only, channel limits, keys
+- Validates signals, operator rules, and message routing
+
+====================================================================================
+*/
+
+
+
+
+
+
 test memory leaks: 
         valgrind --leak-check=full ./ircserv 6667 pass
         2.terminal:

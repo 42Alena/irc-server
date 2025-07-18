@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 11:17:52 by akurmyza          #+#    #+#             */
-/*   Updated: 2025/07/14 17:11:36 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 08:09:39 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,23 +31,31 @@ https://www.rfc-editor.org/rfc/rfc2812.html#page-14
 */
 void handleQuit(Server &server, Client &client, const std::vector<std::string> &params)
 {
-	std::string message;
-	if (params.size() == 0)
-	{
-		message = "Client Quit";
-	}
-	else
-	{
-		message = params[0];
-	}
-	std::string quitMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + client.getHost() + " QUIT :" + message + "\r\n";
+	std::string message = (params.empty()) ? "Client Quit" : params[0];
+
+	// build correct QUIT message format for IRC
+	std::string quitMsg = ":" + client.getPrefix() + " QUIT :" + message + "\r\n";
 	
+	// get all channels the client is in
 	std::vector<Channel *> channels = client.getChannels();
+	
+
+	
+	
 	// notify others in each channel
 	for (std::vector<Channel *>::iterator it = channels.begin(); it != channels.end(); ++it)
 	{
-		(*it)->sendToChannelExcept(quitMsg, client);
+		if (*it)
+		{
+			
+			(*it)->sendToChannelExcept(quitMsg, client);
+		}
 	}
 	
+	// remove the client from all those channels:
 	server.removeClientFromAllChannels(&client);
+	
+	logServerInfo("[QUIT] " + client.getNickname() + " has quit: " + message);
+
 }
+
