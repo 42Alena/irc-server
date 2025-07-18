@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/18 15:39:19 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 16:48:37 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,15 @@ void handleMode(Server &server, Client &client, const std::vector<std::string> &
         return;
     }
 
+    // If only '+' or '-' and no mode chars follow
+    if (modeString.size() == 1)
+    {
+        server.sendToClient(
+            client.getFd(),
+            replyErr472UnknownMode(server.getServerName(), client.getNickname(), modeString));
+        return;
+    }
+
     if (!channel->isOperator(&client))
     {
         server.sendToClient(
@@ -104,57 +113,14 @@ void handleMode(Server &server, Client &client, const std::vector<std::string> &
 
         switch (modeChar)
         {
-            case 'i':
-            case 't':
-                channel->setMode(modeChar, enable);
-                break;
+        case 'i':
+        case 't':
+            channel->setMode(modeChar, enable);
+            break;
 
-            case 'k':
-                if (enable)
-                {
-                    if (argIndex >= params.size())
-                    {
-                        server.sendToClient(
-                            client.getFd(),
-                            replyErr461NeedMoreParams(server.getServerName(), "MODE"));
-                        continue;
-                    }
-                    channel->setKey(params[argIndex]);
-                    channel->setMode('k', true);
-                    modeArgs.push_back(params[argIndex]);
-                    ++argIndex;
-                }
-                else
-                {
-                    channel->setKey("");
-                    channel->setMode('k', false);
-                }
-                break;
-
-            case 'l':
-                if (enable)
-                {
-                    if (argIndex >= params.size())
-                    {
-                        server.sendToClient(
-                            client.getFd(),
-                            replyErr461NeedMoreParams(server.getServerName(), "MODE"));
-                        continue;
-                    }
-                    int limit = std::atoi(params[argIndex].c_str());
-                    channel->setUserLimit(limit);
-                    channel->setMode('l', true);
-                    modeArgs.push_back(params[argIndex]);
-                    ++argIndex;
-                }
-                else
-                {
-                    channel->setUserLimit(-1);
-                    channel->setMode('l', false);
-                }
-                break;
-
-            case 'o':
+        case 'k':
+            if (enable)
+            {
                 if (argIndex >= params.size())
                 {
                     server.sendToClient(
@@ -162,26 +128,69 @@ void handleMode(Server &server, Client &client, const std::vector<std::string> &
                         replyErr461NeedMoreParams(server.getServerName(), "MODE"));
                     continue;
                 }
+                channel->setKey(params[argIndex]);
+                channel->setMode('k', true);
+                modeArgs.push_back(params[argIndex]);
+                ++argIndex;
+            }
+            else
+            {
+                channel->setKey("");
+                channel->setMode('k', false);
+            }
+            break;
+
+        case 'l':
+            if (enable)
+            {
+                if (argIndex >= params.size())
                 {
-                    Client *target = server.getClientByNickname(params[argIndex]);
-                    if (!target || !channel->hasMembers(target))
-                    {
-                        server.sendToClient(
-                            client.getFd(),
-                            replyErr441UserNotInChannel(server.getServerName(), params[argIndex], channelName));
-                        ++argIndex;
-                        continue;
-                    }
-
-                    if (enable)
-                        channel->addOperator(target);
-                    else
-                        channel->removeOperator(target);
-
-                    modeArgs.push_back(params[argIndex]);
-                    ++argIndex;
+                    server.sendToClient(
+                        client.getFd(),
+                        replyErr461NeedMoreParams(server.getServerName(), "MODE"));
+                    continue;
                 }
-                break;
+                int limit = std::atoi(params[argIndex].c_str());
+                channel->setUserLimit(limit);
+                channel->setMode('l', true);
+                modeArgs.push_back(params[argIndex]);
+                ++argIndex;
+            }
+            else
+            {
+                channel->setUserLimit(-1);
+                channel->setMode('l', false);
+            }
+            break;
+
+        case 'o':
+            if (argIndex >= params.size())
+            {
+                server.sendToClient(
+                    client.getFd(),
+                    replyErr461NeedMoreParams(server.getServerName(), "MODE"));
+                continue;
+            }
+            {
+                Client *target = server.getClientByNickname(params[argIndex]);
+                if (!target || !channel->hasMembers(target))
+                {
+                    server.sendToClient(
+                        client.getFd(),
+                        replyErr441UserNotInChannel(server.getServerName(), params[argIndex], channelName));
+                    ++argIndex;
+                    continue;
+                }
+
+                if (enable)
+                    channel->addOperator(target);
+                else
+                    channel->removeOperator(target);
+
+                modeArgs.push_back(params[argIndex]);
+                ++argIndex;
+            }
+            break;
         }
 
         if (appliedModes.empty())
