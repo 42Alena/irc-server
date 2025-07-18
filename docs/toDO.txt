@@ -23,6 +23,7 @@ Set tracking branch	git branch --set-upstream-to=origin/main
 BRANCH: * test/channel-invite
 	- fix send priv mesage
 	- fix with sending msg bye msg by quit
+	- fix :: in invite msg"
 
 BRANCH test/channel
 	in removeUser():

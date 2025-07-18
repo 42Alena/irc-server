@@ -6,7 +6,7 @@
 /*   By: akurmyza <akurmyza@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/10 15:56:02 by lperez-h          #+#    #+#             */
-/*   Updated: 2025/07/18 01:49:21 by akurmyza         ###   ########.fr       */
+/*   Updated: 2025/07/18 11:48:48 by akurmyza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,15 @@ void handleInvite(Server &server, Client &client, const std::vector<std::string>
         return;
     }
 
-    std::string targetNick = params[0];        //  <nickname> first
-    std::string channelName = params[1];       // <channel> is second
-    
-  
+    std::string targetNick = params[0];  //  <nickname> first
+    std::string channelName = params[1]; // <channel> is second
+
+    if (!channelName.empty() && channelName[0] == ':')
+        channelName = channelName.substr(1);
 
     Channel *channel = server.getChannel(channelName); // Get the channel by name from the server
-   
-     if (!channel)
+
+    if (!channel)
     {
         server.sendToClient(
             client.getFd(),
@@ -56,15 +57,13 @@ void handleInvite(Server &server, Client &client, const std::vector<std::string>
             replyErr442NotOnChannel(server.getServerName(), channelName));
         return;
     }
-    
-
 
     Client *targetClient = server.getClientByNickname(targetNick);
     if (!targetClient)
     {
         server.sendToClient(
             client.getFd(),
-            replyErr401NoSuchNick(server.getServerName(), targetNick));  
+            replyErr401NoSuchNick(server.getServerName(), targetNick));
         return;
     }
 
@@ -75,7 +74,7 @@ void handleInvite(Server &server, Client &client, const std::vector<std::string>
             replyErr482ChanOpPrivsNeeded(server.getServerName(), channelName));
         return;
     }
-    
+
     if (channel->hasMembers(targetClient))
     {
         server.sendToClient(
@@ -84,10 +83,7 @@ void handleInvite(Server &server, Client &client, const std::vector<std::string>
         return;
     }
 
-     
-
-    
-    //Invite the client by fd
+    // Invite the client by fd
     channel->inviteUser(targetClient->getFd());
 
     // Notify invited user (not required by RFC but useful)
@@ -101,7 +97,4 @@ void handleInvite(Server &server, Client &client, const std::vector<std::string>
         replyRpl341Inviting(server.getServerName(), targetNick, channelName));
 
     logChannelInfo("[INVITE] " + targetNick + " invited to channel: " + channelName + " by " + client.getNickname());
-
 }
-
-
